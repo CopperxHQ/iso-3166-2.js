@@ -1,167 +1,168 @@
-# iso-3166-2.js
+# iso-3166
 
-[![NPM version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Download Count][downloads-image]][downloads-url]
+Complete ISO 3166-1 (countries) and ISO 3166-2 (subdivisions) lookup library with full TypeScript support.
 
-> Lookup information about ISO-3166-2 subdivisions.
+## Features
 
-## Country code format
+- **Full ISO 3166-1 support**: alpha-2, alpha-3, numeric codes, and country names
+- **Full ISO 3166-2 support**: 5000+ subdivisions (states, provinces, counties, etc.)
+- **Code conversion utilities**: Convert between alpha-2, alpha-3, and numeric formats
+- **Validation functions**: Validate any country or subdivision code
+- **True tree-shaking**: Import only the countries you need
+- **Zero dependencies**: Lightweight and self-contained
+- **Full TypeScript support**: Complete type definitions included
+- **Dual module format**: ESM and CommonJS exports
 
-The country codes in the data are in the ISO 3166-1 alpha 2 format (US,
-SE ...), but there is a conversion table that makes possible to input
-alpha 3 codes (USA, SWE ...) to the `subdivision` and `country` functions.
+## Installation
 
-https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-
-https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
-
-## Examples
-
-```js
-> iso3166.subdivision("SE-O");
-
-{ type: 'County',
-  name: 'Västra Götalands län',
-  countryName: 'Sweden',
-  countryCode: 'SE',
-  regionCode: 'O',
-  code: 'SE-O' }
+```bash
+npm install iso-3166
 ```
 
-```js
-> iso3166.subdivision("UN-1");
-null
+## Quick Start
+
+```typescript
+import { country, subdivision } from 'iso-3166';
+
+// Country lookups
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereAlpha3('SWE');
+// { name: 'Sweden', alpha2: 'SE', alpha3: 'SWE', numeric: '752' }
+
+country.whereNumeric(840);
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+// Subdivision lookups
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State', countryCode: 'US', countryName: 'United States', regionCode: 'CA' }
+
+subdivision.where('SE', 'O');
+// { code: 'SE-O', name: 'V�stra G�talands l�n', type: 'County', ... }
+
+subdivision.whereName('US', 'California');
+// { code: 'US-CA', name: 'California', ... }
 ```
 
-```js
-> iso3166.subdivision("SE", "O");
+## Usage
 
-{ type: 'County',
-  name: 'Västra Götalands län',
-  countryName: 'Sweden',
-  countryCode: 'SE',
-  regionCode: 'O',
-  code: 'SE-O' }
+### Country Functions
+
+```typescript
+import { country } from 'iso-3166';
+
+// Lookups
+country.whereAlpha2('US');           // By alpha-2 code
+country.whereAlpha3('USA');          // By alpha-3 code
+country.whereNumeric(840);           // By numeric code
+country.whereName('United States');  // By name
+country.all();                       // Get all countries
+country.withSubdivisions('US');      // Country with all subdivisions
+
+// Conversions
+country.alpha2ToAlpha3('US');        // 'USA'
+country.alpha3ToAlpha2('USA');       // 'US'
+country.alpha2ToNumeric('US');       // '840'
+country.numericToAlpha2(840);        // 'US'
+country.toName('USA');               // 'United States'
+
+// Validation
+country.isAlpha2('US');              // true
+country.isAlpha3('USA');             // true
+country.isNumeric(840);              // true
+country.isValid('US');               // true (any format)
+country.detectFormat('USA');         // 'alpha3'
 ```
 
-```js
-> iso3166.subdivision("USA", "Indiana");
+### Subdivision Functions
 
-{ type: 'state',
-  name: 'Indiana',
-  countryName: 'United States',
-  countryCode: 'US',
-  regionCode: 'IN',
-  code: 'US-IN' }
+```typescript
+import { subdivision } from 'iso-3166';
+
+// Lookups
+subdivision.whereCode('US-CA');              // By full code
+subdivision.where('US', 'CA');               // By country + region code
+subdivision.whereName('US', 'California');   // By country + name
+subdivision.forCountry('US');                // All subdivisions for a country
+subdivision.all();                           // All subdivisions
+
+// Conversions
+subdivision.toRegionCode('US-CA');           // 'CA'
+subdivision.toFullCode('US', 'CA');          // 'US-CA'
+subdivision.toName('US-CA');                 // 'California'
+subdivision.toCountryCode('US-CA');          // 'US'
+
+// Validation
+subdivision.isValidCode('US-CA');            // true
+subdivision.isValidRegion('US', 'CA');       // true
+subdivision.isValidName('US', 'California'); // true
+subdivision.hasSubdivisions('US');           // true
 ```
 
-```js
-> iso3166.country("Sweden");
-{ name: 'Sweden',
-  sub:
-   { 'SE-O': { type: 'County', name: 'Västra Götalands län' },
-     'SE-N': { type: 'County', name: 'Hallands län' },
-     'SE-M': { type: 'County', name: 'Skåne län' },
-     'SE-K': { type: 'County', name: 'Blekinge län' },
-     'SE-I': { type: 'County', name: 'Gotlands län' },
-     'SE-H': { type: 'County', name: 'Kalmar län' },
-     'SE-G': { type: 'County', name: 'Kronobergs län' },
-     'SE-F': { type: 'County', name: 'Jönköpings län' },
-     'SE-E': { type: 'County', name: 'Östergötlands län' },
-     'SE-D': { type: 'County', name: 'Södermanlands län' },
-     'SE-C': { type: 'County', name: 'Uppsala län' },
-     'SE-W': { type: 'County', name: 'Dalarnas län' },
-     'SE-Z': { type: 'County', name: 'Jämtlands län' },
-     'SE-Y': { type: 'County', name: 'Västernorrlands län' },
-     'SE-X': { type: 'County', name: 'Gävleborgs län' },
-     'SE-AC': { type: 'County', name: 'Västerbottens län' },
-     'SE-AB': { type: 'County', name: 'Stockholms län' },
-     'SE-BD': { type: 'County', name: 'Norrbottens län' },
-     'SE-T': { type: 'County', name: 'Örebro län' },
-     'SE-S': { type: 'County', name: 'Värmlands län' },
-     'SE-U': { type: 'County', name: 'Västmanlands län' } },
-  code: 'SE' }
+## Tree-Shaking
+
+This library supports true tree-shaking via subpath exports:
+
+### Full Library (~60KB gzipped)
+
+```typescript
+import { country, subdivision } from 'iso-3166';
 ```
 
-```js
-> iso3166.country("United Nations");
-null
+### Country Only (~8KB gzipped)
+
+```typescript
+import { whereAlpha2, alpha2ToAlpha3 } from 'iso-3166/country';
 ```
 
-## Functions
+### Specific Countries Only
 
-### iso3166.subdivision(code)
-Retrieves a subdivision by its full code, ex "SE-O", "US-IN". Returns
-`null` if not found.
+```typescript
+import { whereAlpha2 } from 'iso-3166/country';
+import 'iso-3166/subdivision/US';  // Only US subdivisions
+import 'iso-3166/subdivision/CA';  // Only Canada subdivisions
+import { whereCode } from 'iso-3166/subdivision';
 
-* * *
+whereCode('US-CA');  // Works
+whereCode('GB-ENG'); // Returns null (GB not imported)
+```
 
-### iso3166.subdivision(country code, subdivision code)
-Retrieves a subdivision by its country code and subdivision code, ex
-("SWE", "O"). Returns `null` if not found.
+See [Tree-Shaking Guide](./docs/TREE_SHAKING.md) for more details.
 
-* * *
+## API Reference
 
-### iso3166.subdivision(country code, subdivision name)
-Retrieves a subdivision by its country code and subdivision name, ex
-("US", "Indiana"). Returns `null` if not found.
+See [API Documentation](./docs/API.md) for complete API reference.
 
-* * *
+## Migration
 
-### iso3166.country(country code)
-Retrieves a country by its code, ex "US", "SE", "SWE". Returns `null`
-if not found.
+Migrating from `iso-3166-1` or `iso-3166-2`? See [Migration Guide](./docs/MIGRATION.md).
 
-* * *
+## Types
 
-### iso3166.country(country name)
-Retrieves a country by its name, ex "United States", "Sweden". Returns
-`null` if not found.
+```typescript
+interface Country {
+  name: string;      // "United States"
+  alpha2: string;    // "US"
+  alpha3: string;    // "USA"
+  numeric: string;   // "840"
+}
 
-* * *
-
-### iso3166.data
-
-The raw ISO 3166-2 data, the layout is:
-
-```js
-{
-  country code (alpha 2): {
-    name: country name, ex Sweden, United States ...
-    sub: {
-      subdivision code: {
-        type: subdivision type, ex county, divison ...
-        name: subdivision name, ex Västra Götaland, Indiana
-      }
-    }
-  }
+interface Subdivision {
+  code: string;        // "US-CA"
+  name: string;        // "California"
+  type: string;        // "State"
+  countryCode: string; // "US"
+  countryName: string; // "United States"
+  regionCode: string;  // "CA"
 }
 ```
 
-* * *
+## Data Sources
 
-### iso3166.codes
+- ISO 3166-1: Country codes and names
+- ISO 3166-2: Subdivision codes and names
 
-The ISO 3166-1 alpha 3 to alpha 2 conversion table, the layout is:
+## License
 
-```js
-{
-  country code (alpha 3): country code (alpha 2)
-}
-```
-
-## Contributors
-
-* Ola Holmström (@olahol)
-* Ben Ilegbodu (@benmvp)
-* David García (@davidgf)
-* lhchavez (@lhchavez)
-* Peter Pinch (@pdpinch)
-
-[npm-image]: https://img.shields.io/npm/v/iso-3166-2.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/iso-3166-2
-[downloads-image]: http://img.shields.io/npm/dm/iso-3166-2.svg?style=flat-square
-[downloads-url]: https://npmjs.org/package/iso-3166-2
-[travis-image]: https://img.shields.io/travis/olahol/iso-3166-2.js/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/olahol/iso-3166-2.js
+MIT

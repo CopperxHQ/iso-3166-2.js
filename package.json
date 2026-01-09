@@ -1,46 +1,88 @@
 {
-  "name": "iso-3166-2",
-  "description": "Lookup information about ISO-3166-2 subdivisions.",
+  "name": "iso-3166",
   "version": "1.0.0",
-  "author": "Ola Holmström <olaholmstrom+github@gmail.com>",
-  "keywords": [
-    "iso3166",
-    "iso-3166",
-    "iso-3166-2",
-    "geo"
+  "description": "Complete ISO 3166-1 (countries) and ISO 3166-2 (subdivisions) lookup library with full TypeScript support",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./country": {
+      "import": {
+        "types": "./dist/country/index.d.ts",
+        "default": "./dist/country/index.js"
+      },
+      "require": {
+        "types": "./dist/country/index.d.cts",
+        "default": "./dist/country/index.cjs"
+      }
+    },
+    "./subdivision": {
+      "import": {
+        "types": "./dist/subdivision/index.d.ts",
+        "default": "./dist/subdivision/index.js"
+      },
+      "require": {
+        "types": "./dist/subdivision/index.d.cts",
+        "default": "./dist/subdivision/index.cjs"
+      }
+    },
+    "./subdivision/*": {
+      "import": {
+        "types": "./dist/subdivision/data/*.d.ts",
+        "default": "./dist/subdivision/data/*.js"
+      },
+      "require": {
+        "types": "./dist/subdivision/data/*.d.cts",
+        "default": "./dist/subdivision/data/*.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
   ],
-  "main": "./iso3166.min.js",
+  "scripts": {
+    "generate": "tsx scripts/generate.ts",
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run generate && npm run build && npm run test",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "iso-3166",
+    "iso-3166-1",
+    "iso-3166-2",
+    "country",
+    "countries",
+    "subdivision",
+    "state",
+    "province",
+    "region",
+    "alpha-2",
+    "alpha-3",
+    "country-code"
+  ],
+  "author": "",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "http://github.com/olahol/iso-3166-2.js.git"
+    "url": "https://github.com/CopperxHQ/iso-3166-2.js.git"
   },
   "devDependencies": {
-    "browserify": "^12.0.1",
-    "matcha": "*",
-    "tape": "*",
-    "testling": "^1.7.1",
-    "uglifyjs": "^2.4.10",
-    "underscore": "^1.8.3"
-  },
-  "scripts": {
-    "test": "node ./test/index.js"
-  },
-  "testling": {
-    "files": "test/*.js",
-    "browsers": [
-      "ie/8..latest",
-      "chrome/22..latest",
-      "firefox/16..latest",
-      "safari/4..latest",
-      "opera/10.0..latest",
-      "iphone/6",
-      "ipad/6"
-    ]
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://github.com/olahol/iso-3166-2.js/raw/master/LICENSE"
-    }
-  ]
+    "tsup": "^8.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
+  }
 }
