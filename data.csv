@@ -129,6 +129,16 @@ Algeria,DZ-45,Naama,Province,DZ
 Algeria,DZ-46,Aïn Témouchent,Province,DZ
 Algeria,DZ-47,Ghardaïa,Province,DZ
 Algeria,DZ-48,Relizane,Province,DZ
+Algeria,DZ-49,Timimoun,Province,DZ
+Algeria,DZ-50,Bordj Badji Mokhtar,Province,DZ
+Algeria,DZ-51,Ouled Djellal,Province,DZ
+Algeria,DZ-52,Béni Abbès,Province,DZ
+Algeria,DZ-53,In Salah,Province,DZ
+Algeria,DZ-54,In Guezzam,Province,DZ
+Algeria,DZ-55,Touggourt,Province,DZ
+Algeria,DZ-56,Djanet,Province,DZ
+Algeria,DZ-57,El M'Ghair,Province,DZ
+Algeria,DZ-58,El Meniaa,Province,DZ
 American Samoa,AS-AS,American Samoa,Country,AS
 Andorra,AD-02,Canillo,Parish,AD
 Andorra,AD-03,Encamp,Parish,AD
@@ -403,6 +413,7 @@ Bangladesh,BD-D,Khulna,Division,BD
 Bangladesh,BD-E,Rajshahi,Division,BD
 Bangladesh,BD-F,Rangpur,Division,BD
 Bangladesh,BD-G,Sylhet,Division,BD
+Bangladesh,BD-H,Mymensingh,Division,BD
 Barbados,BB-01,Christ Church,Parish,BB
 Barbados,BB-02,Saint Andrew,Parish,BB
 Barbados,BB-03,Saint George,Parish,BB
@@ -1353,39 +1364,30 @@ France,FR-92,Hauts-de-Seine,Metropolitan department,FR
 France,FR-93,Seine-Saint-Denis,Metropolitan department,FR
 France,FR-94,Val-de-Marne,Metropolitan department,FR
 France,FR-95,Val-d'Oise,Metropolitan department,FR
-France,FR-A,Alsace,Metropolitan region,FR
-France,FR-B,Aquitaine,Metropolitan region,FR
+France,FR-ARA,Auvergne-Rhône-Alpes,Metropolitan region,FR
+France,FR-BFC,Bourgogne-Franche-Comté,Metropolitan region,FR
 France,FR-BL,Saint-Barthélemy,Overseas territorial collectivity,FR
-France,FR-C,Auvergne,Metropolitan region,FR
+France,FR-BRE,Bretagne,Metropolitan region,FR
+France,FR-COR,Corse,Metropolitan collectivity,FR
 France,FR-CP,Clipperton,Dependency,FR
-France,FR-D,Bourgogne,Metropolitan region,FR
-France,FR-E,Bretagne,Metropolitan region,FR
-France,FR-F,Centre,Metropolitan region,FR
-France,FR-G,Champagne-Ardenne,Metropolitan region,FR
+France,FR-CVL,Centre-Val de Loire,Metropolitan region,FR
+France,FR-GES,Grand Est,Metropolitan region,FR
 France,FR-GF,Guyane,Overseas department,FR
 France,FR-GP,Guadeloupe,Overseas department,FR
-France,FR-H,Corse,Metropolitan region,FR
-France,FR-I,Franche-Comté,Metropolitan region,FR
-France,FR-J,Île-de-France,Metropolitan region,FR
-France,FR-K,Languedoc-Roussillon,Metropolitan region,FR
-France,FR-L,Limousin,Metropolitan region,FR
+France,FR-HDF,Hauts-de-France,Metropolitan region,FR
+France,FR-IDF,Île-de-France,Metropolitan region,FR
 France,FR-MF,Saint-Martin,Overseas territorial collectivity,FR
-France,FR-M,Lorraine,Metropolitan region,FR
 France,FR-MQ,Martinique,Overseas department,FR
+France,FR-NAQ,Nouvelle-Aquitaine,Metropolitan region,FR
 France,FR-NC,Nouvelle-Calédonie,Overseas territorial collectivity,FR
-France,FR-N,Midi-Pyrénées,Metropolitan region,FR
-France,FR-O,Nord-Pas-de-Calais,Metropolitan region,FR
-France,FR-P,Basse-Normandie,Metropolitan region,FR
+France,FR-NOR,Normandie,Metropolitan region,FR
+France,FR-OCC,Occitanie,Metropolitan region,FR
+France,FR-PAC,Provence-Alpes-Côte d'Azur,Metropolitan region,FR
+France,FR-PDL,Pays de la Loire,Metropolitan region,FR
 France,FR-PF,Polynésie française,Overseas territorial collectivity,FR
 France,FR-PM,Saint-Pierre-et-Miquelon,Overseas territorial collectivity,FR
-France,FR-Q,Haute-Normandie,Metropolitan region,FR
 France,FR-RE,La Réunion,Overseas department,FR
-France,FR-R,Pays-de-la-Loire,Metropolitan region,FR
-France,FR-S,Picardie,Metropolitan region,FR
 France,FR-TF,Terres australes françaises,Overseas territorial collectivity,FR
-France,FR-T,Poitou-Charentes,Metropolitan region,FR
-France,FR-U,Provence-Alpes-Côte-d'Azur,Metropolitan region,FR
-France,FR-V,Rhône-Alpes,Metropolitan region,FR
 France,FR-WF,Wallis-et-Futuna,Overseas territorial collectivity,FR
 France,FR-YT,Mayotte,Overseas department,FR
 French Guiana,GF-GF,French Guiana,Country,GF
@@ -1698,15 +1700,15 @@ India,IN-AS,Assam,State,IN
 India,IN-BR,Bihar,State,IN
 India,IN-CH,Chandigarh,Union territory,IN
 India,IN-CT,Chhattisgarh,State,IN
-India,IN-DD,Daman and Diu,Union territory,IN
+India,IN-DH,Dadra and Nagar Haveli and Daman and Diu,Union territory,IN
 India,IN-DL,Delhi,Union territory,IN
-India,IN-DN,Dadra and Nagar Haveli,Union territory,IN
 India,IN-GA,Goa,State,IN
 India,IN-GJ,Gujarat,State,IN
 India,IN-HP,Himachal Pradesh,State,IN
 India,IN-HR,Haryana,State,IN
 India,IN-JH,Jharkhand,State,IN
-India,IN-JK,Jammu and Kashmir,State,IN
+India,IN-JK,Jammu and Kashmir,Union territory,IN
+India,IN-LA,Ladakh,Union territory,IN
 India,IN-KA,Karnataka,State,IN
 India,IN-KL,Kerala,State,IN
 India,IN-LD,Lakshadweep,Union territory,IN
@@ -1755,7 +1757,11 @@ Indonesia,ID-NT,Nusa Tenggara Timur,Province,ID
 Indonesia,ID-NU,Nusa Tenggara,Geographical unit,ID
 Indonesia,ID-PA,Papua,Province,ID
 Indonesia,ID-PB,Papua Barat,Province,ID
+Indonesia,ID-PD,Papua Barat Daya,Province,ID
+Indonesia,ID-PE,Papua Pegunungan,Province,ID
 Indonesia,ID-PP,Papua,Geographical unit,ID
+Indonesia,ID-PS,Papua Selatan,Province,ID
+Indonesia,ID-PT,Papua Tengah,Province,ID
 Indonesia,ID-RI,Riau,Province,ID
 Indonesia,ID-SA,Sulawesi Utara,Province,ID
 Indonesia,ID-SB,Sumatera Barat,Province,ID
@@ -1807,6 +1813,7 @@ Iraq,IQ-BG,Baghdād,Governorate,IQ
 Iraq,IQ-DA,Dahūk,Governorate,IQ
 Iraq,IQ-DI,Diyālá,Governorate,IQ
 Iraq,IQ-DQ,Dhī Qār,Governorate,IQ
+Iraq,IQ-HA,Halabja,Governorate,IQ
 Iraq,IQ-KA,Karbalā',Governorate,IQ
 Iraq,IQ-KI,Kirkūk,Governorate,IQ
 Iraq,IQ-MA,Maysān,Governorate,IQ
@@ -2071,9 +2078,13 @@ Kazakhstan,KZ-MAN,Mangghystaū oblysy,Region,KZ
 Kazakhstan,KZ-PAV,Pavlodar oblysy,Region,KZ
 Kazakhstan,KZ-SEV,Severo-Kazahstanskaja oblast',Region,KZ
 Kazakhstan,KZ-VOS,Shyghys Qazaqstan oblysy,Region,KZ
-Kazakhstan,KZ-YUZ,Južno-Kazahstanskaja oblast',Region,KZ
+Kazakhstan,KZ-TUR,Turkistan oblysy,Region,KZ
 Kazakhstan,KZ-ZAP,Batys Qazaqstan oblysy,Region,KZ
-Kazakhstan,KZ-ZHA,Žambylskaja oblast',Region,KZ
+Kazakhstan,KZ-SHY,Shymkent,City,KZ
+Kazakhstan,KZ-ABY,Abai oblysy,Region,KZ
+Kazakhstan,KZ-ZHE,Zhetysu oblysy,Region,KZ
+Kazakhstan,KZ-ULY,Ulytau oblysy,Region,KZ
+Kazakhstan,KZ-ZHA,Zhambyl oblysy,Region,KZ
 Kenya,KE-01,Baringo,County,KE
 Kenya,KE-02,Bomet,County,KE
 Kenya,KE-03,Bungoma,County,KE
@@ -2880,22 +2891,18 @@ Montenegro,ME-21,Žabljak,Municipality,ME
 Montenegro,ME-22,Gusinje,Municipality,ME
 Montenegro,ME-23,Petnjica,Municipality,ME
 Montserrat,MS-MS,Montserrat,Country,MS
-Morocco,MA-01,Tanger-Tétouan,Region,MA
-Morocco,MA-02,Gharb-Chrarda-Beni Hssen,Region,MA
-Morocco,MA-03,Taza-Al Hoceima-Taounate,Region,MA
-Morocco,MA-04,L'Oriental,Region,MA
-Morocco,MA-05,Fès-Boulemane,Region,MA
-Morocco,MA-06,Meknès-Tafilalet,Region,MA
-Morocco,MA-07,Rabat-Salé-Zemmour-Zaer,Region,MA
-Morocco,MA-08,Grand Casablanca,Region,MA
-Morocco,MA-09,Chaouia-Ouardigha,Region,MA
-Morocco,MA-10,Doukkala-Abda,Region,MA
-Morocco,MA-11,Marrakech-Tensift-Al Haouz,Region,MA
-Morocco,MA-12,Tadla-Azilal,Region,MA
-Morocco,MA-13,Sous-Massa-Draa,Region,MA
-Morocco,MA-14,Guelmim-Es Semara,Region,MA
-Morocco,MA-15,Laâyoune-Boujdour-Sakia el Hamra,Region,MA
-Morocco,MA-16,Oued ed Dahab-Lagouira,Region,MA
+Morocco,MA-01,Tanger-Tétouan-Al Hoceïma,Region,MA
+Morocco,MA-02,L'Oriental,Region,MA
+Morocco,MA-03,Fès-Meknès,Region,MA
+Morocco,MA-04,Rabat-Salé-Kénitra,Region,MA
+Morocco,MA-05,Béni Mellal-Khénifra,Region,MA
+Morocco,MA-06,Casablanca-Settat,Region,MA
+Morocco,MA-07,Marrakech-Safi,Region,MA
+Morocco,MA-08,Drâa-Tafilalet,Region,MA
+Morocco,MA-09,Souss-Massa,Region,MA
+Morocco,MA-10,Guelmim-Oued Noun,Region,MA
+Morocco,MA-11,Laâyoune-Sakia El Hamra,Region,MA
+Morocco,MA-12,Dakhla-Oued Ed-Dahab,Region,MA
 Morocco,MA-AGD,Agadir-Ida-Outanane,Prefecture,MA
 Morocco,MA-AOU,Aousserd,Prefecture,MA
 Morocco,MA-ASZ,Assa-Zag,Province,MA
@@ -3013,25 +3020,13 @@ Nauru,NR-11,Meneng,District,NR
 Nauru,NR-12,Nibok,District,NR
 Nauru,NR-13,Uaboe,District,NR
 Nauru,NR-14,Yaren,District,NR
-Nepal,NP-1,Central,Development region,NP
-Nepal,NP-2,Madhya Pashchimanchal,Development region,NP
-Nepal,NP-3,Pashchimanchal,Development region,NP
-Nepal,NP-4,Eastern,Development region,NP
-Nepal,NP-5,Far Western,Development region,NP
-Nepal,NP-BA,Bagmati,Zone,NP
-Nepal,NP-BH,Bheri,Zone,NP
-Nepal,NP-DH,Dhawalagiri,Zone,NP
-Nepal,NP-GA,Gandaki,Zone,NP
-Nepal,NP-JA,Janakpur,Zone,NP
-Nepal,NP-KA,Karnali,Zone,NP
-Nepal,NP-KO,Kosi,Zone,NP
-Nepal,NP-LU,Lumbini,Zone,NP
-Nepal,NP-MA,Mahakali,Zone,NP
-Nepal,NP-ME,Mechi,Zone,NP
-Nepal,NP-NA,Narayani,Zone,NP
-Nepal,NP-RA,Rapti,Zone,NP
-Nepal,NP-SA,Sagarmatha,Zone,NP
-Nepal,NP-SE,Seti,Zone,NP
+Nepal,NP-P1,Koshi,Province,NP
+Nepal,NP-P2,Madhesh,Province,NP
+Nepal,NP-P3,Bagmati,Province,NP
+Nepal,NP-P4,Gandaki,Province,NP
+Nepal,NP-P5,Lumbini,Province,NP
+Nepal,NP-P6,Karnali,Province,NP
+Nepal,NP-P7,Sudurpashchim,Province,NP
 Netherlands,NL-AW,Aruba,Country,NL
 Netherlands,NL-BQ1,Bonaire,Special municipality,NL
 Netherlands,NL-BQ2,Saba,Special municipality,NL
@@ -3297,7 +3292,7 @@ Philippines,PH-10,Northern Mindanao,Region,PH
 Philippines,PH-11,Davao,Region,PH
 Philippines,PH-12,Rehiyon ng Soccsksargen,Region,PH
 Philippines,PH-13,Caraga,Region,PH
-Philippines,PH-14,Autonomous Region in Muslim Mindanao,Region,PH
+Philippines,PH-14,Bangsamoro,Autonomous region,PH
 Philippines,PH-15,Cordillera Administrative Region,Region,PH
 Philippines,PH-40,Calabarzon,Region,PH
 Philippines,PH-41,Mimaropa,Region,PH
