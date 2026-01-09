@@ -1,11 +1,22 @@
+# Source files (distributed via dist/)
+src/
+scripts/
+tests/
+
+# Config files
 *.swp
-node_modules
-npm-debug.log
+*.log
 .git*
-parse.py
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+
+# Data source files
 data.csv
 codes.csv
-functions.js
-data.js
-Makefile
-test
+
+# Development
+node_modules/
+coverage/
+.DS_Store
+.idea/
