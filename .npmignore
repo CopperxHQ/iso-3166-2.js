@@ -11,9 +11,8 @@ tsconfig.json
 tsup.config.ts
 vitest.config.ts
 
-# Data source files
+# Data source file
 data.csv
-codes.csv
 
 # Development
 node_modules/

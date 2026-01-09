@@ -16,7 +16,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
-// ISO 3166-1 numeric codes (embedded for completeness)
+// ISO 3166-1 numeric codes
 const NUMERIC_CODES: Record<string, string> = {
   AD: '020', AE: '784', AF: '004', AG: '028', AI: '660', AL: '008', AM: '051',
   AO: '024', AQ: '010', AR: '032', AS: '016', AT: '040', AU: '036', AW: '533',
@@ -94,23 +94,15 @@ function parseCSV(content: string): string[][] {
 function main() {
   console.log('Generating iso-3166 data files...\n');
 
-  // Read source files
-  const codesContent = readFileSync(join(ROOT, 'codes.csv'), 'utf-8');
+  // Read source file (data.csv contains all data including alpha3)
   const dataContent = readFileSync(join(ROOT, 'data.csv'), 'utf-8');
 
-  // Parse alpha2 -> alpha3 mapping
-  const alpha2ToAlpha3: Record<string, string> = {};
-  for (const [alpha2, alpha3] of parseCSV(codesContent)) {
-    if (alpha2 && alpha3) {
-      alpha2ToAlpha3[alpha2] = alpha3;
-    }
-  }
-
-  // Parse subdivision data and build country info
+  // Parse data and build country info
+  // Format: countryName,fullCode,subdivisionName,type,alpha2,alpha3
   const countries: Record<string, CountryInfo> = {};
 
   for (const row of parseCSV(dataContent)) {
-    const [countryName, fullCode, subdivisionName, type, alpha2] = row;
+    const [countryName, fullCode, subdivisionName, type, alpha2, alpha3] = row;
 
     if (!alpha2 || !fullCode) continue;
 
@@ -118,7 +110,7 @@ function main() {
     if (!countries[alpha2]) {
       countries[alpha2] = {
         name: countryName,
-        alpha3: alpha2ToAlpha3[alpha2] || '',
+        alpha3: alpha3 || '',
         numeric: NUMERIC_CODES[alpha2] || '',
         subdivisions: {},
       };
