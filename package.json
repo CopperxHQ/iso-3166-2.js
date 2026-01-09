@@ -6,6 +6,14 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "./dist/subdivision/data/*.js",
+    "./dist/subdivision/data/*.cjs",
+    "./src/subdivision/data/*.ts"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "exports": {
     ".": {
       "import": {

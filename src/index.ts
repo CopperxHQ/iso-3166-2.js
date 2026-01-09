@@ -97,6 +97,7 @@ export {
   whereName as whereCountry,
   all as allCountries,
   withSubdivisions,
+  resolveAlpha2,
 } from './country';
 
 // Country conversions
@@ -168,3 +169,14 @@ export type {
   CountryData,
   SubdivisionData,
 } from './types';
+
+// ============ Default Export ============
+
+/**
+ * Default export for legacy compatibility
+ * Provides both country and subdivision namespaces
+ */
+export default {
+  country,
+  subdivision,
+};

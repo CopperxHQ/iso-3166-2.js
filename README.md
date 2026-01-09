@@ -39,7 +39,7 @@ subdivision.whereCode('US-CA');
 // { code: 'US-CA', name: 'California', type: 'State', countryCode: 'US', countryName: 'United States', regionCode: 'CA' }
 
 subdivision.where('SE', 'O');
-// { code: 'SE-O', name: 'Västra Götalands län', type: 'County', ... }
+// { code: 'SE-O', name: 'VÃ¤stra GÃ¶talands lÃ¤n', type: 'County', ... }
 
 subdivision.whereName('US', 'California');
 // { code: 'US-CA', name: 'California', ... }
