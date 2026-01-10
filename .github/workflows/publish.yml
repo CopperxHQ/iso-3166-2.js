@@ -6,6 +6,9 @@ on:
     paths-ignore:
       - '*.md'
       - 'docs/**'
+    # Prevent infinite loop when CI pushes version commits
+    tags-ignore:
+      - 'v*'
   release:
     types: [published]
   workflow_dispatch:
@@ -32,6 +35,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Skip if commit was made by github-actions bot (prevents infinite loop)
+    if: github.actor != 'github-actions[bot]'
     permissions:
       contents: write
       id-token: write
