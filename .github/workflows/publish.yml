@@ -1,54 +1,72 @@
-name: Publish Latest
+name: Publish
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths-ignore:
       - '*.md'
       - 'docs/**'
-      - '.github/workflows/ci.yml'
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'npm tag'
+        required: true
+        default: 'latest'
+        type: choice
+        options:
+          - latest
+          - beta
+          - next
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # Skip if release is a pre-release
-    if: ${{ github.event_name != 'release' || !github.event.release.prerelease }}
-
     permissions:
       contents: read
       id-token: write
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
 
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npm run generate
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
 
-      - name: Generate data
-        run: npm run generate
+      - name: Determine npm tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+              echo "tag=beta" >> $GITHUB_OUTPUT
+            else
+              echo "tag=latest" >> $GITHUB_OUTPUT
+            fi
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+            echo "tag=next" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Run typecheck
-        run: npm run typecheck
+      - name: Set next version
+        if: steps.tag.outputs.tag == 'next'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          npm version "${VERSION}-next.$(git rev-parse --short HEAD)" --no-git-tag-version
 
-      - name: Run tests
-        run: npm test
-
-      - name: Build
-        run: npm run build
-
-      - name: Publish to npm (latest)
-        run: npm publish --access public --tag latest --provenance
+      - name: Publish to npm
+        run: npm publish --access public --tag ${{ steps.tag.outputs.tag }} --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
