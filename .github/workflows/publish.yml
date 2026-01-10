@@ -64,7 +64,7 @@ jobs:
         if: steps.tag.outputs.tag == 'next'
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          npm version "${VERSION}-next.$(git rev-parse --short HEAD)" --no-git-tag-version
+          npm version "${VERSION}-next.$(git rev-parse --short HEAD)" --no-git-tag-version --ignore-scripts
 
       - name: Publish to npm
         run: npm publish --access public --tag ${{ steps.tag.outputs.tag }} --provenance
