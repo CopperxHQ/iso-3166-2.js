@@ -2,7 +2,11 @@ name: Publish Next
 
 on:
   push:
-    branches: [main, master]
+    branches: [dev]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - '.github/workflows/ci.yml'
   workflow_dispatch:
 
 jobs:
@@ -15,6 +19,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: dev
 
       - name: Use Node.js
         uses: actions/setup-node@v4

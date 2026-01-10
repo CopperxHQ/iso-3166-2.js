@@ -4,11 +4,17 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or tag to publish from'
+        required: false
+        default: 'main'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.ref, 'beta') }}
+    # Publish beta from pre-releases or manual trigger
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.release.prerelease }}
 
     permissions:
       contents: read
@@ -16,6 +22,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.event.release.tag_name }}
 
       - name: Use Node.js
         uses: actions/setup-node@v4

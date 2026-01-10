@@ -1,18 +1,21 @@
-name: Publish to npm
+name: Publish Latest
 
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - '.github/workflows/ci.yml'
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'npm tag (latest, beta, next)'
-        required: false
-        default: 'latest'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Skip if release is a pre-release
+    if: ${{ github.event_name != 'release' || !github.event.release.prerelease }}
 
     permissions:
       contents: read
@@ -20,6 +23,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -43,7 +48,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to npm
-        run: npm publish --access public --tag ${{ github.event.inputs.tag || 'latest' }} --provenance
+      - name: Publish to npm (latest)
+        run: npm publish --access public --tag latest --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
