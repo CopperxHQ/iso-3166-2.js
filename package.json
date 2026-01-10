@@ -64,8 +64,17 @@
     "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run generate && npm run build && npm run test",
-    "typecheck": "tsc --noEmit"
+    "preversion": "npm run test && npm run typecheck",
+    "version": "npm run generate && npm run build && git add -A",
+    "postversion": "git push && git push --tags",
+    "release": "npm version patch",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "release:major": "npm version major",
+    "release:prerelease": "npm version prerelease --preid=beta",
+    "publish:npm": "npm publish --access public"
   },
   "keywords": [
     "iso-3166",
