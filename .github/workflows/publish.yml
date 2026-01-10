@@ -2,55 +2,18 @@ name: Publish
 
 on:
   push:
-    branches: [main, dev]
-    paths-ignore:
-      - '*.md'
-      - 'docs/**'
-    # Prevent infinite loop when CI pushes version commits
-    tags-ignore:
+    tags:
       - 'v*'
-  release:
-    types: [published]
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'npm tag'
-        required: true
-        default: 'latest'
-        type: choice
-        options:
-          - latest
-          - beta
-          - next
-      version:
-        description: 'Version bump type (ignored for next tag)'
-        required: true
-        default: 'patch'
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # Skip if commit was made by github-actions bot (prevents infinite loop)
-    if: github.actor != 'github-actions[bot]'
     permissions:
-      contents: write
+      contents: read
       id-token: write
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -65,41 +28,19 @@ jobs:
       - run: npm test
       - run: npm run build
 
-      - name: Determine npm tag and version type
-        id: config
+      - name: Determine npm tag
+        id: npm-tag
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ inputs.tag }}" >> $GITHUB_OUTPUT
-            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" = "release" ]; then
-            if [ "${{ github.event.release.prerelease }}" = "true" ]; then
-              echo "tag=beta" >> $GITHUB_OUTPUT
-            else
-              echo "tag=latest" >> $GITHUB_OUTPUT
-            fi
-            echo "version=skip" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "version=patch" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "$VERSION" == *"-beta"* ]]; then
+            echo "tag=beta" >> $GITHUB_OUTPUT
+          elif [[ "$VERSION" == *"-next"* ]] || [[ "$VERSION" == *"-alpha"* ]]; then
             echo "tag=next" >> $GITHUB_OUTPUT
-            echo "version=prerelease" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Bump version
-        if: steps.config.outputs.version != 'skip'
-        run: |
-          if [ "${{ steps.config.outputs.tag }}" = "next" ]; then
-            npm version prerelease --preid=next --ignore-scripts
           else
-            npm version ${{ steps.config.outputs.version }} --ignore-scripts
+            echo "tag=latest" >> $GITHUB_OUTPUT
           fi
-
-      - name: Push version commit and tag
-        if: steps.config.outputs.version != 'skip'
-        run: git push --follow-tags
 
       - name: Publish to npm
-        run: npm publish --access public --tag ${{ steps.config.outputs.tag }} --provenance
+        run: npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }} --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
