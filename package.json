@@ -1,5 +1,5 @@
 {
-  "name": "iso-3166",
+  "name": "@koshmoney/countries",
   "version": "1.0.0",
   "description": "Complete ISO 3166-1 (countries) and ISO 3166-2 (subdivisions) lookup library with full TypeScript support",
   "type": "module",
@@ -64,8 +64,20 @@
     "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run generate && npm run build && npm run test",
-    "typecheck": "tsc --noEmit"
+    "preversion": "npm run test && npm run typecheck",
+    "version": "npm run generate && npm run build && git add -A",
+    "postversion": "git push && git push --tags",
+    "release": "npm version patch",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "release:major": "npm version major",
+    "release:beta": "npm version prerelease --preid=beta",
+    "release:next": "npm version prerelease --preid=next",
+    "publish:npm": "npm publish --access public",
+    "publish:beta": "npm publish --access public --tag beta",
+    "publish:next": "npm publish --access public --tag next"
   },
   "keywords": [
     "iso-3166",
