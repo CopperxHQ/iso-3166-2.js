@@ -97,7 +97,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CopperxHQ/iso-3166-2.js.git"
+    "url": "https://github.com/CopperxHQ/countries.git"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
