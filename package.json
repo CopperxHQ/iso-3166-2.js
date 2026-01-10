@@ -1,5 +1,5 @@
 {
-  "name": "iso-3166",
+  "name": "@koshmoney/countries",
   "version": "1.0.0",
   "description": "Complete ISO 3166-1 (countries) and ISO 3166-2 (subdivisions) lookup library with full TypeScript support",
   "type": "module",
