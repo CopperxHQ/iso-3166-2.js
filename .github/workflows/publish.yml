@@ -19,16 +19,33 @@ on:
           - latest
           - beta
           - next
+      version:
+        description: 'Version bump type (ignored for next tag)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -43,30 +60,41 @@ jobs:
       - run: npm test
       - run: npm run build
 
-      - name: Determine npm tag
-        id: tag
+      - name: Determine npm tag and version type
+        id: config
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "tag=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" = "release" ]; then
             if [ "${{ github.event.release.prerelease }}" = "true" ]; then
               echo "tag=beta" >> $GITHUB_OUTPUT
             else
               echo "tag=latest" >> $GITHUB_OUTPUT
             fi
+            echo "version=skip" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
             echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "version=patch" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
             echo "tag=next" >> $GITHUB_OUTPUT
+            echo "version=prerelease" >> $GITHUB_OUTPUT
           fi
 
-      - name: Set next version
-        if: steps.tag.outputs.tag == 'next'
+      - name: Bump version
+        if: steps.config.outputs.version != 'skip'
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          npm version "${VERSION}-next.$(git rev-parse --short HEAD)" --no-git-tag-version --ignore-scripts
+          if [ "${{ steps.config.outputs.tag }}" = "next" ]; then
+            npm version prerelease --preid=next --ignore-scripts
+          else
+            npm version ${{ steps.config.outputs.version }} --ignore-scripts
+          fi
+
+      - name: Push version commit and tag
+        if: steps.config.outputs.version != 'skip'
+        run: git push --follow-tags
 
       - name: Publish to npm
-        run: npm publish --access public --tag ${{ steps.tag.outputs.tag }} --provenance
+        run: npm publish --access public --tag ${{ steps.config.outputs.tag }} --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
