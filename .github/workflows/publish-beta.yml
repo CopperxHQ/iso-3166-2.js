@@ -1,0 +1,55 @@
+name: Publish Beta
+
+on:
+  push:
+    branches: [dev]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+
+jobs:
+  publish-beta:
+    runs-on: ubuntu-latest
+    # Skip if commit was made by github-actions bot (prevents infinite loop)
+    if: github.actor != 'github-actions[bot]'
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+      - run: npm run generate
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      - name: Bump beta version
+        run: npm version prerelease --preid=beta --no-git-tag-version
+
+      - name: Commit version bump
+        run: |
+          git add package.json package-lock.json
+          git commit -m "chore: bump beta version [skip ci]"
+          git push
+
+      - name: Publish to npm (beta)
+        run: npm publish --access public --tag beta --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
