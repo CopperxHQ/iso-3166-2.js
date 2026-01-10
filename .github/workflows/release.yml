@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths-ignore:
       - '*.md'
       - 'docs/**'
@@ -17,6 +17,7 @@ on:
           - patch
           - minor
           - major
+          - beta
 
 jobs:
   release:
@@ -54,12 +55,19 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "bump=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+            echo "bump=beta" >> $GITHUB_OUTPUT
           else
             echo "bump=patch" >> $GITHUB_OUTPUT
           fi
 
       - name: Bump version and create tag
-        run: npm version ${{ steps.version.outputs.bump }} --ignore-scripts
+        run: |
+          if [ "${{ steps.version.outputs.bump }}" = "beta" ]; then
+            npm version prerelease --preid=beta --ignore-scripts
+          else
+            npm version ${{ steps.version.outputs.bump }} --ignore-scripts
+          fi
 
       - name: Push version commit and tag
         run: git push --follow-tags
