@@ -73,8 +73,11 @@
     "release:patch": "npm version patch",
     "release:minor": "npm version minor",
     "release:major": "npm version major",
-    "release:prerelease": "npm version prerelease --preid=beta",
-    "publish:npm": "npm publish --access public"
+    "release:beta": "npm version prerelease --preid=beta",
+    "release:next": "npm version prerelease --preid=next",
+    "publish:npm": "npm publish --access public",
+    "publish:beta": "npm publish --access public --tag beta",
+    "publish:next": "npm publish --access public --tag next"
   },
   "keywords": [
     "iso-3166",
