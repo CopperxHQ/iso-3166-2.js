@@ -54,6 +54,16 @@
         "types": "./dist/subdivision/data/*.d.cts",
         "default": "./dist/subdivision/data/*.cjs"
       }
+    },
+    "./postalCode": {
+      "import": {
+        "types": "./dist/postalCode/index.d.ts",
+        "default": "./dist/postalCode/index.js"
+      },
+      "require": {
+        "types": "./dist/postalCode/index.d.cts",
+        "default": "./dist/postalCode/index.cjs"
+      }
     }
   },
   "files": [
@@ -91,7 +101,14 @@
     "region",
     "alpha-2",
     "alpha-3",
-    "country-code"
+    "country-code",
+    "postal-code",
+    "postcode",
+    "zip-code",
+    "zipcode",
+    "pin-code",
+    "pincode",
+    "address-validation"
   ],
   "author": "",
   "license": "MIT",

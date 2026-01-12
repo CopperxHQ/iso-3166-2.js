@@ -75,3 +75,17 @@ export type CountryData = Record<string, CountryRecord>;
  * Subdivision data for a single country
  */
 export type SubdivisionData = Record<string, SubdivisionInfo>;
+
+// ============ Postal Code Types ============
+
+/**
+ * Postal code information for a country
+ */
+export interface PostalCodeInfo {
+  /** Regex pattern for validation */
+  regex: RegExp;
+  /** Human-readable format (e.g., "NNNNN" or "A1A 1A1") */
+  format: string;
+  /** Local terminology (e.g., "ZIP Code", "PIN Code", "Postcode") */
+  name: string;
+}

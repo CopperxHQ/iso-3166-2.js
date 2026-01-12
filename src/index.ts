@@ -28,6 +28,7 @@ import './subdivision/data/all';
 // Import modules
 import * as countryModule from './country';
 import * as subdivisionModule from './subdivision';
+import * as postalCodeModule from './postalCode';
 
 // ============ Namespaced Exports ============
 
@@ -60,6 +61,14 @@ export const country = {
   isCountryName: countryModule.isCountryName,
   isValid: countryModule.isValid,
   detectFormat: countryModule.detectFormat,
+
+  // Postal code proxies
+  isValidPostalCode: postalCodeModule.isValid,
+  hasPostalCode: postalCodeModule.hasPostalCode,
+  getPostalCodePattern: postalCodeModule.getPattern,
+  getPostalCodeFormat: postalCodeModule.getFormat,
+  getPostalCodeName: postalCodeModule.getName,
+  getPostalCodeInfo: postalCodeModule.getInfo,
 };
 
 /**
@@ -86,6 +95,37 @@ export const subdivision = {
   isValidRegion: subdivisionModule.isValidRegion,
   isValidName: subdivisionModule.isValidName,
 };
+
+/**
+ * Postal code functions
+ * Validates and looks up postal codes, ZIP codes, PIN codes worldwide
+ */
+export const postalCode = {
+  isValid: postalCodeModule.isValid,
+  hasPostalCode: postalCodeModule.hasPostalCode,
+  getPattern: postalCodeModule.getPattern,
+  getFormat: postalCodeModule.getFormat,
+  getName: postalCodeModule.getName,
+  getInfo: postalCodeModule.getInfo,
+};
+
+/**
+ * Alias for postalCode (US terminology)
+ * @example zipCode.isValid('US', '90210')
+ */
+export const zipCode = postalCode;
+
+/**
+ * Alias for postalCode (India terminology)
+ * @example pinCode.isValid('IN', '110001')
+ */
+export const pinCode = postalCode;
+
+/**
+ * Alias for postalCode (UK/AU/NZ terminology)
+ * @example postcode.isValid('GB', 'SW1A 1AA')
+ */
+export const postcode = postalCode;
 
 // ============ Direct Exports (for tree-shaking) ============
 
@@ -148,6 +188,16 @@ export {
   hasSubdivisions,
 } from './subdivision';
 
+// Postal code functions
+export {
+  isValid as isValidPostalCode,
+  hasPostalCode,
+  getPattern as getPostalCodePattern,
+  getFormat as getPostalCodeFormat,
+  getName as getPostalCodeName,
+  getInfo as getPostalCodeInfo,
+} from './postalCode';
+
 // ============ Data Exports ============
 
 export { countries, alpha3Index, numericIndex, nameIndex } from './country';
@@ -156,6 +206,7 @@ export {
   getAllSubdivisions,
   getRegisteredCountries,
 } from './subdivision';
+export { postalCodes, countriesWithoutPostalCodes } from './postalCode';
 
 // ============ Type Exports ============
 
@@ -168,15 +219,20 @@ export type {
   CountryRecord,
   CountryData,
   SubdivisionData,
+  PostalCodeInfo,
 } from './types';
 
 // ============ Default Export ============
 
 /**
- * Default export for legacy compatibility
- * Provides both country and subdivision namespaces
+ * Default export for compatibility
+ * Provides country, subdivision, and postal code namespaces
  */
 export default {
   country,
   subdivision,
+  postalCode,
+  zipCode,
+  pinCode,
+  postcode,
 };
