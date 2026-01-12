@@ -10,6 +10,7 @@ Complete ISO 3166-1 (countries) and ISO 3166-2 (subdivisions) lookup library wit
 
 - **Full ISO 3166-1 support**: alpha-2, alpha-3, numeric codes, and country names
 - **Full ISO 3166-2 support**: 5000+ subdivisions (states, provinces, regions, etc.)
+- **Postal code validation**: Validate ZIP codes, PIN codes, postcodes for 150+ countries
 - **Code conversion utilities**: Convert between alpha-2, alpha-3, and numeric formats
 - **Validation functions**: Validate any country or subdivision code
 - **True tree-shaking**: Import only the countries you need
@@ -34,7 +35,7 @@ pnpm add @koshmoney/countries
 ## Quick Start
 
 ```typescript
-import { country, subdivision } from '@koshmoney/countries';
+import { country, subdivision, postalCode } from '@koshmoney/countries';
 
 // Country lookups
 country.whereAlpha2('US');
@@ -55,6 +56,12 @@ subdivision.where('GB', 'ENG');
 
 subdivision.whereName('DE', 'Berlin');
 // { code: 'DE-BE', name: 'Berlin', ... }
+
+// Postal code validation
+postalCode.isValid('US', '90210');     // true
+postalCode.isValid('GB', 'SW1A 1AA');  // true
+postalCode.getName('US');              // 'ZIP Code'
+postalCode.getName('IN');              // 'PIN Code'
 ```
 
 ## Usage
@@ -112,6 +119,54 @@ subdivision.isValidName('US', 'California'); // true
 subdivision.hasSubdivisions('US');           // true
 ```
 
+### Postal Code Validation
+
+Validate postal codes, ZIP codes, PIN codes, and similar address codes worldwide.
+
+```typescript
+import { postalCode } from '@koshmoney/countries';
+
+// Or use regional aliases (all equivalent)
+import { zipCode } from '@koshmoney/countries';   // US terminology
+import { pinCode } from '@koshmoney/countries';   // India terminology
+import { postcode } from '@koshmoney/countries';  // UK/AU terminology
+
+// Validation (lenient - accepts common variations)
+postalCode.isValid('US', '90210');           // true
+postalCode.isValid('US', '90210-1234');      // true (ZIP+4)
+postalCode.isValid('GB', 'SW1A 1AA');        // true
+postalCode.isValid('GB', 'sw1a1aa');         // true (case-insensitive, no space)
+postalCode.isValid('IN', '110001');          // true
+postalCode.isValid('CA', 'K1A 0B1');         // true
+postalCode.isValid('DE', '10115');           // true
+postalCode.isValid('JP', '100-0001');        // true
+
+// Get local terminology
+postalCode.getName('US');  // 'ZIP Code'
+postalCode.getName('IN');  // 'PIN Code'
+postalCode.getName('GB');  // 'Postcode'
+postalCode.getName('DE');  // 'PLZ'
+postalCode.getName('BR');  // 'CEP'
+postalCode.getName('JP');  // '郵便番号'
+postalCode.getName('KR');  // '우편번호'
+
+// Check if country uses postal codes
+postalCode.hasPostalCode('US');    // true
+postalCode.hasPostalCode('HK');    // false (Hong Kong has no postal codes)
+postalCode.hasPostalCode('AE');    // false (UAE has no postal codes)
+
+// Get format information
+postalCode.getFormat('US');        // 'NNNNN or NNNNN-NNNN'
+postalCode.getFormat('GB');        // 'AA9A 9AA'
+postalCode.getFormat('CA');        // 'A1A 1A1'
+postalCode.getPattern('US');       // /^\d{5}(-\d{4})?$/
+
+// Also available via country namespace
+country.isValidPostalCode('US', '90210');
+country.hasPostalCode('US');
+country.getPostalCodeName('US');
+```
+
 ### Direct Imports (Tree-Shakeable)
 
 ```typescript
@@ -136,6 +191,16 @@ import {
   isValidCode,
   hasSubdivisions,
 } from '@koshmoney/countries/subdivision';
+
+// Postal code functions
+import {
+  isValid,
+  hasPostalCode,
+  getName,
+  getFormat,
+  getPattern,
+  getInfo,
+} from '@koshmoney/countries/postalCode';
 ```
 
 ## Tree-Shaking
@@ -233,6 +298,12 @@ interface Subdivision {
 interface CountryWithSubdivisions extends Country {
   subdivisions: Subdivision[];
 }
+
+interface PostalCodeInfo {
+  regex: RegExp;     // Validation pattern
+  format: string;    // "NNNNN" or "A1A 1A1"
+  name: string;      // "ZIP Code", "PIN Code", "Postcode", etc.
+}
 ```
 
 ## API Reference
@@ -247,6 +318,8 @@ Migrating from `iso-3166-1` or `iso-3166-2`? See [Migration Guide](./docs/MIGRAT
 
 - [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1): Country codes (alpha-2, alpha-3, numeric)
 - [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2): Subdivision codes
+- [postcode-validator](https://github.com/melwynfurtado/postcode-validator): Postal code validation patterns
+- [Universal Postal Union (UPU)](https://www.upu.int): Postal code standards
 
 ## Contributing
 

@@ -35,3 +35,13 @@ export {
 
 // Re-export data for direct access
 export { countries, alpha3Index, numericIndex, nameIndex } from './data';
+
+// Postal code proxy functions
+export {
+  isValid as isValidPostalCode,
+  hasPostalCode,
+  getPattern as getPostalCodePattern,
+  getFormat as getPostalCodeFormat,
+  getName as getPostalCodeName,
+  getInfo as getPostalCodeInfo,
+} from '../postalCode';
