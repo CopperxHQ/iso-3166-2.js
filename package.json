@@ -64,6 +64,46 @@
         "types": "./dist/postalCode/index.d.cts",
         "default": "./dist/postalCode/index.cjs"
       }
+    },
+    "./currency": {
+      "import": {
+        "types": "./dist/currency/index.d.ts",
+        "default": "./dist/currency/index.js"
+      },
+      "require": {
+        "types": "./dist/currency/index.d.cts",
+        "default": "./dist/currency/index.cjs"
+      }
+    },
+    "./dialCode": {
+      "import": {
+        "types": "./dist/dialCode/index.d.ts",
+        "default": "./dist/dialCode/index.js"
+      },
+      "require": {
+        "types": "./dist/dialCode/index.d.cts",
+        "default": "./dist/dialCode/index.cjs"
+      }
+    },
+    "./geography": {
+      "import": {
+        "types": "./dist/geography/index.d.ts",
+        "default": "./dist/geography/index.js"
+      },
+      "require": {
+        "types": "./dist/geography/index.d.cts",
+        "default": "./dist/geography/index.cjs"
+      }
+    },
+    "./membership": {
+      "import": {
+        "types": "./dist/membership/index.d.ts",
+        "default": "./dist/membership/index.js"
+      },
+      "require": {
+        "types": "./dist/membership/index.d.cts",
+        "default": "./dist/membership/index.cjs"
+      }
     }
   },
   "files": [
@@ -93,6 +133,7 @@
     "iso-3166",
     "iso-3166-1",
     "iso-3166-2",
+    "iso-4217",
     "country",
     "countries",
     "subdivision",
@@ -108,7 +149,16 @@
     "zipcode",
     "pin-code",
     "pincode",
-    "address-validation"
+    "address-validation",
+    "currency",
+    "dial-code",
+    "phone-code",
+    "calling-code",
+    "continent",
+    "geography",
+    "eu",
+    "sepa",
+    "eurozone"
   ],
   "author": "",
   "license": "MIT",
@@ -120,6 +170,9 @@
     "access": "public",
     "provenance": true,
     "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "libphonenumber-js": "^1.11.0"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
