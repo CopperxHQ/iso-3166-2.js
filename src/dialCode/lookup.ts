@@ -48,13 +48,16 @@ export function getDialCodes(alpha2: string): string[] | null {
  * getDialCodeInfo('US') // { dialCode: '+1', countryCode: 'US' }
  */
 export function getDialCodeInfo(alpha2: string): DialCodeInfo | null {
-  const code = normalize(alpha2);
-  const dialCode = getDialCode(code);
-  if (!dialCode) return null;
-  return {
-    dialCode,
-    countryCode: code,
-  };
+  const code = normalize(alpha2) as CountryCode;
+  if (!isSupportedCountry(code)) return null;
+  try {
+    return {
+      dialCode: '+' + getCountryCallingCode(code),
+      countryCode: code,
+    };
+  } catch {
+    return null;
+  }
 }
 
 /**

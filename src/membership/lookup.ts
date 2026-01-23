@@ -93,7 +93,7 @@ export function isMember(alpha2: string, membershipType: MembershipType): boolea
 /**
  * Get all memberships for a country
  * @param alpha2 - Country alpha-2 code
- * @returns MembershipInfo object or null if invalid country
+ * @returns MembershipInfo object with all membership statuses
  * @example
  * getMemberships('FR')
  * // { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }

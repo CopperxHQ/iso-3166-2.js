@@ -74,11 +74,11 @@ export const geography: Record<string, GeographicInfo> = {
   TG: { continent: 'Africa', region: 'Western Africa' },
 
   // Antarctica
-  AQ: { continent: 'Antarctica', region: 'Sub-Saharan Africa' }, // Special case
-  BV: { continent: 'Antarctica', region: 'Sub-Saharan Africa' },
-  GS: { continent: 'Antarctica', region: 'Sub-Saharan Africa' },
-  HM: { continent: 'Antarctica', region: 'Sub-Saharan Africa' },
-  TF: { continent: 'Antarctica', region: 'Sub-Saharan Africa' },
+  AQ: { continent: 'Antarctica', region: 'Antarctica' },
+  BV: { continent: 'Antarctica', region: 'Antarctica' },
+  GS: { continent: 'Antarctica', region: 'Antarctica' },
+  HM: { continent: 'Antarctica', region: 'Antarctica' },
+  TF: { continent: 'Antarctica', region: 'Antarctica' },
 
   // Asia - Central Asia
   KZ: { continent: 'Asia', region: 'Central Asia' },
@@ -120,6 +120,7 @@ export const geography: Record<string, GeographicInfo> = {
   NP: { continent: 'Asia', region: 'Southern Asia' },
   PK: { continent: 'Asia', region: 'Southern Asia' },
   LK: { continent: 'Asia', region: 'Southern Asia' },
+  IO: { continent: 'Asia', region: 'Southern Asia' },
 
   // Asia - Western Asia
   AM: { continent: 'Asia', region: 'Western Asia' },
@@ -298,49 +299,39 @@ export const geography: Record<string, GeographicInfo> = {
   SR: { continent: 'South America', region: 'South America' },
   UY: { continent: 'South America', region: 'South America' },
   VE: { continent: 'South America', region: 'South America' },
+};
 
-  // British Indian Ocean Territory
-  IO: { continent: 'Asia', region: 'Southern Asia' },
+// Pre-computed indexes for O(1) lookup (avoids runtime computation)
+const buildContinentIndex = (): Record<Continent, string[]> => {
+  const index: Record<string, string[]> = {};
+  for (const [code, info] of Object.entries(geography)) {
+    if (!index[info.continent]) index[info.continent] = [];
+    index[info.continent].push(code);
+  }
+  for (const key of Object.keys(index)) {
+    index[key].sort();
+  }
+  return index as Record<Continent, string[]>;
+};
+
+const buildRegionIndex = (): Record<Region, string[]> => {
+  const index: Record<string, string[]> = {};
+  for (const [code, info] of Object.entries(geography)) {
+    if (!index[info.region]) index[info.region] = [];
+    index[info.region].push(code);
+  }
+  for (const key of Object.keys(index)) {
+    index[key].sort();
+  }
+  return index as Record<Region, string[]>;
 };
 
 /**
  * Continent to countries index
  */
-export const continentIndex: Record<Continent, string[]> = {
-  'Africa': Object.entries(geography).filter(([, g]) => g.continent === 'Africa').map(([c]) => c).sort(),
-  'Antarctica': Object.entries(geography).filter(([, g]) => g.continent === 'Antarctica').map(([c]) => c).sort(),
-  'Asia': Object.entries(geography).filter(([, g]) => g.continent === 'Asia').map(([c]) => c).sort(),
-  'Europe': Object.entries(geography).filter(([, g]) => g.continent === 'Europe').map(([c]) => c).sort(),
-  'North America': Object.entries(geography).filter(([, g]) => g.continent === 'North America').map(([c]) => c).sort(),
-  'Oceania': Object.entries(geography).filter(([, g]) => g.continent === 'Oceania').map(([c]) => c).sort(),
-  'South America': Object.entries(geography).filter(([, g]) => g.continent === 'South America').map(([c]) => c).sort(),
-};
+export const continentIndex: Record<Continent, string[]> = buildContinentIndex();
 
 /**
  * Region to countries index
  */
-export const regionIndex: Record<Region, string[]> = {
-  'Northern Africa': Object.entries(geography).filter(([, g]) => g.region === 'Northern Africa').map(([c]) => c).sort(),
-  'Sub-Saharan Africa': Object.entries(geography).filter(([, g]) => g.region === 'Sub-Saharan Africa').map(([c]) => c).sort(),
-  'Eastern Africa': Object.entries(geography).filter(([, g]) => g.region === 'Eastern Africa').map(([c]) => c).sort(),
-  'Middle Africa': Object.entries(geography).filter(([, g]) => g.region === 'Middle Africa').map(([c]) => c).sort(),
-  'Southern Africa': Object.entries(geography).filter(([, g]) => g.region === 'Southern Africa').map(([c]) => c).sort(),
-  'Western Africa': Object.entries(geography).filter(([, g]) => g.region === 'Western Africa').map(([c]) => c).sort(),
-  'Caribbean': Object.entries(geography).filter(([, g]) => g.region === 'Caribbean').map(([c]) => c).sort(),
-  'Central America': Object.entries(geography).filter(([, g]) => g.region === 'Central America').map(([c]) => c).sort(),
-  'Northern America': Object.entries(geography).filter(([, g]) => g.region === 'Northern America').map(([c]) => c).sort(),
-  'South America': Object.entries(geography).filter(([, g]) => g.region === 'South America').map(([c]) => c).sort(),
-  'Central Asia': Object.entries(geography).filter(([, g]) => g.region === 'Central Asia').map(([c]) => c).sort(),
-  'Eastern Asia': Object.entries(geography).filter(([, g]) => g.region === 'Eastern Asia').map(([c]) => c).sort(),
-  'South-eastern Asia': Object.entries(geography).filter(([, g]) => g.region === 'South-eastern Asia').map(([c]) => c).sort(),
-  'Southern Asia': Object.entries(geography).filter(([, g]) => g.region === 'Southern Asia').map(([c]) => c).sort(),
-  'Western Asia': Object.entries(geography).filter(([, g]) => g.region === 'Western Asia').map(([c]) => c).sort(),
-  'Eastern Europe': Object.entries(geography).filter(([, g]) => g.region === 'Eastern Europe').map(([c]) => c).sort(),
-  'Northern Europe': Object.entries(geography).filter(([, g]) => g.region === 'Northern Europe').map(([c]) => c).sort(),
-  'Southern Europe': Object.entries(geography).filter(([, g]) => g.region === 'Southern Europe').map(([c]) => c).sort(),
-  'Western Europe': Object.entries(geography).filter(([, g]) => g.region === 'Western Europe').map(([c]) => c).sort(),
-  'Australia and New Zealand': Object.entries(geography).filter(([, g]) => g.region === 'Australia and New Zealand').map(([c]) => c).sort(),
-  'Melanesia': Object.entries(geography).filter(([, g]) => g.region === 'Melanesia').map(([c]) => c).sort(),
-  'Micronesia': Object.entries(geography).filter(([, g]) => g.region === 'Micronesia').map(([c]) => c).sort(),
-  'Polynesia': Object.entries(geography).filter(([, g]) => g.region === 'Polynesia').map(([c]) => c).sort(),
-};
+export const regionIndex: Record<Region, string[]> = buildRegionIndex();

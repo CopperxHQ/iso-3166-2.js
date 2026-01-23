@@ -156,7 +156,8 @@ export type Region =
   | 'Australia and New Zealand'
   | 'Melanesia'
   | 'Micronesia'
-  | 'Polynesia';
+  | 'Polynesia'
+  | 'Antarctica';
 
 /**
  * Geographic information for a country
