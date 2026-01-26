@@ -12,6 +12,10 @@ Complete API documentation for the iso-3166 library.
   - [Lookups](#subdivision-lookups)
   - [Conversions](#subdivision-conversions)
   - [Validation](#subdivision-validation)
+- [Currency Functions](#currency-functions)
+- [Dial Code Functions](#dial-code-functions)
+- [Geography Functions](#geography-functions)
+- [Membership Functions](#membership-functions)
 - [Types](#types)
 
 ---
@@ -513,6 +517,331 @@ subdivision.isValidName('US', 'Narnia');     // false
 
 ---
 
+## Currency Functions
+
+Import: `import { currency } from '@koshmoney/countries/currency';`
+
+#### `getCurrency(alpha2: string): CurrencyInfo | null`
+
+Get full currency information for a country.
+
+```typescript
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.getCurrency('JP');
+// { code: 'JPY', symbol: '¥', name: 'Japanese Yen' }
+
+currency.getCurrency('XX');
+// null
+```
+
+---
+
+#### `getCurrencyCode(alpha2: string): string | null`
+
+Get currency code for a country.
+
+```typescript
+currency.getCurrencyCode('US'); // 'USD'
+currency.getCurrencyCode('DE'); // 'EUR'
+currency.getCurrencyCode('XX'); // null
+```
+
+---
+
+#### `getCurrencySymbol(alpha2: string): string | null`
+
+Get currency symbol for a country.
+
+```typescript
+currency.getCurrencySymbol('US'); // '$'
+currency.getCurrencySymbol('GB'); // '£'
+currency.getCurrencySymbol('IN'); // '₹'
+```
+
+---
+
+#### `getCurrencyName(alpha2: string): string | null`
+
+Get currency name for a country.
+
+```typescript
+currency.getCurrencyName('US'); // 'US Dollar'
+currency.getCurrencyName('JP'); // 'Japanese Yen'
+```
+
+---
+
+#### `getCountriesByCurrency(currencyCode: string): string[]`
+
+Get all countries using a specific currency.
+
+```typescript
+currency.getCountriesByCurrency('EUR');
+// ['AD', 'AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', ...]
+
+currency.getCountriesByCurrency('USD');
+// ['AS', 'EC', 'FM', 'GU', 'IO', 'MH', 'MP', 'PR', 'PW', 'TC', 'UM', 'US', 'VG', 'VI']
+```
+
+---
+
+## Dial Code Functions
+
+Import: `import { dialCode } from '@koshmoney/countries/dialCode';`
+
+> Powered by [libphonenumber-js](https://www.npmjs.com/package/libphonenumber-js)
+
+#### `getDialCode(alpha2: string): string | null`
+
+Get international dialing code for a country.
+
+```typescript
+dialCode.getDialCode('US'); // '+1'
+dialCode.getDialCode('GB'); // '+44'
+dialCode.getDialCode('FR'); // '+33'
+dialCode.getDialCode('XX'); // null
+```
+
+---
+
+#### `getDialCodes(alpha2: string): string[] | null`
+
+Get all dial codes for a country (array for consistency).
+
+```typescript
+dialCode.getDialCodes('US'); // ['+1']
+dialCode.getDialCodes('GB'); // ['+44']
+```
+
+---
+
+#### `getDialCodeInfo(alpha2: string): DialCodeInfo | null`
+
+Get full dial code information.
+
+```typescript
+dialCode.getDialCodeInfo('US');
+// { dialCode: '+1', countryCode: 'US' }
+
+dialCode.getDialCodeInfo('XX');
+// null
+```
+
+---
+
+#### `isValidPhoneCountry(alpha2: string): boolean`
+
+Check if country code is supported for phone operations.
+
+```typescript
+dialCode.isValidPhoneCountry('US'); // true
+dialCode.isValidPhoneCountry('XX'); // false
+```
+
+---
+
+#### `getSupportedCountries(): string[]`
+
+Get all supported country codes.
+
+```typescript
+dialCode.getSupportedCountries();
+// ['AC', 'AD', 'AE', 'AF', ...]
+```
+
+---
+
+## Geography Functions
+
+Import: `import { geography } from '@koshmoney/countries/geography';`
+
+> Based on [UN M49](https://unstats.un.org/unsd/methodology/m49/) geographic regions classification.
+
+#### `getContinent(alpha2: string): Continent | null`
+
+Get continent for a country.
+
+```typescript
+geography.getContinent('US'); // 'North America'
+geography.getContinent('JP'); // 'Asia'
+geography.getContinent('DE'); // 'Europe'
+geography.getContinent('AU'); // 'Oceania'
+geography.getContinent('XX'); // null
+```
+
+---
+
+#### `getRegion(alpha2: string): Region | null`
+
+Get UN M49 subregion for a country.
+
+```typescript
+geography.getRegion('US'); // 'Northern America'
+geography.getRegion('JP'); // 'Eastern Asia'
+geography.getRegion('DE'); // 'Western Europe'
+geography.getRegion('BR'); // 'South America'
+```
+
+---
+
+#### `getGeography(alpha2: string): GeographyInfo | null`
+
+Get full geography information.
+
+```typescript
+geography.getGeography('FR');
+// { continent: 'Europe', region: 'Western Europe' }
+
+geography.getGeography('XX');
+// null
+```
+
+---
+
+#### `getCountriesByContinent(continent: Continent): string[]`
+
+Get all countries in a continent.
+
+```typescript
+geography.getCountriesByContinent('Europe');
+// ['AD', 'AL', 'AT', 'AX', 'BA', 'BE', ...]
+
+geography.getCountriesByContinent('Antarctica');
+// ['AQ', 'BV', 'GS', 'HM', 'TF']
+```
+
+---
+
+#### `getCountriesByRegion(region: Region): string[]`
+
+Get all countries in a region.
+
+```typescript
+geography.getCountriesByRegion('Eastern Asia');
+// ['CN', 'HK', 'JP', 'KP', 'KR', 'MO', 'MN', 'TW']
+
+geography.getCountriesByRegion('Northern America');
+// ['BM', 'CA', 'GL', 'PM', 'US']
+```
+
+---
+
+#### `getContinents(): Continent[]`
+
+Get all continents.
+
+```typescript
+geography.getContinents();
+// ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']
+```
+
+---
+
+#### `getRegions(): Region[]`
+
+Get all regions.
+
+```typescript
+geography.getRegions();
+// ['Northern Africa', 'Sub-Saharan Africa', 'Antarctica', 'Central Asia', ...]
+```
+
+---
+
+## Membership Functions
+
+Import: `import { membership } from '@koshmoney/countries/membership';`
+
+#### `isEU(alpha2: string): boolean`
+
+Check if country is an EU member (27 countries).
+
+```typescript
+membership.isEU('FR'); // true
+membership.isEU('CH'); // false (Switzerland)
+membership.isEU('GB'); // false (post-Brexit)
+```
+
+---
+
+#### `isSEPA(alpha2: string): boolean`
+
+Check if country is in SEPA zone (36 countries).
+
+```typescript
+membership.isSEPA('FR'); // true
+membership.isSEPA('CH'); // true (Switzerland is SEPA)
+membership.isSEPA('GB'); // true (UK remains in SEPA)
+```
+
+---
+
+#### `isEEA(alpha2: string): boolean`
+
+Check if country is in EEA (30 countries).
+
+```typescript
+membership.isEEA('NO'); // true (Norway)
+membership.isEEA('CH'); // false (Switzerland not in EEA)
+```
+
+---
+
+#### `isEurozone(alpha2: string): boolean`
+
+Check if country uses the Euro (20 countries).
+
+```typescript
+membership.isEurozone('DE'); // true
+membership.isEurozone('SE'); // false (Sweden uses SEK)
+```
+
+---
+
+#### `isSchengen(alpha2: string): boolean`
+
+Check if country is in Schengen Area (27 countries).
+
+```typescript
+membership.isSchengen('FR'); // true
+membership.isSchengen('IE'); // false (Ireland not in Schengen)
+```
+
+---
+
+#### `getMemberships(alpha2: string): MembershipInfo`
+
+Get all membership statuses for a country.
+
+```typescript
+membership.getMemberships('FR');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+
+membership.getMemberships('CH');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: true }
+
+membership.getMemberships('GB');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: false }
+```
+
+---
+
+#### `getMembers(membershipType: MembershipType): string[]`
+
+Get all member countries of a specific group.
+
+```typescript
+membership.getMembers('EU');
+// ['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK']
+
+membership.getMembers('Eurozone');
+// ['AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PT', 'SI', 'SK']
+```
+
+---
+
 ## Types
 
 ### Country
@@ -573,4 +902,101 @@ interface CountryWithSubdivisions extends Country {
 
 ```typescript
 type CountryCodeFormat = 'alpha2' | 'alpha3' | 'numeric';
+```
+
+### CurrencyInfo
+
+```typescript
+interface CurrencyInfo {
+  /** Currency code (e.g., "USD") */
+  code: string;
+  /** Currency symbol (e.g., "$") */
+  symbol: string;
+  /** Currency name (e.g., "US Dollar") */
+  name: string;
+}
+```
+
+### DialCodeInfo
+
+```typescript
+interface DialCodeInfo {
+  /** Dial code with + prefix (e.g., "+1") */
+  dialCode: string;
+  /** Country alpha-2 code (e.g., "US") */
+  countryCode: string;
+}
+```
+
+### GeographyInfo
+
+```typescript
+interface GeographyInfo {
+  /** Continent name */
+  continent: Continent;
+  /** UN M49 region name */
+  region: Region;
+}
+```
+
+### Continent
+
+```typescript
+type Continent =
+  | 'Africa'
+  | 'Antarctica'
+  | 'Asia'
+  | 'Europe'
+  | 'North America'
+  | 'Oceania'
+  | 'South America';
+```
+
+### Region
+
+```typescript
+type Region =
+  | 'Northern Africa'
+  | 'Sub-Saharan Africa'
+  | 'Antarctica'
+  | 'Central Asia'
+  | 'Eastern Asia'
+  | 'South-eastern Asia'
+  | 'Southern Asia'
+  | 'Western Asia'
+  | 'Eastern Europe'
+  | 'Northern Europe'
+  | 'Southern Europe'
+  | 'Western Europe'
+  | 'Caribbean'
+  | 'Central America'
+  | 'Northern America'
+  | 'South America'
+  | 'Australia and New Zealand'
+  | 'Melanesia'
+  | 'Micronesia'
+  | 'Polynesia';
+```
+
+### MembershipInfo
+
+```typescript
+interface MembershipInfo {
+  /** EU member state */
+  EU: boolean;
+  /** SEPA zone member */
+  SEPA: boolean;
+  /** EEA member */
+  EEA: boolean;
+  /** Eurozone member (uses Euro) */
+  Eurozone: boolean;
+  /** Schengen Area member */
+  Schengen: boolean;
+}
+```
+
+### MembershipType
+
+```typescript
+type MembershipType = 'EU' | 'SEPA' | 'EEA' | 'Eurozone' | 'Schengen';
 ```
