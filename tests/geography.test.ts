@@ -5,7 +5,7 @@ import {
   getGeography,
   countriesInContinent,
   countriesInRegion,
-  geography,
+  geographyData,
   continentIndex,
   regionIndex,
 } from '../src/geography';
@@ -174,9 +174,9 @@ describe('Geography Module', () => {
     it('should have geography data for major countries', () => {
       const majorCountries = ['US', 'CA', 'GB', 'FR', 'DE', 'JP', 'CN', 'IN', 'AU', 'BR', 'ZA'];
       for (const code of majorCountries) {
-        expect(geography[code]).toBeDefined();
-        expect(geography[code].continent).toBeDefined();
-        expect(geography[code].region).toBeDefined();
+        expect(geographyData[code]).toBeDefined();
+        expect(geographyData[code].continent).toBeDefined();
+        expect(geographyData[code].region).toBeDefined();
       }
     });
 

@@ -82,3 +82,8 @@ export function usesCurrency(alpha2: string, currencyCode: string): boolean {
   const currency = normalize(currencyCode);
   return currencies[country]?.code === currency;
 }
+
+/**
+ * Alias for countriesUsingCurrency
+ */
+export const getCountriesByCurrency = countriesUsingCurrency;

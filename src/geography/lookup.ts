@@ -63,3 +63,33 @@ export function countriesInContinent(continent: Continent): string[] {
 export function countriesInRegion(region: Region): string[] {
   return regionIndex[region] ?? [];
 }
+
+/**
+ * Alias for countriesInContinent
+ */
+export const getCountriesByContinent = countriesInContinent;
+
+/**
+ * Alias for countriesInRegion
+ */
+export const getCountriesByRegion = countriesInRegion;
+
+/**
+ * Get all continents
+ * @returns Array of continent names
+ * @example
+ * getContinents() // ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']
+ */
+export function getContinents(): Continent[] {
+  return Object.keys(continentIndex) as Continent[];
+}
+
+/**
+ * Get all regions
+ * @returns Array of region names
+ * @example
+ * getRegions() // ['Northern Africa', 'Sub-Saharan Africa', ...]
+ */
+export function getRegions(): Region[] {
+  return Object.keys(regionIndex) as Region[];
+}
