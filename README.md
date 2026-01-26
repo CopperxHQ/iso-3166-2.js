@@ -11,10 +11,14 @@ Complete ISO 3166-1 (countries) and ISO 3166-2 (subdivisions) lookup library wit
 - **Full ISO 3166-1 support**: alpha-2, alpha-3, numeric codes, and country names
 - **Full ISO 3166-2 support**: 5000+ subdivisions (states, provinces, regions, etc.)
 - **Postal code validation**: Validate ZIP codes, PIN codes, postcodes for 150+ countries
+- **Currency data**: Get currency code, symbol, and name for any country
+- **Phone dial codes**: Get international dialing codes (powered by libphonenumber-js)
+- **Geography data**: Continent and region classification (UN M49 standard)
+- **Membership checks**: EU, SEPA, EEA, Eurozone, and Schengen membership
 - **Code conversion utilities**: Convert between alpha-2, alpha-3, and numeric formats
 - **Validation functions**: Validate any country or subdivision code
-- **True tree-shaking**: Import only the countries you need
-- **Zero dependencies**: Lightweight and self-contained
+- **True tree-shaking**: Import only the modules you need
+- **Minimal dependencies**: Core modules are dependency-free; dial codes use libphonenumber-js
 - **Full TypeScript support**: Complete type definitions included
 - **Dual module format**: ESM and CommonJS exports
 
@@ -62,6 +66,27 @@ postalCode.isValid('US', '90210');     // true
 postalCode.isValid('GB', 'SW1A 1AA');  // true
 postalCode.getName('US');              // 'ZIP Code'
 postalCode.getName('IN');              // 'PIN Code'
+
+// Currency data
+import { currency } from '@koshmoney/countries/currency';
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+// Phone dial codes
+import { dialCode } from '@koshmoney/countries/dialCode';
+dialCode.getDialCode('US');            // '+1'
+dialCode.getDialCode('GB');            // '+44'
+
+// Geography (continent/region)
+import { geography } from '@koshmoney/countries/geography';
+geography.getContinent('US');          // 'North America'
+geography.getRegion('JP');             // 'Eastern Asia'
+
+// EU/SEPA membership
+import { membership } from '@koshmoney/countries/membership';
+membership.isEU('FR');                 // true
+membership.isSEPA('CH');               // true
+membership.isEurozone('DE');           // true
 ```
 
 ## Usage
@@ -167,6 +192,137 @@ country.hasPostalCode('US');
 country.getPostalCodeName('US');
 ```
 
+### Currency Functions
+
+Get currency information for any country.
+
+```typescript
+import { currency } from '@koshmoney/countries/currency';
+
+// Get full currency info
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.getCurrency('JP');
+// { code: 'JPY', symbol: '¥', name: 'Japanese Yen' }
+
+currency.getCurrency('GB');
+// { code: 'GBP', symbol: '£', name: 'British Pound' }
+
+// Individual lookups
+currency.getCurrencyCode('DE');        // 'EUR'
+currency.getCurrencySymbol('IN');      // '₹'
+currency.getCurrencyName('BR');        // 'Brazilian Real'
+
+// Reverse lookup
+currency.getCountriesByCurrency('EUR');
+// ['AD', 'AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', ...]
+```
+
+### Dial Code Functions
+
+Get international dialing codes (powered by libphonenumber-js).
+
+```typescript
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// Get dial code
+dialCode.getDialCode('US');            // '+1'
+dialCode.getDialCode('GB');            // '+44'
+dialCode.getDialCode('FR');            // '+33'
+dialCode.getDialCode('JP');            // '+81'
+
+// Get full dial code info
+dialCode.getDialCodeInfo('US');
+// { dialCode: '+1', countryCode: 'US' }
+
+// Validation
+dialCode.isValidPhoneCountry('US');    // true
+dialCode.isValidPhoneCountry('XX');    // false
+
+// Get all supported countries
+dialCode.getSupportedCountries();      // ['AC', 'AD', 'AE', ...]
+```
+
+### Geography Functions
+
+Get continent and region data (UN M49 classification).
+
+```typescript
+import { geography } from '@koshmoney/countries/geography';
+
+// Get continent
+geography.getContinent('US');          // 'North America'
+geography.getContinent('JP');          // 'Asia'
+geography.getContinent('DE');          // 'Europe'
+geography.getContinent('AU');          // 'Oceania'
+
+// Get region (UN M49 subregion)
+geography.getRegion('US');             // 'Northern America'
+geography.getRegion('JP');             // 'Eastern Asia'
+geography.getRegion('DE');             // 'Western Europe'
+geography.getRegion('BR');             // 'South America'
+
+// Get full geography info
+geography.getGeography('FR');
+// { continent: 'Europe', region: 'Western Europe' }
+
+// Reverse lookups
+geography.getCountriesByContinent('Europe');
+// ['AD', 'AL', 'AT', 'AX', 'BA', 'BE', ...]
+
+geography.getCountriesByRegion('Eastern Asia');
+// ['CN', 'HK', 'JP', 'KP', 'KR', 'MO', 'MN', 'TW']
+
+// Get all continents/regions
+geography.getContinents();
+// ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']
+
+geography.getRegions();
+// ['Northern Africa', 'Sub-Saharan Africa', 'Northern America', ...]
+```
+
+### Membership Functions
+
+Check EU, SEPA, EEA, Eurozone, and Schengen membership.
+
+```typescript
+import { membership } from '@koshmoney/countries/membership';
+
+// EU membership (27 countries)
+membership.isEU('FR');                 // true
+membership.isEU('CH');                 // false (Switzerland)
+membership.isEU('GB');                 // false (post-Brexit)
+
+// SEPA membership (36 countries)
+membership.isSEPA('FR');               // true
+membership.isSEPA('CH');               // true (Switzerland is SEPA)
+membership.isSEPA('GB');               // true (UK remains in SEPA)
+
+// EEA membership (30 countries)
+membership.isEEA('NO');                // true (Norway)
+membership.isEEA('CH');                // false (Switzerland not in EEA)
+
+// Eurozone membership (20 countries)
+membership.isEurozone('DE');           // true
+membership.isEurozone('SE');           // false (Sweden uses SEK)
+
+// Schengen membership (27 countries)
+membership.isSchengen('FR');           // true
+membership.isSchengen('IE');           // false (Ireland not in Schengen)
+
+// Get all memberships at once
+membership.getMemberships('FR');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+
+membership.getMemberships('CH');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: true }
+
+// Get all members of a group
+membership.getMembers('EU');           // ['AT', 'BE', 'BG', ...] (27 countries)
+membership.getMembers('Eurozone');     // ['AT', 'BE', 'CY', ...] (20 countries)
+```
+
 ### Direct Imports (Tree-Shakeable)
 
 ```typescript
@@ -201,6 +357,46 @@ import {
   getPattern,
   getInfo,
 } from '@koshmoney/countries/postalCode';
+
+// Currency functions
+import {
+  getCurrency,
+  getCurrencyCode,
+  getCurrencySymbol,
+  getCurrencyName,
+  getCountriesByCurrency,
+} from '@koshmoney/countries/currency';
+
+// Dial code functions
+import {
+  getDialCode,
+  getDialCodes,
+  getDialCodeInfo,
+  isValidPhoneCountry,
+  getSupportedCountries,
+} from '@koshmoney/countries/dialCode';
+
+// Geography functions
+import {
+  getContinent,
+  getRegion,
+  getGeography,
+  getCountriesByContinent,
+  getCountriesByRegion,
+  getContinents,
+  getRegions,
+} from '@koshmoney/countries/geography';
+
+// Membership functions
+import {
+  isEU,
+  isSEPA,
+  isEEA,
+  isEurozone,
+  isSchengen,
+  getMemberships,
+  getMembers,
+} from '@koshmoney/countries/membership';
 ```
 
 ## Tree-Shaking
@@ -304,6 +500,44 @@ interface PostalCodeInfo {
   format: string;    // "NNNNN" or "A1A 1A1"
   name: string;      // "ZIP Code", "PIN Code", "Postcode", etc.
 }
+
+interface CurrencyInfo {
+  code: string;      // "USD"
+  symbol: string;    // "$"
+  name: string;      // "US Dollar"
+}
+
+interface DialCodeInfo {
+  dialCode: string;    // "+1"
+  countryCode: string; // "US"
+}
+
+interface GeographyInfo {
+  continent: Continent; // "North America"
+  region: Region;       // "Northern America"
+}
+
+type Continent =
+  | 'Africa' | 'Antarctica' | 'Asia'
+  | 'Europe' | 'North America' | 'Oceania' | 'South America';
+
+type Region =
+  | 'Northern Africa' | 'Sub-Saharan Africa' | 'Antarctica'
+  | 'Central Asia' | 'Eastern Asia' | 'South-eastern Asia'
+  | 'Southern Asia' | 'Western Asia' | 'Eastern Europe'
+  | 'Northern Europe' | 'Southern Europe' | 'Western Europe'
+  | 'Caribbean' | 'Central America' | 'Northern America' | 'South America'
+  | 'Australia and New Zealand' | 'Melanesia' | 'Micronesia' | 'Polynesia';
+
+interface MembershipInfo {
+  EU: boolean;
+  SEPA: boolean;
+  EEA: boolean;
+  Eurozone: boolean;
+  Schengen: boolean;
+}
+
+type MembershipType = 'EU' | 'SEPA' | 'EEA' | 'Eurozone' | 'Schengen';
 ```
 
 ## API Reference
@@ -320,6 +554,9 @@ Migrating from `iso-3166-1` or `iso-3166-2`? See [Migration Guide](./docs/MIGRAT
 - [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2): Subdivision codes
 - [postcode-validator](https://github.com/melwynfurtado/postcode-validator): Postal code validation patterns
 - [Universal Postal Union (UPU)](https://www.upu.int): Postal code standards
+- [libphonenumber-js](https://www.npmjs.com/package/libphonenumber-js): Phone dial codes
+- [UN M49](https://unstats.un.org/unsd/methodology/m49/): Geographic regions classification
+- [European Commission](https://european-union.europa.eu/): EU/EEA/Eurozone/Schengen membership data
 
 ## Contributing
 
