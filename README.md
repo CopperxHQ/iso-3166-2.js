@@ -214,9 +214,14 @@ currency.getCurrencyCode('DE');        // 'EUR'
 currency.getCurrencySymbol('IN');      // '₹'
 currency.getCurrencyName('BR');        // 'Brazilian Real'
 
-// Reverse lookup
-currency.getCountriesByCurrency('EUR');
+// Check if country uses a specific currency
+currency.usesCurrency('FR', 'EUR');    // true
+currency.usesCurrency('GB', 'EUR');    // false
+
+// Reverse lookup - get all countries using a currency
+currency.countriesUsingCurrency('EUR');
 // ['AD', 'AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', ...]
+currency.getCountriesByCurrency('EUR'); // alias for countriesUsingCurrency
 ```
 
 ### Dial Code Functions
@@ -267,12 +272,14 @@ geography.getRegion('BR');             // 'South America'
 geography.getGeography('FR');
 // { continent: 'Europe', region: 'Western Europe' }
 
-// Reverse lookups
-geography.getCountriesByContinent('Europe');
+// Reverse lookups - get all countries in a continent/region
+geography.countriesInContinent('Europe');
 // ['AD', 'AL', 'AT', 'AX', 'BA', 'BE', ...]
+geography.getCountriesByContinent('Europe'); // alias for countriesInContinent
 
-geography.getCountriesByRegion('Eastern Asia');
+geography.countriesInRegion('Eastern Asia');
 // ['CN', 'HK', 'JP', 'KP', 'KR', 'MO', 'MN', 'TW']
+geography.getCountriesByRegion('Eastern Asia'); // alias for countriesInRegion
 
 // Get all continents/regions
 geography.getContinents();
@@ -310,6 +317,10 @@ membership.isEurozone('SE');           // false (Sweden uses SEK)
 // Schengen membership (27 countries)
 membership.isSchengen('FR');           // true
 membership.isSchengen('IE');           // false (Ireland not in Schengen)
+
+// Generic membership check
+membership.isMember('FR', 'EU');       // true
+membership.isMember('CH', 'SEPA');     // true
 
 // Get all memberships at once
 membership.getMemberships('FR');
@@ -364,7 +375,9 @@ import {
   getCurrencyCode,
   getCurrencySymbol,
   getCurrencyName,
-  getCountriesByCurrency,
+  usesCurrency,
+  countriesUsingCurrency,
+  getCountriesByCurrency, // alias for countriesUsingCurrency
 } from '@koshmoney/countries/currency';
 
 // Dial code functions
@@ -381,8 +394,10 @@ import {
   getContinent,
   getRegion,
   getGeography,
-  getCountriesByContinent,
-  getCountriesByRegion,
+  countriesInContinent,
+  countriesInRegion,
+  getCountriesByContinent, // alias for countriesInContinent
+  getCountriesByRegion,    // alias for countriesInRegion
   getContinents,
   getRegions,
 } from '@koshmoney/countries/geography';
@@ -394,6 +409,7 @@ import {
   isEEA,
   isEurozone,
   isSchengen,
+  isMember,
   getMemberships,
   getMembers,
 } from '@koshmoney/countries/membership';
