@@ -89,3 +89,105 @@ export interface PostalCodeInfo {
   /** Local terminology (e.g., "ZIP Code", "PIN Code", "Postcode") */
   name: string;
 }
+
+// ============ Currency Types ============
+
+/**
+ * Currency information for a country
+ */
+export interface CurrencyInfo {
+  /** ISO 4217 currency code (e.g., "USD") */
+  code: string;
+  /** Currency symbol (e.g., "$", "€", "£") */
+  symbol: string;
+  /** Full currency name (e.g., "US Dollar") */
+  name: string;
+}
+
+// ============ Dial Code Types ============
+
+/**
+ * Phone dial code information for a country
+ */
+export interface DialCodeInfo {
+  /** International dial code (e.g., "+1") */
+  dialCode: string;
+  /** Country alpha-2 code (e.g., "US") */
+  countryCode: string;
+}
+
+// ============ Geography Types ============
+
+/**
+ * Continent names (7 continents)
+ */
+export type Continent =
+  | 'Africa'
+  | 'Antarctica'
+  | 'Asia'
+  | 'Europe'
+  | 'North America'
+  | 'Oceania'
+  | 'South America';
+
+/**
+ * UN M49 geographic regions
+ */
+export type Region =
+  | 'Northern Africa'
+  | 'Sub-Saharan Africa'
+  | 'Eastern Africa'
+  | 'Middle Africa'
+  | 'Southern Africa'
+  | 'Western Africa'
+  | 'Caribbean'
+  | 'Central America'
+  | 'Northern America'
+  | 'South America'
+  | 'Central Asia'
+  | 'Eastern Asia'
+  | 'South-eastern Asia'
+  | 'Southern Asia'
+  | 'Western Asia'
+  | 'Eastern Europe'
+  | 'Northern Europe'
+  | 'Southern Europe'
+  | 'Western Europe'
+  | 'Australia and New Zealand'
+  | 'Melanesia'
+  | 'Micronesia'
+  | 'Polynesia'
+  | 'Antarctica';
+
+/**
+ * Geographic information for a country
+ */
+export interface GeographicInfo {
+  /** Continent name */
+  continent: Continent;
+  /** UN M49 region */
+  region: Region;
+}
+
+// ============ Membership Types ============
+
+/**
+ * Political/economic union membership types
+ */
+export type MembershipType = 'EU' | 'SEPA' | 'EEA' | 'Eurozone' | 'Schengen';
+
+/**
+ * Membership status for a country
+ */
+export interface MembershipInfo {
+  /** European Union member */
+  EU: boolean;
+  /** Single Euro Payments Area member */
+  SEPA: boolean;
+  /** European Economic Area member */
+  EEA: boolean;
+  /** Uses Euro as currency */
+  Eurozone: boolean;
+  /** Schengen Area member */
+  Schengen: boolean;
+}
