@@ -8,13 +8,14 @@
   "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
-      "country": ["dist/country/index.d.ts"],
-      "subdivision": ["dist/subdivision/index.d.ts"],
-      "postalCode": ["dist/postalCode/index.d.ts"],
-      "currency": ["dist/currency/index.d.ts"],
-      "dialCode": ["dist/dialCode/index.d.ts"],
-      "geography": ["dist/geography/index.d.ts"],
-      "membership": ["dist/membership/index.d.ts"]
+      "country": ["./dist/country/index.d.ts"],
+      "subdivision": ["./dist/subdivision/index.d.ts"],
+      "subdivision/*": ["./dist/subdivision/data/*.d.ts"],
+      "postalCode": ["./dist/postalCode/index.d.ts"],
+      "currency": ["./dist/currency/index.d.ts"],
+      "dialCode": ["./dist/dialCode/index.d.ts"],
+      "geography": ["./dist/geography/index.d.ts"],
+      "membership": ["./dist/membership/index.d.ts"]
     }
   },
   "sideEffects": [
