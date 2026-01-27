@@ -36,7 +36,26 @@ yarn add @koshmoney/countries
 pnpm add @koshmoney/countries
 ```
 
+### TypeScript Configuration
+
+Subpath imports work automatically with modern TypeScript settings (`moduleResolution: "node16"`, `"nodenext"`, or `"bundler"`).
+
+For older configurations (`moduleResolution: "node"`), the library includes `typesVersions` fallback, so no additional configuration is needed.
+
+## Module Types
+
+This library separates modules for optimal bundle size:
+
+| Type | Modules | Import Path |
+|------|---------|-------------|
+| **Core** | `country`, `subdivision`, `postalCode` | `@koshmoney/countries` |
+| **Specialized** | `currency`, `dialCode`, `geography`, `membership` | `@koshmoney/countries/{module}` |
+
+**Core modules** are included in the main bundle. **Specialized modules** require subpath imports to keep your bundle small.
+
 ## Quick Start
+
+### Core Modules
 
 ```typescript
 import { country, subdivision, postalCode } from '@koshmoney/countries';
@@ -66,7 +85,11 @@ postalCode.isValid('US', '90210');     // true
 postalCode.isValid('GB', 'SW1A 1AA');  // true
 postalCode.getName('US');              // 'ZIP Code'
 postalCode.getName('IN');              // 'PIN Code'
+```
 
+### Specialized Modules (subpath imports)
+
+```typescript
 // Currency data
 import { currency } from '@koshmoney/countries/currency';
 currency.getCurrency('US');
