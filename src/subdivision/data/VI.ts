@@ -3,10 +3,10 @@ import type { SubdivisionInfo } from '../../types';
 import { register } from '../registry';
 
 export const countryCode = 'VI';
-export const countryName = "U.S. Virgin Islands";
+export const countryName = "Virgin Islands";
 
 export const subdivisions: Record<string, SubdivisionInfo> = {
-  'VI-VI': { name: "U.S. Virgin Islands", type: "Country" },
+  'VI-VI': { name: "Virgin Islands", type: "Country" },
 };
 
 // Auto-register on import
