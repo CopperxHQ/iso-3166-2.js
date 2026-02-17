@@ -62,6 +62,27 @@ describe('Membership Module', () => {
       expect(isSEPA('GI')).toBe(true); // Gibraltar
     });
 
+    it('should return true for UK Crown Dependencies', () => {
+      expect(isSEPA('GG')).toBe(true); // Guernsey
+      expect(isSEPA('IM')).toBe(true); // Isle of Man
+      expect(isSEPA('JE')).toBe(true); // Jersey
+    });
+
+    it('should return true for French Overseas Territories', () => {
+      expect(isSEPA('BL')).toBe(true); // Saint Barthélemy
+      expect(isSEPA('GF')).toBe(true); // French Guiana
+      expect(isSEPA('GP')).toBe(true); // Guadeloupe
+      expect(isSEPA('MF')).toBe(true); // Saint Martin (French part)
+      expect(isSEPA('MQ')).toBe(true); // Martinique
+      expect(isSEPA('PM')).toBe(true); // Saint Pierre and Miquelon
+      expect(isSEPA('RE')).toBe(true); // Réunion
+      expect(isSEPA('YT')).toBe(true); // Mayotte
+    });
+
+    it('should return true for Åland Islands', () => {
+      expect(isSEPA('AX')).toBe(true); // Åland Islands (Finland)
+    });
+
     it('should return false for non-SEPA countries', () => {
       expect(isSEPA('US')).toBe(false);
       expect(isSEPA('JP')).toBe(false);

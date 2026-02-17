@@ -42,11 +42,13 @@ export const EEA_MEMBERS = new Set([
 ]);
 
 /**
- * SEPA Members (36 countries/territories)
+ * SEPA Members (36 countries + 12 territories = 48 total)
  * Single Euro Payments Area
+ * Source: European Payments Council (EPC)
  */
 export const SEPA_MEMBERS = new Set([
   ...EEA_MEMBERS,
+  // Non-EU/EEA countries
   'CH', // Switzerland
   'MC', // Monaco
   'SM', // San Marino
@@ -54,6 +56,21 @@ export const SEPA_MEMBERS = new Set([
   'VA', // Vatican City
   'GB', // United Kingdom (still in SEPA post-Brexit)
   'GI', // Gibraltar
+  // UK Crown Dependencies
+  'GG', // Guernsey
+  'IM', // Isle of Man
+  'JE', // Jersey
+  // French Overseas Territories (with separate ISO codes)
+  'BL', // Saint Barthélemy
+  'GF', // French Guiana
+  'GP', // Guadeloupe
+  'MF', // Saint Martin (French part)
+  'MQ', // Martinique
+  'PM', // Saint Pierre and Miquelon
+  'RE', // Réunion
+  'YT', // Mayotte
+  // Finnish Territory
+  'AX', // Åland Islands
 ]);
 
 /**
