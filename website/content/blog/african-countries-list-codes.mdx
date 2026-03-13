@@ -1,0 +1,180 @@
+---
+description: "Complete list of all 54 African countries with ISO 3166-1 alpha-2, alpha-3, and numeric codes. Organized by UN M49 subregion with code examples."
+---
+
+# African Countries: Complete List with ISO 3166 Codes
+
+Africa is the second-largest continent by both area and population, with 54 sovereign nations and several dependent territories. This reference lists every African country and territory recognized in ISO 3166, organized by UN M49 subregion, with their alpha-2, alpha-3, and numeric codes.
+
+## Quick Access with Code
+
+Get all African countries programmatically using `@koshmoney/countries`:
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { country } from '@koshmoney/countries';
+
+// Get all African country codes
+const africanCodes = geography.getCountriesByContinent('Africa');
+// ['AO', 'BF', 'BI', 'BJ', 'BW', 'CD', 'CF', 'CG', 'CI', 'CM', ...]
+
+// Get full country objects
+const africanCountries = africanCodes.map((code) => country.whereAlpha2(code));
+console.log(africanCountries.length); // 58 (including territories)
+```
+
+## Northern Africa
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Algeria | DZ | DZA | 012 |
+| Egypt | EG | EGY | 818 |
+| Libya | LY | LBY | 434 |
+| Morocco | MA | MAR | 504 |
+| Sudan | SD | SDN | 729 |
+| Tunisia | TN | TUN | 788 |
+| Western Sahara | EH | ESH | 732 |
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByRegion('Northern Africa');
+// ['DZ', 'EG', 'EH', 'LY', 'MA', 'SD', 'TN']
+```
+
+## Eastern Africa
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Burundi | BI | BDI | 108 |
+| Comoros | KM | COM | 174 |
+| Djibouti | DJ | DJI | 262 |
+| Eritrea | ER | ERI | 232 |
+| Ethiopia | ET | ETH | 231 |
+| Kenya | KE | KEN | 404 |
+| Madagascar | MG | MDG | 450 |
+| Malawi | MW | MWI | 454 |
+| Mauritius | MU | MUS | 480 |
+| Mayotte | YT | MYT | 175 |
+| Mozambique | MZ | MOZ | 508 |
+| Reunion | RE | REU | 638 |
+| Rwanda | RW | RWA | 646 |
+| Seychelles | SC | SYC | 690 |
+| Somalia | SO | SOM | 706 |
+| South Sudan | SS | SSD | 728 |
+| Tanzania | TZ | TZA | 834 |
+| Uganda | UG | UGA | 800 |
+| Zambia | ZM | ZMB | 894 |
+| Zimbabwe | ZW | ZWE | 716 |
+
+Eastern Africa is the largest subregion on the continent with 20 entries, including the island nations of Comoros, Madagascar, Mauritius, and Seychelles, as well as the French overseas territories of Mayotte and Reunion.
+
+## Middle Africa
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Angola | AO | AGO | 024 |
+| Cameroon | CM | CMR | 120 |
+| Central African Republic | CF | CAF | 140 |
+| Chad | TD | TCD | 148 |
+| Congo | CG | COG | 178 |
+| Congo, Democratic Republic | CD | COD | 180 |
+| Equatorial Guinea | GQ | GNQ | 226 |
+| Gabon | GA | GAB | 266 |
+| Sao Tome and Principe | ST | STP | 678 |
+
+> [!NOTE]
+> The two Congo entries are distinct countries. The Republic of the Congo (CG/COG) and the Democratic Republic of the Congo (CD/COD) have different ISO codes. Be careful not to confuse them in your applications.
+
+## Southern Africa
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Botswana | BW | BWA | 072 |
+| Eswatini (Swaziland) | SZ | SWZ | 748 |
+| Lesotho | LS | LSO | 426 |
+| Namibia | NA | NAM | 516 |
+| South Africa | ZA | ZAF | 710 |
+
+Southern Africa is the smallest subregion with just 5 countries. South Africa (ZA) is the economic powerhouse of the region and the entire continent.
+
+## Western Africa
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Benin | BJ | BEN | 204 |
+| Burkina Faso | BF | BFA | 854 |
+| Cape Verde | CV | CPV | 132 |
+| Gambia | GM | GMB | 270 |
+| Ghana | GH | GHA | 288 |
+| Guinea | GN | GIN | 324 |
+| Guinea-Bissau | GW | GNB | 624 |
+| Ivory Coast | CI | CIV | 384 |
+| Liberia | LR | LBR | 430 |
+| Mali | ML | MLI | 466 |
+| Mauritania | MR | MRT | 478 |
+| Niger | NE | NER | 562 |
+| Nigeria | NG | NGA | 566 |
+| Saint Helena | SH | SHN | 654 |
+| Senegal | SN | SEN | 686 |
+| Sierra Leone | SL | SLE | 694 |
+| Togo | TG | TGO | 768 |
+
+Nigeria (NG) is the most populous country in Africa and the seventh most populous in the world.
+
+## Working with African Country Data
+
+### Filter African countries by currency
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { currency } from '@koshmoney/countries/currency';
+
+const africanCodes = geography.getCountriesByContinent('Africa');
+
+// Find all African countries using a specific currency
+const xofCountries = africanCodes.filter((code) => {
+  const curr = currency.getCurrency(code);
+  return curr?.code === 'XOF';
+});
+// West African CFA franc countries
+```
+
+### Validate an African country code
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { geography } from '@koshmoney/countries/geography';
+
+function isAfricanCountry(code: string): boolean {
+  if (!country.isAlpha2(code)) return false;
+  return geography.getContinent(code) === 'Africa';
+}
+
+isAfricanCountry('NG'); // true (Nigeria)
+isAfricanCountry('US'); // false
+isAfricanCountry('XX'); // false
+```
+
+### Get subdivisions for an African country
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const nigerianStates = subdivision.forCountry('NG');
+// [{ code: 'NG-AB', name: 'Abia', type: 'State', ... }, ...]
+console.log(nigerianStates.length); // 36 states + FCT
+```
+
+## Summary
+
+Africa has 58 entries in the ISO 3166 standard across 5 UN M49 subregions. The `@koshmoney/countries` library provides full access to all African country codes, subdivisions, currencies, and geographic classifications through a consistent, type-safe API.
+
+---
+
+## Related
+
+- [Geography API](/docs/api/geography) -- Continent and region lookups
+- [European Countries List](/blog/european-countries-list-codes) -- All European country codes
+- [Asian Countries List](/blog/asian-countries-list-codes) -- All Asian country codes
+- [Country API](/docs/api/country) -- Full country lookup reference

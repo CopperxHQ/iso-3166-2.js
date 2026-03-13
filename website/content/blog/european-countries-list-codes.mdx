@@ -1,0 +1,174 @@
+---
+description: "Complete list of all European countries with ISO 3166-1 alpha-2, alpha-3, and numeric codes. Organized by UN M49 subregion. Includes EU, SEPA, and Schengen membership status."
+---
+
+# European Countries: Complete List with ISO 3166 Codes
+
+Europe has 51 entries in the ISO 3166 standard, spanning sovereign nations, microstates, and dependent territories. This reference lists every European country organized by UN M49 subregion, with their ISO codes and political membership status.
+
+For a focused list of EU member states only, see our [EU Country Codes](/blog/eu-country-codes-list) article.
+
+## Quick Access with Code
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { country } from '@koshmoney/countries';
+
+const europeanCodes = geography.getCountriesByContinent('Europe');
+// ['AD', 'AL', 'AT', 'AX', 'BA', 'BE', 'BG', 'BY', 'CH', ...]
+
+const europeanCountries = europeanCodes.map((code) => country.whereAlpha2(code));
+console.log(europeanCountries.length); // 51
+```
+
+## Eastern Europe
+
+| Country | Alpha-2 | Alpha-3 | Numeric | EU | SEPA |
+|---------|---------|---------|---------|:--:|:----:|
+| Belarus | BY | BLR | 112 | | |
+| Bulgaria | BG | BGR | 100 | Yes | Yes |
+| Czech Republic | CZ | CZE | 203 | Yes | Yes |
+| Hungary | HU | HUN | 348 | Yes | Yes |
+| Moldova | MD | MDA | 498 | | |
+| Poland | PL | POL | 616 | Yes | Yes |
+| Romania | RO | ROU | 642 | Yes | Yes |
+| Russia | RU | RUS | 643 | | |
+| Slovakia | SK | SVK | 703 | Yes | Yes |
+| Ukraine | UA | UKR | 804 | | |
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByRegion('Eastern Europe');
+// ['BG', 'BY', 'CZ', 'HU', 'MD', 'PL', 'RO', 'RU', 'SK', 'UA']
+```
+
+## Northern Europe
+
+| Country | Alpha-2 | Alpha-3 | Numeric | EU | SEPA |
+|---------|---------|---------|---------|:--:|:----:|
+| Aland Islands | AX | ALA | 248 | | |
+| Denmark | DK | DNK | 208 | Yes | Yes |
+| Estonia | EE | EST | 233 | Yes | Yes |
+| Faroe Islands | FO | FRO | 234 | | |
+| Finland | FI | FIN | 246 | Yes | Yes |
+| Guernsey | GG | GGY | 831 | | |
+| Iceland | IS | ISL | 352 | | Yes |
+| Ireland | IE | IRL | 372 | Yes | Yes |
+| Isle of Man | IM | IMN | 833 | | |
+| Jersey | JE | JEY | 832 | | |
+| Latvia | LV | LVA | 428 | Yes | Yes |
+| Lithuania | LT | LTU | 440 | Yes | Yes |
+| Norway | NO | NOR | 578 | | Yes |
+| Svalbard & Jan Mayen | SJ | SJM | 744 | | |
+| Sweden | SE | SWE | 752 | Yes | Yes |
+| United Kingdom | GB | GBR | 826 | | Yes |
+
+> [!NOTE]
+> The United Kingdom (GB) left the EU in 2020 but remains in the SEPA zone. Iceland and Norway are not EU members but are in the EEA and SEPA. Use the `membership` module to check these distinctions programmatically.
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.getMemberships('GB');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: false }
+
+membership.getMemberships('NO');
+// { EU: false, SEPA: true, EEA: true, Eurozone: false, Schengen: true }
+```
+
+## Southern Europe
+
+| Country | Alpha-2 | Alpha-3 | Numeric | EU | SEPA |
+|---------|---------|---------|---------|:--:|:----:|
+| Albania | AL | ALB | 008 | | Yes |
+| Andorra | AD | AND | 020 | | Yes |
+| Bosnia and Herzegovina | BA | BIH | 070 | | |
+| Croatia | HR | HRV | 191 | Yes | Yes |
+| Gibraltar | GI | GIB | 292 | | Yes |
+| Greece | GR | GRC | 300 | Yes | Yes |
+| Italy | IT | ITA | 380 | Yes | Yes |
+| Malta | MT | MLT | 470 | Yes | Yes |
+| Montenegro | ME | MNE | 499 | | |
+| North Macedonia | MK | MKD | 807 | | |
+| Portugal | PT | PRT | 620 | Yes | Yes |
+| San Marino | SM | SMR | 674 | | Yes |
+| Serbia | RS | SRB | 688 | | |
+| Slovenia | SI | SVN | 705 | Yes | Yes |
+| Spain | ES | ESP | 724 | Yes | Yes |
+| Vatican City | VA | VAT | 336 | | Yes |
+
+Southern Europe includes several microstates (Andorra, San Marino, Vatican City) that have their own ISO codes. Gibraltar (GI) is a British Overseas Territory with its own code.
+
+## Western Europe
+
+| Country | Alpha-2 | Alpha-3 | Numeric | EU | SEPA |
+|---------|---------|---------|---------|:--:|:----:|
+| Austria | AT | AUT | 040 | Yes | Yes |
+| Belgium | BE | BEL | 056 | Yes | Yes |
+| France | FR | FRA | 250 | Yes | Yes |
+| Germany | DE | DEU | 276 | Yes | Yes |
+| Liechtenstein | LI | LIE | 438 | | Yes |
+| Luxembourg | LU | LUX | 442 | Yes | Yes |
+| Monaco | MC | MCO | 492 | | Yes |
+| Netherlands | NL | NLD | 528 | Yes | Yes |
+| Switzerland | CH | CHE | 756 | | Yes |
+
+Western Europe is compact but economically significant. Switzerland (CH) and Liechtenstein (LI) are SEPA members but not EU or EEA members.
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.getMemberships('CH');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: true }
+```
+
+## Membership Overview
+
+Use the `membership` module to programmatically filter European countries by political group:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// All EU member states (27 countries)
+const euMembers = membership.getMembers('EU');
+// ['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI',
+//  'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT',
+//  'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK']
+
+// Eurozone countries (20 countries using the Euro)
+const eurozone = membership.getMembers('Eurozone');
+
+// Schengen Area (27 countries with free movement)
+const schengen = membership.getMembers('Schengen');
+
+// SEPA zone (36 countries for Euro payments)
+const sepa = membership.getMembers('SEPA');
+```
+
+### Find European countries outside the EU
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+import { country } from '@koshmoney/countries';
+
+const european = geography.getCountriesByContinent('Europe');
+const nonEU = european.filter((code) => !membership.isEU(code));
+
+nonEU.map((code) => country.toName(code));
+// ['Albania', 'Andorra', 'Belarus', 'Bosnia and Herzegovina', ...]
+```
+
+## Summary
+
+Europe has 51 entries in the ISO 3166 standard across 4 UN M49 subregions. The political landscape of overlapping memberships (EU, EEA, SEPA, Eurozone, Schengen) makes programmatic membership checks essential for fintech, e-commerce, and compliance applications.
+
+---
+
+## Related
+
+- [EU Country Codes List](/blog/eu-country-codes-list) -- Focused EU member state list
+- [GDPR EU Countries for Developers](/blog/gdpr-eu-countries-developers) -- GDPR compliance
+- [Membership API](/docs/api/membership) -- EU, SEPA, EEA, Eurozone, Schengen checks
+- [Geography API](/docs/api/geography) -- Continent and region lookups

@@ -1,0 +1,152 @@
+---
+description: "Complete list of all 8 Australian states and territories with ISO 3166-2:AU codes. Code examples for lookups, validation, and dropdown menus."
+---
+
+# Australian State and Territory Codes: Complete ISO 3166-2:AU List
+
+Australia is divided into 6 states and 2 territories, each with an ISO 3166-2:AU code used in shipping, tax forms, government systems, and address validation. This reference covers every subdivision with its official ISO code and practical code examples.
+
+## Complete List
+
+| Code | Name | Type |
+|------|------|------|
+| AU-ACT | Australian Capital Territory | Territory |
+| AU-NSW | New South Wales | State |
+| AU-NT | Northern Territory | Territory |
+| AU-QLD | Queensland | State |
+| AU-SA | South Australia | State |
+| AU-TAS | Tasmania | State |
+| AU-VIC | Victoria | State |
+| AU-WA | Western Australia | State |
+
+Australia has 6 states (NSW, QLD, SA, TAS, VIC, WA) and 2 internal territories (ACT, NT). The Australian Capital Territory contains the capital city Canberra, similar to how Washington D.C. works in the United States.
+
+## Region Codes (Short Form)
+
+When working with forms or APIs, you often need just the region code (the part after the hyphen):
+
+| Region Code | Full ISO Code | State/Territory |
+|-------------|---------------|-----------------|
+| ACT | AU-ACT | Australian Capital Territory |
+| NSW | AU-NSW | New South Wales |
+| NT | AU-NT | Northern Territory |
+| QLD | AU-QLD | Queensland |
+| SA | AU-SA | South Australia |
+| TAS | AU-TAS | Tasmania |
+| VIC | AU-VIC | Victoria |
+| WA | AU-WA | Western Australia |
+
+## Using Australian State Codes in Code
+
+### Get All Australian States
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const states = subdivision.forCountry('AU');
+// [
+//   { code: 'AU-ACT', name: 'Australian Capital Territory', type: 'Territory' },
+//   { code: 'AU-NSW', name: 'New South Wales', type: 'State' },
+//   { code: 'AU-NT', name: 'Northern Territory', type: 'Territory' },
+//   { code: 'AU-QLD', name: 'Queensland', type: 'State' },
+//   { code: 'AU-SA', name: 'South Australia', type: 'State' },
+//   { code: 'AU-TAS', name: 'Tasmania', type: 'State' },
+//   { code: 'AU-VIC', name: 'Victoria', type: 'State' },
+//   { code: 'AU-WA', name: 'Western Australia', type: 'State' },
+// ]
+```
+
+### Look Up a Specific State
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('AU-NSW');
+// { code: 'AU-NSW', name: 'New South Wales', type: 'State', countryCode: 'AU', regionCode: 'NSW' }
+
+subdivision.where('AU', 'VIC');
+// { code: 'AU-VIC', name: 'Victoria', type: 'State', countryCode: 'AU', regionCode: 'VIC' }
+```
+
+### Validate a State Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('AU-NSW');     // true
+subdivision.isValidCode('AU-XX');      // false
+
+subdivision.isValidRegion('AU', 'VIC');  // true
+subdivision.isValidRegion('AU', 'CA');   // false (CA is Canadian)
+```
+
+### Build a State Dropdown
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const options = subdivision.forCountry('AU').map(s => ({
+  value: s.code.split('-')[1],  // 'NSW', 'VIC', etc.
+  label: s.name,
+}));
+
+// [{ value: 'ACT', label: 'Australian Capital Territory' }, ...]
+```
+
+### Tree-Shaking: Load Only Australian Data
+
+```typescript copy
+// Only load AU subdivisions (~200 bytes)
+import '@koshmoney/countries/subdivision/AU';
+import { forCountry } from '@koshmoney/countries/subdivision';
+
+const states = forCountry('AU');  // Works
+const usStates = forCountry('US');  // Returns [] (not loaded)
+```
+
+## Postal Code Validation
+
+Australian postcodes are 4-digit numbers:
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('AU', '2000');   // true (Sydney)
+postalCode.isValid('AU', '3000');   // true (Melbourne)
+postalCode.isValid('AU', '90210');  // false (US ZIP code)
+
+postalCode.getFormat('AU');   // 'NNNN'
+postalCode.getName('AU');     // 'Postcode'
+```
+
+### Postcode Ranges by State
+
+Each state uses a specific range of postcodes:
+
+| State/Territory | Postcode Range |
+|----------------|----------------|
+| ACT | 0200-0299, 2600-2618, 2900-2920 |
+| NSW | 1000-2599, 2619-2899, 2921-2999 |
+| NT | 0800-0899 |
+| QLD | 4000-4999, 9000-9999 |
+| SA | 5000-5799 |
+| TAS | 7000-7999 |
+| VIC | 3000-3999, 8000-8999 |
+| WA | 6000-6797 |
+
+## Country Data
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha2('AU');
+// { name: 'Australia', alpha2: 'AU', alpha3: 'AUS', numeric: '036' }
+```
+
+## Related Resources
+
+- [Subdivision API Reference](/docs/api/subdivision) -- Full subdivision module API
+- [Country Dropdown Guide](/docs/guides/country-dropdown) -- Build dropdowns with subdivisions
+- [Australia Country Page](/countries/au) -- Full Australia reference
+- [New Zealand Country Page](/countries/nz) -- Nearby country reference
+- [Oceania Countries](/blog/oceania-countries-list-codes) -- All Oceania country codes

@@ -1,0 +1,132 @@
+---
+description: "Get international dialing codes for any country. Powered by libphonenumber-js for accurate phone code data."
+---
+
+# Dial Code API
+
+Get international dialing codes for any country. Powered by [libphonenumber-js](https://www.npmjs.com/package/libphonenumber-js). This is a specialized module -- import it from the `dialCode` subpath.
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// Or direct imports
+import { getDialCode, getDialCodeInfo } from '@koshmoney/countries/dialCode';
+```
+
+> [!NOTE]
+> The `dialCode` module is the only module with a runtime dependency (`libphonenumber-js`). It is only loaded when you import from `@koshmoney/countries/dialCode`.
+
+## Types
+
+```typescript
+interface DialCodeInfo {
+  dialCode: string;    // "+1"
+  countryCode: string; // "US"
+}
+```
+
+---
+
+## Lookups
+
+### `getDialCode(alpha2)`
+
+Get the international dialing code for a country.
+
+**Parameters:** `alpha2: string` -- Alpha-2 country code (case-insensitive)
+
+**Returns:** `string | null`
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.getDialCode('US'); // '+1'
+dialCode.getDialCode('GB'); // '+44'
+dialCode.getDialCode('FR'); // '+33'
+dialCode.getDialCode('JP'); // '+81'
+dialCode.getDialCode('IN'); // '+91'
+dialCode.getDialCode('XX'); // null
+```
+
+---
+
+### `getDialCodes(alpha2)`
+
+Get all dial codes for a country as an array.
+
+**Parameters:** `alpha2: string`
+
+**Returns:** `string[] | null`
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.getDialCodes('US'); // ['+1']
+dialCode.getDialCodes('GB'); // ['+44']
+dialCode.getDialCodes('XX'); // null
+```
+
+---
+
+### `getDialCodeInfo(alpha2)`
+
+Get full dial code information including country code.
+
+**Parameters:** `alpha2: string`
+
+**Returns:** `DialCodeInfo | null`
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.getDialCodeInfo('US');
+// { dialCode: '+1', countryCode: 'US' }
+
+dialCode.getDialCodeInfo('GB');
+// { dialCode: '+44', countryCode: 'GB' }
+
+dialCode.getDialCodeInfo('XX');
+// null
+```
+
+---
+
+## Validation
+
+### `isValidPhoneCountry(alpha2)`
+
+Check if a country code is supported for phone dial code operations.
+
+**Parameters:** `alpha2: string`
+
+**Returns:** `boolean`
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.isValidPhoneCountry('US'); // true
+dialCode.isValidPhoneCountry('GB'); // true
+dialCode.isValidPhoneCountry('XX'); // false
+```
+
+---
+
+### `getSupportedCountries()`
+
+Get all country codes supported for dial code lookups.
+
+**Returns:** `string[]`
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+const countries = dialCode.getSupportedCountries();
+// ['AC', 'AD', 'AE', 'AF', ...]
+```
+
+---
+
+## Related
+
+- [Country API](/docs/api/country) -- Look up country data
+- [React Examples](/docs/examples/react) -- Phone input with country code selector

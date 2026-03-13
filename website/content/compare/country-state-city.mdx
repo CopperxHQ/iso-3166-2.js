@@ -1,0 +1,210 @@
+---
+description: "Compare @koshmoney/countries vs country-state-city. Cities data, TypeScript support, bundle size, tree-shaking, and API comparison."
+---
+
+# @koshmoney/countries vs country-state-city
+
+`country-state-city` is a comprehensive geographical data library that includes countries, states, and cities worldwide. It is the go-to package when you need city-level data. Here is how it compares to `@koshmoney/countries`.
+
+## Feature Comparison
+
+| Feature | @koshmoney/countries | country-state-city |
+|---|---|---|
+| Countries | 249 (ISO 3166-1) | 249 |
+| Subdivisions/States | 5,000+ (ISO 3166-2) | 5,000+ states |
+| **Cities** | **Not included** | **150,000+ cities** |
+| Postal Code Validation | 150+ countries | Not included |
+| Currency Data | ISO 4217 | Basic currency info |
+| Phone Dial Codes | Via libphonenumber-js | Phone codes |
+| **Coordinates** | **Not included** | **Lat/lng for countries, states, cities** |
+| **Timezones** | **Not included** | **Timezone data** |
+| EU/SEPA/EEA Membership | Built-in | Not included |
+| Geography (Continent/Region) | UN M49 | Not included |
+| Code Validation | Full validation suite | Not included |
+| Alpha-3/Numeric Codes | Yes | Limited |
+| TypeScript Support | Built-in | Built-in |
+| Tree-Shaking | Subpath exports | Partial |
+| **Full Bundle Size** | **~60KB gzipped** | **~2MB+ gzipped** |
+| Dependencies | 0 (core) | 0 |
+
+## Where country-state-city Wins
+
+### City Data
+
+The defining feature. `country-state-city` includes 150,000+ cities with coordinates. If your application needs city-level data (autocomplete, location pickers, geographic searches), this is what you need:
+
+```typescript
+// country-state-city
+import { City } from 'country-state-city';
+
+City.getCitiesOfState('US', 'CA');
+// [{ name: 'Los Angeles', latitude: '34.05223', longitude: '-118.24368' }, ...]
+
+City.getCitiesOfCountry('JP');
+// [{ name: 'Tokyo', ... }, { name: 'Osaka', ... }, ...]
+```
+
+`@koshmoney/countries` does not include city data. If cities are a core requirement, `country-state-city` is the right choice.
+
+### Coordinates and Timezones
+
+`country-state-city` includes geographic coordinates and timezone information for countries and states. This is useful for map-based UIs and timezone detection.
+
+## Where @koshmoney/countries Wins
+
+### Bundle Size
+
+This is the most significant difference for frontend applications:
+
+| Import | @koshmoney/countries | country-state-city |
+|---|---|---|
+| Full library | ~60KB gzipped | ~2MB+ gzipped |
+| Country only | ~8KB gzipped | Not separable |
+| Country + 1 state set | ~10KB gzipped | Not separable |
+
+`country-state-city` includes all cities in the bundle even if you only need countries and states. The city JSON alone is ~8MB raw (~2MB gzipped after minification). For frontend applications where bundle size matters, this is a significant cost.
+
+### Granular Tree-Shaking
+
+`@koshmoney/countries` lets you import data at the individual country level:
+
+```typescript copy
+// Load only US and Canada subdivisions: ~10KB total
+import '@koshmoney/countries/subdivision/US';
+import '@koshmoney/countries/subdivision/CA';
+import { forCountry } from '@koshmoney/countries/subdivision';
+
+forCountry('US');  // Works
+forCountry('CA');  // Works
+forCountry('GB');  // Returns [] (not loaded)
+```
+
+### Postal Code Validation
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('US', '90210');       // true
+postalCode.isValid('GB', 'SW1A 1AA');    // true
+postalCode.isValid('JP', '100-0001');    // true
+postalCode.getFormat('CA');              // 'A1A 1A1'
+postalCode.getName('DE');                // 'PLZ'
+```
+
+### EU/SEPA Membership
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEU('FR');          // true
+membership.isSEPA('GB');        // true
+membership.isEurozone('DE');    // true
+membership.getMembers('EEA');   // 30 EEA countries
+```
+
+### Code Conversion and Validation
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.alpha2ToAlpha3('US');      // 'USA'
+country.alpha3ToAlpha2('GBR');     // 'GB'
+country.alpha2ToNumeric('DE');     // '276'
+country.isValid('US');             // true
+country.detectFormat('USA');       // 'alpha3'
+```
+
+### ISO 3166-2 Compliance
+
+`@koshmoney/countries` uses official ISO 3166-2 codes (e.g., `US-CA`, `GB-ENG`). `country-state-city` uses its own code format that may not match the ISO standard exactly.
+
+## API Comparison
+
+### Getting States/Subdivisions
+
+```typescript
+// country-state-city
+import { State } from 'country-state-city';
+State.getStatesOfCountry('US');
+// [{ name: 'Alabama', isoCode: 'AL', countryCode: 'US', ... }]
+```
+
+```typescript copy
+// @koshmoney/countries
+import { subdivision } from '@koshmoney/countries';
+subdivision.forCountry('US');
+// [{ code: 'US-AL', name: 'Alabama', type: 'State', regionCode: 'AL', ... }]
+```
+
+### Looking Up a Country
+
+```typescript
+// country-state-city
+import { Country } from 'country-state-city';
+Country.getCountryByCode('US');
+// { name: 'United States', isoCode: 'US', phonecode: '1', currency: 'USD', ... }
+```
+
+```typescript copy
+// @koshmoney/countries
+import { country } from '@koshmoney/countries';
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+```
+
+## Migration Guide
+
+### States/Subdivisions
+
+```typescript
+// Before (country-state-city)
+import { State } from 'country-state-city';
+const states = State.getStatesOfCountry('US');
+const california = states.find(s => s.isoCode === 'CA');
+```
+
+```typescript copy
+// After (@koshmoney/countries)
+import { subdivision } from '@koshmoney/countries';
+const states = subdivision.forCountry('US');
+const california = subdivision.where('US', 'CA');
+```
+
+### Country Lookup
+
+```typescript
+// Before
+import { Country } from 'country-state-city';
+const us = Country.getCountryByCode('US');
+
+// After
+import { country } from '@koshmoney/countries';
+const us = country.whereAlpha2('US');
+```
+
+## When to Choose Which
+
+**Choose `country-state-city` if:**
+- You need city-level data (autocomplete, location pickers)
+- You need geographic coordinates for mapping
+- You need timezone data
+- Bundle size is not a primary concern (backend or SSR)
+
+**Choose `@koshmoney/countries` if:**
+- You do not need city data
+- Bundle size matters (frontend applications)
+- You need postal code validation
+- You need EU/SEPA/Eurozone membership checks
+- You want ISO 3166-2 compliant subdivision codes
+- You need code conversion between alpha-2, alpha-3, and numeric formats
+- You want tree-shakeable imports
+
+**Use both together if:**
+You need cities for some features and small bundles for others. Use `@koshmoney/countries` on the frontend for dropdowns and validation, and `country-state-city` on the backend for city-level queries.
+
+## Related Resources
+
+- [Tree-Shaking Country Data](/blog/tree-shaking-country-data) -- how subpath exports reduce bundle size
+- [Getting Started](/docs/getting-started) -- quick setup guide
+- [vs i18n-iso-countries](/compare/i18n-iso-countries) -- translation-focused alternative
+- [vs countries-list](/compare/countries-list) -- data-focused alternative

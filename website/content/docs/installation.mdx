@@ -1,0 +1,85 @@
+---
+description: "Install @koshmoney/countries via npm, yarn, or pnpm. Supports ESM and CommonJS with full TypeScript types."
+---
+
+# Installation
+
+## Package Managers
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+```bash copy
+yarn add @koshmoney/countries
+```
+
+```bash copy
+pnpm add @koshmoney/countries
+```
+
+## Module Formats
+
+The library ships in both ESM and CommonJS formats:
+
+```typescript copy
+// ESM (recommended)
+import { country, subdivision } from '@koshmoney/countries';
+
+// CommonJS
+const { country, subdivision } = require('@koshmoney/countries');
+```
+
+## Selective Imports
+
+For optimal bundle size, import only the modules you need:
+
+### Core Modules (main bundle)
+
+```typescript copy
+// All core modules (~60KB gzipped)
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+// Individual core modules
+import { country } from '@koshmoney/countries';
+import { subdivision } from '@koshmoney/countries';
+import { postalCode } from '@koshmoney/countries';
+```
+
+### Specialized Modules (subpath imports)
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+```
+
+### Per-Country Subdivision Data
+
+Load subdivision data for specific countries only:
+
+```typescript copy
+// Only US subdivisions (~1.5KB instead of ~55KB)
+import '@koshmoney/countries/subdivision/US';
+import { whereCode } from '@koshmoney/countries/subdivision';
+
+whereCode('US-CA');  // Works
+whereCode('GB-ENG'); // Returns null (GB not imported)
+```
+
+## TypeScript Configuration
+
+Subpath imports work automatically with modern TypeScript settings:
+
+- `moduleResolution: "node16"`
+- `moduleResolution: "nodenext"`
+- `moduleResolution: "bundler"`
+
+For `moduleResolution: "node"`, the library includes `typesVersions` fallback.
+
+## Requirements
+
+- **Node.js**: 16.0.0 or higher
+- **TypeScript**: 4.5+ (for subpath imports)
+- **Bundler**: Any modern bundler (Webpack 5+, Vite, Rollup, esbuild, tsup)

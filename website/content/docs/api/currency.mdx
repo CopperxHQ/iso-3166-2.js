@@ -1,0 +1,156 @@
+---
+description: "Get currency code, symbol, and name for any country. Reverse lookup countries by currency. ISO 4217 data."
+---
+
+# Currency API
+
+Get ISO 4217 currency data for any country. This is a specialized module -- import it from the `currency` subpath.
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+// Or direct imports
+import { getCurrency, getCurrencyCode } from '@koshmoney/countries/currency';
+```
+
+## Types
+
+```typescript
+interface CurrencyInfo {
+  code: string;    // "USD"
+  symbol: string;  // "$"
+  name: string;    // "US Dollar"
+}
+```
+
+---
+
+## Lookups
+
+### `getCurrency(alpha2)`
+
+Get full currency information for a country.
+
+**Parameters:** `alpha2: string` -- Alpha-2 country code (case-insensitive)
+**Returns:** `CurrencyInfo | null`
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.getCurrency('JP');
+// { code: 'JPY', symbol: '¥', name: 'Japanese Yen' }
+
+currency.getCurrency('GB');
+// { code: 'GBP', symbol: '£', name: 'British Pound' }
+
+currency.getCurrency('XX');
+// null
+```
+
+---
+
+### `getCurrencyCode(alpha2)`
+
+Get the ISO 4217 currency code for a country.
+
+**Parameters:** `alpha2: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrencyCode('US'); // 'USD'
+currency.getCurrencyCode('DE'); // 'EUR'
+currency.getCurrencyCode('JP'); // 'JPY'
+currency.getCurrencyCode('XX'); // null
+```
+
+---
+
+### `getCurrencySymbol(alpha2)`
+
+Get the currency symbol for a country.
+
+**Parameters:** `alpha2: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrencySymbol('US'); // '$'
+currency.getCurrencySymbol('GB'); // '£'
+currency.getCurrencySymbol('IN'); // '₹'
+currency.getCurrencySymbol('JP'); // '¥'
+currency.getCurrencySymbol('DE'); // '€'
+```
+
+---
+
+### `getCurrencyName(alpha2)`
+
+Get the currency name for a country.
+
+**Parameters:** `alpha2: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrencyName('US'); // 'US Dollar'
+currency.getCurrencyName('JP'); // 'Japanese Yen'
+currency.getCurrencyName('BR'); // 'Brazilian Real'
+```
+
+---
+
+## Reverse Lookups
+
+### `getCountriesByCurrency(currencyCode)`
+
+Get all countries using a specific currency code.
+
+**Parameters:** `currencyCode: string` -- ISO 4217 currency code
+**Returns:** `string[]`
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCountriesByCurrency('EUR');
+// ['AD', 'AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', ...]
+
+currency.getCountriesByCurrency('USD');
+// ['AS', 'EC', 'FM', 'GU', 'IO', 'MH', 'MP', 'PR', 'PW', 'TC', 'UM', 'US', 'VG', 'VI']
+
+currency.getCountriesByCurrency('XXX');
+// []
+```
+
+---
+
+### `usesCurrency(alpha2, currencyCode)`
+
+Check if a country uses a specific currency.
+
+**Parameters:**
+- `alpha2: string` -- Alpha-2 country code
+- `currencyCode: string` -- ISO 4217 currency code
+
+**Returns:** `boolean`
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.usesCurrency('FR', 'EUR');  // true
+currency.usesCurrency('GB', 'EUR');  // false
+currency.usesCurrency('US', 'USD');  // true
+```
+
+---
+
+## Related
+
+- [Membership API](/docs/api/membership) -- Check Eurozone membership
+- [Geography API](/docs/api/geography) -- Get continent and region data

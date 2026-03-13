@@ -1,0 +1,194 @@
+---
+description: "Complete list of all Oceania countries and territories with ISO 3166-1 alpha-2, alpha-3, and numeric codes. Organized by UN M49 subregion with code examples."
+---
+
+# Oceania Countries: Complete List with ISO 3166 Codes
+
+Oceania spans the vast Pacific Ocean and includes Australia, New Zealand, and hundreds of islands grouped into three cultural-geographic regions: Melanesia, Micronesia, and Polynesia. The continent has 25 entries in the ISO 3166 standard, ranging from a continent-sized country (Australia) to some of the smallest nations on Earth.
+
+## Quick Access with Code
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { country } from '@koshmoney/countries';
+
+const oceaniaCodes = geography.getCountriesByContinent('Oceania');
+// ['AS', 'AU', 'CC', 'CK', 'CX', 'FJ', 'FM', 'GU', 'KI', 'MH', ...]
+
+const oceaniaCountries = oceaniaCodes.map((code) => country.whereAlpha2(code));
+console.log(oceaniaCountries.length); // 25
+```
+
+## Australia and New Zealand
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Australia | AU | AUS | 036 |
+| Christmas Island | CX | CXR | 162 |
+| Cocos Islands | CC | CCK | 166 |
+| New Zealand | NZ | NZL | 554 |
+| Norfolk Island | NF | NFK | 574 |
+
+Australia (AU) is by far the largest country in Oceania and the sixth-largest in the world by land area. New Zealand (NZ) is the second-largest and second most populous country in the subregion. Christmas Island, Cocos Islands, and Norfolk Island are Australian external territories with their own ISO codes.
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByRegion('Australia and New Zealand');
+// ['AU', 'CC', 'CX', 'NF', 'NZ']
+```
+
+### Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const australianStates = subdivision.forCountry('AU');
+// [{ code: 'AU-ACT', name: 'Australian Capital Territory', type: 'Territory', ... }, ...]
+
+const nzRegions = subdivision.forCountry('NZ');
+// [{ code: 'NZ-AUK', name: 'Auckland', type: 'Region', ... }, ...]
+```
+
+## Melanesia
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Fiji | FJ | FJI | 242 |
+| New Caledonia | NC | NCL | 540 |
+| Papua New Guinea | PG | PNG | 598 |
+| Solomon Islands | SB | SLB | 090 |
+| Vanuatu | VU | VUT | 548 |
+
+Papua New Guinea (PG) is the largest Melanesian country and one of the most linguistically diverse countries in the world, with over 800 languages spoken. New Caledonia (NC) is a French special collectivity with its own ISO code.
+
+> [!NOTE]
+> New Caledonia (NC) uses the CFP Franc (XPF), the same currency used in French Polynesia. This is a remnant of the French colonial period and is pegged to the Euro.
+
+## Micronesia
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Guam | GU | GUM | 316 |
+| Kiribati | KI | KIR | 296 |
+| Marshall Islands | MH | MHL | 584 |
+| Micronesia, Federated States Of | FM | FSM | 583 |
+| Nauru | NR | NRU | 520 |
+| Northern Mariana Islands | MP | MNP | 580 |
+| Palau | PW | PLW | 585 |
+
+Micronesia consists of thousands of small islands across the western and central Pacific. Several of these nations use the US Dollar as their official currency due to their Compact of Free Association with the United States: the Federated States of Micronesia (FM), the Marshall Islands (MH), and Palau (PW). Guam (GU) and the Northern Mariana Islands (MP) are US territories.
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrency('FM');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.getCurrency('MH');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.getCurrency('PW');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+```
+
+## Polynesia
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| American Samoa | AS | ASM | 016 |
+| Cook Islands | CK | COK | 184 |
+| French Polynesia | PF | PYF | 258 |
+| Niue | NU | NIU | 570 |
+| Pitcairn | PN | PCN | 612 |
+| Samoa | WS | WSM | 882 |
+| Tokelau | TK | TKL | 772 |
+| Tonga | TO | TON | 776 |
+| Tuvalu | TV | TUV | 798 |
+| Wallis & Futuna Islands | WF | WLF | 876 |
+
+Polynesia is the largest subregion by number of entries (10) and stretches across the widest expanse of the Pacific. Note the distinction between Samoa (WS) and American Samoa (AS) -- they share cultural heritage but have separate ISO codes and different currencies.
+
+Tuvalu (TV) is notable for its `.tv` domain, which has become a significant source of national revenue through licensing to media companies.
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByRegion('Polynesia');
+// ['AS', 'CK', 'NU', 'PF', 'PN', 'TK', 'TO', 'TV', 'WF', 'WS']
+```
+
+## Currencies
+
+Oceania has a diverse currency landscape. Australia and New Zealand have their own well-known currencies, while many Pacific island nations use the US Dollar or currencies pegged to it:
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrency('AU');
+// { code: 'AUD', symbol: '$', name: 'Australian Dollar' }
+
+currency.getCurrency('NZ');
+// { code: 'NZD', symbol: '$', name: 'New Zealand Dollar' }
+
+currency.getCurrency('FJ');
+// { code: 'FJD', symbol: '$', name: 'Fijian Dollar' }
+
+currency.getCurrency('PG');
+// { code: 'PGK', symbol: 'K', name: 'Papua New Guinean Kina' }
+```
+
+The Cook Islands (CK), Niue (NU), and Tokelau (TK) use the New Zealand Dollar, reflecting their close political relationship with New Zealand.
+
+## Working with Oceania Data
+
+### Filter Oceania countries by currency
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+
+const oceaniaCodes = geography.getCountriesByContinent('Oceania');
+
+// Find all Oceania countries using the US Dollar
+const usdCountries = oceaniaCodes.filter((code) => {
+  const curr = currency.getCurrency(code);
+  return curr?.code === 'USD';
+});
+
+usdCountries.map((code) => country.toName(code));
+// ['American Samoa', 'Guam', 'Marshall Islands', 'Micronesia, Federated States Of', ...]
+```
+
+### Get dial codes for Pacific island nations
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { country } from '@koshmoney/countries';
+
+const oceaniaCodes = geography.getCountriesByContinent('Oceania');
+
+const phoneCodes = oceaniaCodes
+  .map((code) => ({
+    country: country.toName(code),
+    code,
+    dialCode: dialCode.getDialCode(code),
+  }))
+  .filter((c) => c.dialCode);
+// [{ country: 'Australia', code: 'AU', dialCode: '+61' }, ...]
+```
+
+## Summary
+
+Oceania has 25 entries in the ISO 3166 standard across 4 UN M49 subregions: Australia and New Zealand (5), Melanesia (5), Micronesia (7), and Polynesia (10). Despite having fewer entries than other continents, Oceania spans the largest geographic area -- the Pacific Ocean covers a third of the Earth's surface. The `@koshmoney/countries` library provides consistent access to all Oceanian country data through its geography, currency, and dial code modules.
+
+---
+
+## Related
+
+- [Geography API](/docs/api/geography) -- Continent and region lookups
+- [Asian Countries List](/blog/asian-countries-list-codes) -- All Asian country codes
+- [African Countries List](/blog/african-countries-list-codes) -- All African country codes
+- [Currency API](/docs/api/currency) -- Currency lookups by country

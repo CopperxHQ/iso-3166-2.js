@@ -1,0 +1,287 @@
+---
+description: "Complete list of all 27 Schengen Area countries with ISO codes. Understand Schengen vs EU, which countries are in Schengen but not EU, and code examples for membership checks."
+---
+
+# Schengen Countries List: All 27 Members of the Schengen Area
+
+The Schengen Area is a zone of 27 European countries that have abolished passport and border controls at their mutual borders. If you build travel, logistics, shipping, or compliance applications that serve European users, understanding Schengen membership is important for border-crossing logic, shipping estimates, and user experience.
+
+This reference lists every Schengen member with their ISO codes, explains how Schengen relates to the EU, and provides code examples for checking membership programmatically.
+
+## What Is the Schengen Area?
+
+The Schengen Area was established by the 1985 Schengen Agreement (named after the town of Schengen in Luxembourg). It enables free movement of people across internal borders without passport checks. Key characteristics:
+
+- **27 member countries** with no internal border controls
+- **Common visa policy** for non-EU visitors (Schengen visa)
+- **Shared border security** at external borders
+- **Not identical to the EU** -- some EU countries are not in Schengen, and some non-EU countries are
+
+For developers, Schengen membership affects shipping estimates (no customs delays at internal borders), travel planning applications, and visa eligibility calculations.
+
+## Quick Access with Code
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Get all 27 Schengen member codes
+const schengenCountries = membership.getMembers('Schengen');
+// ['AT', 'BE', 'CH', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR',
+//  'GR', 'HR', 'HU', 'IS', 'IT', 'LI', 'LT', 'LU', 'LV', 'MT',
+//  'NL', 'NO', 'PL', 'PT', 'SE', 'SI', 'SK']
+
+console.log(schengenCountries.length); // 27
+
+// Check if a specific country is in Schengen
+membership.isSchengen('FR'); // true
+membership.isSchengen('CH'); // true (non-EU Schengen member)
+membership.isSchengen('IE'); // false (Ireland opted out)
+membership.isSchengen('GB'); // false (UK never joined)
+```
+
+## All 27 Schengen Members
+
+### EU Members in Schengen (23)
+
+| Country | Alpha-2 | Alpha-3 | Numeric | EU | Eurozone |
+|---------|---------|---------|---------|:--:|:--------:|
+| Austria | AT | AUT | 040 | Yes | Yes |
+| Belgium | BE | BEL | 056 | Yes | Yes |
+| Croatia | HR | HRV | 191 | Yes | Yes |
+| Czech Republic | CZ | CZE | 203 | Yes | |
+| Denmark | DK | DNK | 208 | Yes | |
+| Estonia | EE | EST | 233 | Yes | Yes |
+| Finland | FI | FIN | 246 | Yes | Yes |
+| France | FR | FRA | 250 | Yes | Yes |
+| Germany | DE | DEU | 276 | Yes | Yes |
+| Greece | GR | GRC | 300 | Yes | Yes |
+| Hungary | HU | HUN | 348 | Yes | |
+| Italy | IT | ITA | 380 | Yes | Yes |
+| Latvia | LV | LVA | 428 | Yes | Yes |
+| Lithuania | LT | LTU | 440 | Yes | Yes |
+| Luxembourg | LU | LUX | 442 | Yes | Yes |
+| Malta | MT | MLT | 470 | Yes | Yes |
+| Netherlands | NL | NLD | 528 | Yes | Yes |
+| Poland | PL | POL | 616 | Yes | |
+| Portugal | PT | PRT | 620 | Yes | Yes |
+| Slovakia | SK | SVK | 703 | Yes | Yes |
+| Slovenia | SI | SVN | 705 | Yes | Yes |
+| Spain | ES | ESP | 724 | Yes | Yes |
+| Sweden | SE | SWE | 752 | Yes | |
+
+### Non-EU Schengen Members (4)
+
+| Country | Alpha-2 | Alpha-3 | Numeric | EU | EFTA | EEA |
+|---------|---------|---------|---------|:--:|:----:|:---:|
+| Iceland | IS | ISL | 352 | | Yes | Yes |
+| Liechtenstein | LI | LIE | 438 | | Yes | Yes |
+| Norway | NO | NOR | 578 | | Yes | Yes |
+| Switzerland | CH | CHE | 756 | | Yes | |
+
+These four countries participate in Schengen through separate agreements. Iceland, Liechtenstein, and Norway are EEA members; Switzerland has bilateral agreements with the EU. All four are EFTA (European Free Trade Association) members.
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Switzerland: Schengen but not EU or EEA
+membership.getMemberships('CH');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: true }
+
+// Norway: Schengen and EEA but not EU
+membership.getMemberships('NO');
+// { EU: false, SEPA: true, EEA: true, Eurozone: false, Schengen: true }
+```
+
+## EU Members NOT in Schengen
+
+Four EU member states are not part of the Schengen Area:
+
+| Country | Alpha-2 | Reason |
+|---------|---------|--------|
+| Bulgaria | BG | Applied, awaiting full admission (partial air/sea since 2024) |
+| Cyprus | CY | Applied, pending resolution of Northern Cyprus situation |
+| Ireland | IE | Formal opt-out (maintains Common Travel Area with UK) |
+| Romania | RO | Applied, awaiting full admission (partial air/sea since 2024) |
+
+> [!NOTE]
+> Bulgaria and Romania joined Schengen for air and sea borders in March 2024 but do not yet have full Schengen membership for land borders. The `isSchengen()` function reflects the current full membership status per the official Schengen agreement.
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { country } from '@koshmoney/countries';
+
+// Find EU members NOT in Schengen
+const euMembers = membership.getMembers('EU');
+const nonSchengen = euMembers.filter((code) => !membership.isSchengen(code));
+
+nonSchengen.map((code) => country.toName(code));
+// ['Bulgaria', 'Cyprus', 'Ireland', 'Romania']
+```
+
+## Schengen vs EU vs EEA
+
+| Group | Size | Purpose | Non-EU Members |
+|-------|------|---------|---------------|
+| **EU** | 27 | Political and economic union | None (by definition) |
+| **EEA** | 30 | Single market access | Iceland, Liechtenstein, Norway |
+| **Schengen** | 27 | Border-free travel | Iceland, Liechtenstein, Norway, Switzerland |
+| **SEPA** | 36 | EUR payment transfers | 9 non-EU members including UK |
+| **Eurozone** | 20 | EUR as official currency | None (EU-only institution) |
+
+The Schengen Area and the EU have 23 countries in common, but they are not identical. Four EU members are outside Schengen (Bulgaria, Cyprus, Ireland, Romania), and four non-EU members are inside Schengen (Iceland, Liechtenstein, Norway, Switzerland).
+
+## Why Developers Need Schengen Checks
+
+### Shipping and Logistics
+
+Within the Schengen Area, goods move between countries without border checks. This affects delivery estimates and customs documentation:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function getShippingInfo(originCountry: string, destCountry: string) {
+  const bothSchengen = membership.isSchengen(originCountry) && membership.isSchengen(destCountry);
+
+  if (bothSchengen) {
+    return {
+      customsRequired: false,
+      estimatedDays: 2,
+      note: 'Schengen internal shipment -- no border delays',
+    };
+  }
+
+  const bothEU = membership.isEU(originCountry) && membership.isEU(destCountry);
+
+  if (bothEU) {
+    return {
+      customsRequired: false,
+      estimatedDays: 3,
+      note: 'EU internal shipment -- customs union applies',
+    };
+  }
+
+  return {
+    customsRequired: true,
+    estimatedDays: 5,
+    note: 'International shipment -- customs clearance required',
+  };
+}
+
+getShippingInfo('DE', 'FR');
+// { customsRequired: false, estimatedDays: 2, note: 'Schengen internal...' }
+
+getShippingInfo('DE', 'IE');
+// { customsRequired: false, estimatedDays: 3, note: 'EU internal...' }
+
+getShippingInfo('DE', 'US');
+// { customsRequired: true, estimatedDays: 5, note: 'International...' }
+```
+
+### Travel and Visa Applications
+
+For travel platforms, Schengen membership determines visa requirements. A Schengen visa grants access to all 27 Schengen countries:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { country } from '@koshmoney/countries';
+
+function getSchengenTravelInfo(countryCode: string) {
+  if (membership.isSchengen(countryCode)) {
+    return {
+      visaType: 'Schengen visa covers this country',
+      borderCheck: false,
+      schengenDaysApply: true,
+    };
+  }
+
+  if (membership.isEU(countryCode)) {
+    return {
+      visaType: 'Separate visa may be required',
+      borderCheck: true,
+      schengenDaysApply: false,
+    };
+  }
+
+  return {
+    visaType: 'Country-specific visa required',
+    borderCheck: true,
+    schengenDaysApply: false,
+  };
+}
+```
+
+### User Location Detection
+
+For applications that detect user location and adjust content, Schengen membership can inform whether cross-border movement is likely:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Get all membership info at once for a user's country
+function getEuropeanContext(countryCode: string) {
+  const memberships = membership.getMemberships(countryCode);
+
+  return {
+    isEuropean: memberships.EU || memberships.EEA || memberships.Schengen,
+    gdprApplies: memberships.EEA,
+    sepaAvailable: memberships.SEPA,
+    euRegulations: memberships.EU,
+    borderFreeTravel: memberships.Schengen,
+    usesEuro: memberships.Eurozone,
+  };
+}
+
+getEuropeanContext('CH');
+// {
+//   isEuropean: true,
+//   gdprApplies: false,
+//   sepaAvailable: true,
+//   euRegulations: false,
+//   borderFreeTravel: true,
+//   usesEuro: false,
+// }
+```
+
+## Building a Schengen Country Dropdown
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { country } from '@koshmoney/countries';
+
+// Dropdown of Schengen countries for a travel form
+const schengenOptions = membership.getMembers('Schengen')
+  .map((code) => ({
+    value: code,
+    label: country.toName(code),
+    isEU: membership.isEU(code),
+  }))
+  .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+
+// Group by EU / non-EU for an optgroup dropdown
+const euSchengen = schengenOptions.filter((c) => c.isEU);
+const nonEUSchengen = schengenOptions.filter((c) => !c.isEU);
+```
+
+## Common Mistakes
+
+**Assuming Schengen equals the EU.** They have different members. Switzerland and Norway are in Schengen but not the EU. Ireland and Cyprus are in the EU but not Schengen. Using `isEU()` when you mean `isSchengen()` (or vice versa) produces incorrect results.
+
+**Forgetting the non-EU Schengen members.** Iceland, Liechtenstein, Norway, and Switzerland are full Schengen members. Excluding them from border-free shipping calculations or travel planning is a bug.
+
+**Treating Schengen as a customs union.** Schengen eliminates passport controls, not customs checks. The EU Customs Union is separate. Switzerland is in Schengen but not the EU Customs Union, so goods crossing the Swiss border may still require customs declarations even though people cross freely.
+
+**Hardcoding the member list.** Bulgaria and Romania are in the process of joining. Membership changes over time -- use a maintained library rather than a static array.
+
+## Summary
+
+The Schengen Area has 27 members: 23 EU member states plus Iceland, Liechtenstein, Norway, and Switzerland. It enables border-free movement of people and affects shipping logistics, travel planning, and visa calculations. The `@koshmoney/countries` library provides `membership.isSchengen()` and `membership.getMembers('Schengen')` for reliable programmatic checks.
+
+---
+
+## Related
+
+- [EU Country Codes List](/blog/eu-country-codes-list) -- All 27 EU member state codes
+- [SEPA Countries List](/blog/sepa-countries-list) -- All 36 SEPA members
+- [Eurozone Countries List](/blog/eurozone-countries-list) -- All 20 Eurozone members
+- [European Countries List](/blog/european-countries-list-codes) -- All 51 European country codes
+- [Membership API](/docs/api/membership) -- Full membership module reference

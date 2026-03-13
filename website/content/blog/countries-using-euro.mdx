@@ -1,0 +1,212 @@
+---
+description: "Complete list of all countries and territories that use the Euro (EUR) as their official currency. Includes Eurozone members, microstates, and overseas territories with ISO codes and code examples."
+---
+
+# Countries Using the Euro: Complete List with ISO Codes
+
+The Euro (EUR) is the official currency in 35 countries and territories worldwide, making it the second most traded currency after the US Dollar. While the Eurozone has 20 members, many additional microstates, overseas departments, and territories also use the Euro. If you build applications that handle European payments, currency display, or international commerce, you need the full picture -- not just the Eurozone list.
+
+This reference lists every country and territory that uses the Euro, organized by category, with ISO codes and code examples.
+
+## Quick Access with Code
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+
+// Find all countries using the Euro
+const eurCountries = currency.getCountriesByCurrency('EUR');
+// ['AD', 'AT', 'AX', 'BE', 'BL', 'CY', 'DE', 'EE', 'ES', 'FI',
+//  'FR', 'GF', 'GP', 'GR', 'HR', 'IE', 'IT', 'LT', 'LU', 'LV',
+//  'MC', 'ME', 'MF', 'MQ', 'MT', 'NL', 'PM', 'PT', 'RE', 'SI',
+//  'SK', 'SM', 'TF', 'VA', 'YT']
+
+console.log(eurCountries.length); // 35
+
+currency.getCurrency('DE');
+// { code: 'EUR', symbol: '€', name: 'Euro' }
+```
+
+## Eurozone Members (20)
+
+The Eurozone is the formal monetary union of EU member states that have adopted the Euro. For a detailed breakdown with adoption dates, see our [Eurozone Countries List](/blog/eurozone-countries-list).
+
+| Country | Alpha-2 | Alpha-3 | Numeric | Adopted |
+|---------|---------|---------|---------|---------|
+| Austria | AT | AUT | 040 | 1999 |
+| Belgium | BE | BEL | 056 | 1999 |
+| Croatia | HR | HRV | 191 | 2023 |
+| Cyprus | CY | CYP | 196 | 2008 |
+| Estonia | EE | EST | 233 | 2011 |
+| Finland | FI | FIN | 246 | 1999 |
+| France | FR | FRA | 250 | 1999 |
+| Germany | DE | DEU | 276 | 1999 |
+| Greece | GR | GRC | 300 | 2001 |
+| Ireland | IE | IRL | 372 | 1999 |
+| Italy | IT | ITA | 380 | 1999 |
+| Latvia | LV | LVA | 428 | 2014 |
+| Lithuania | LT | LTU | 440 | 2015 |
+| Luxembourg | LU | LUX | 442 | 1999 |
+| Malta | MT | MLT | 470 | 2008 |
+| Netherlands | NL | NLD | 528 | 1999 |
+| Portugal | PT | PRT | 620 | 1999 |
+| Slovakia | SK | SVK | 703 | 2009 |
+| Slovenia | SI | SVN | 705 | 2007 |
+| Spain | ES | ESP | 724 | 1999 |
+
+## European Microstates (4)
+
+These small European states use the Euro through monetary agreements with the EU, but are not EU or Eurozone members:
+
+| Country | Alpha-2 | Alpha-3 | Numeric | Agreement Via |
+|---------|---------|---------|---------|--------------|
+| Andorra | AD | AND | 020 | EU monetary agreement |
+| Monaco | MC | MCO | 492 | France |
+| San Marino | SM | SMR | 674 | Italy |
+| Vatican City | VA | VAT | 336 | Italy |
+
+These countries can mint their own Euro coins (with national designs on the reverse), but their monetary policy is set by the European Central Bank.
+
+> [!TIP]
+> The `membership.isEurozone()` function returns `false` for these microstates because the Eurozone is specifically an EU institution. To check if a country uses the Euro regardless of Eurozone membership, use `currency.getCurrencyCode(code) === 'EUR'` instead.
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+// Monaco: uses EUR but is NOT in the Eurozone
+membership.isEurozone('MC'); // false
+currency.getCurrencyCode('MC'); // 'EUR'
+
+// Germany: uses EUR AND is in the Eurozone
+membership.isEurozone('DE'); // true
+currency.getCurrencyCode('DE'); // 'EUR'
+```
+
+## Non-EU Members Using EUR (1)
+
+| Country | Alpha-2 | Alpha-3 | Numeric | Notes |
+|---------|---------|---------|---------|-------|
+| Montenegro | ME | MNE | 499 | Unilateral adoption (2002) |
+
+Montenegro adopted the Euro unilaterally when it was using the Deutsche Mark. Unlike the microstates, Montenegro has no formal monetary agreement with the EU and cannot mint Euro coins.
+
+## French Overseas Territories (8)
+
+France's overseas departments and collectivities use the Euro as part of France's monetary system:
+
+| Territory | Alpha-2 | Alpha-3 | Numeric | Region |
+|-----------|---------|---------|---------|--------|
+| Aland Islands | AX | ALA | 248 | Northern Europe (Finland) |
+| French Guiana | GF | GUF | 254 | South America |
+| Guadeloupe | GP | GLP | 312 | Caribbean |
+| Martinique | MQ | MTQ | 474 | Caribbean |
+| Mayotte | YT | MYT | 175 | Eastern Africa |
+| Reunion | RE | REU | 638 | Eastern Africa |
+| St. Barthelemy | BL | BLM | 652 | Caribbean |
+| St. Martin | MF | MAF | 663 | Caribbean |
+
+> [!NOTE]
+> The Aland Islands (AX) are an autonomous region of Finland, not France. They use the Euro through Finland's Eurozone membership. French Southern Territories (TF) and St. Pierre & Miquelon (PM) also use EUR.
+
+## Additional EUR Territories (2)
+
+| Territory | Alpha-2 | Alpha-3 | Numeric | Notes |
+|-----------|---------|---------|---------|-------|
+| French Southern Territories | TF | ATF | 260 | French territory in Indian Ocean |
+| St. Pierre & Miquelon | PM | SPM | 666 | French collectivity near Canada |
+
+## Eurozone vs All EUR Users
+
+This is a critical distinction for developers:
+
+| Category | Count | `isEurozone()` | `getCurrencyCode() === 'EUR'` |
+|----------|-------|:---------------:|:-----------------------------:|
+| Eurozone members | 20 | true | true |
+| European microstates | 4 | false | true |
+| Unilateral adopters | 1 | false | true |
+| French overseas territories | 8 | false | true |
+| Other EUR territories | 2 | false | true |
+| **Total** | **35** | **20** | **35** |
+
+Use `membership.isEurozone()` when you need to know if a country is part of the formal Eurozone (for ECB monetary policy, Eurozone-specific regulations). Use `currency.getCurrencyCode()` when you need to know if a country uses the Euro as its currency (for pricing, payment processing, currency display).
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { membership } from '@koshmoney/countries/membership';
+
+// All countries that USE the Euro (35)
+const allEurUsers = currency.getCountriesByCurrency('EUR');
+
+// Only formal Eurozone members (20)
+const eurozoneMembers = membership.getMembers('Eurozone');
+
+// EUR users outside the Eurozone (15)
+const nonEurozoneEUR = allEurUsers.filter(
+  (code) => !membership.isEurozone(code)
+);
+// ['AD', 'AX', 'BL', 'GF', 'GP', 'MC', 'ME', 'MF', 'MQ', 'PM', 'RE', 'SM', 'TF', 'VA', 'YT']
+```
+
+## Working with EUR Country Data
+
+### Dynamic currency display
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+function formatPrice(amount: number, countryCode: string): string {
+  const curr = currency.getCurrency(countryCode);
+  if (!curr) return `$${amount.toFixed(2)}`;
+
+  return `${curr.symbol}${amount.toFixed(2)} ${curr.code}`;
+}
+
+formatPrice(29.99, 'DE'); // '€29.99 EUR'
+formatPrice(29.99, 'MC'); // '€29.99 EUR'
+formatPrice(29.99, 'GB'); // '£29.99 GBP'
+formatPrice(29.99, 'US'); // '$29.99 USD'
+```
+
+### Find EUR countries by continent
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { geography } from '@koshmoney/countries/geography';
+import { country } from '@koshmoney/countries';
+
+const eurCountries = currency.getCountriesByCurrency('EUR');
+
+// EUR users outside Europe
+const nonEuropeanEUR = eurCountries.filter((code) => {
+  const continent = geography.getContinent(code);
+  return continent && continent !== 'Europe';
+});
+
+nonEuropeanEUR.map((code) => ({
+  name: country.toName(code),
+  continent: geography.getContinent(code),
+}));
+// [
+//   { name: 'French Guiana', continent: 'South America' },
+//   { name: 'Guadeloupe', continent: 'North America' },
+//   { name: 'Martinique', continent: 'North America' },
+//   { name: 'Mayotte', continent: 'Africa' },
+//   { name: 'Reunion', continent: 'Africa' },
+//   { name: 'French Southern Territories', continent: 'Antarctica' },
+// ]
+```
+
+## Summary
+
+The Euro is the official currency in 35 countries and territories: 20 Eurozone members, 4 European microstates with monetary agreements, 1 unilateral adopter (Montenegro), and 10 overseas territories (mostly French). The `@koshmoney/countries` library distinguishes between Eurozone membership (`membership.isEurozone()`) and actual EUR usage (`currency.getCurrencyCode()`), giving developers precise control over currency and compliance logic.
+
+---
+
+## Related
+
+- [Eurozone Countries List](/blog/eurozone-countries-list) -- Detailed Eurozone membership with adoption dates
+- [SEPA Countries List](/blog/sepa-countries-list) -- All 36 SEPA members
+- [EU Country Codes List](/blog/eu-country-codes-list) -- All 27 EU member states
+- [Countries Using the US Dollar](/blog/countries-using-us-dollar) -- All USD countries
+- [Currency API](/docs/api/currency) -- Full currency module reference

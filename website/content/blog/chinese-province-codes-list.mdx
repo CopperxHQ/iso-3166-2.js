@@ -1,0 +1,185 @@
+---
+description: "Complete list of all 34 Chinese province-level divisions with ISO 3166-2:CN codes. Provinces, municipalities, autonomous regions, and special administrative regions."
+---
+
+# Chinese Province Codes: Complete ISO 3166-2:CN Reference (2026)
+
+China has 34 province-level administrative divisions, each with an ISO 3166-2:CN code. This reference covers all provinces, municipalities, autonomous regions, and special administrative regions.
+
+## Overview
+
+| Division Type | Count | Code Range |
+|--------------|-------|------------|
+| Provinces | 23 | CN-13 to CN-71 |
+| Municipalities | 4 | CN-11, CN-12, CN-31, CN-50 |
+| Autonomous Regions | 5 | CN-15, CN-45, CN-54, CN-64, CN-65 |
+| Special Administrative Regions | 2 | CN-91, CN-92 |
+| **Total** | **34** | |
+
+## Municipalities (4)
+
+Municipalities are province-level cities under direct central government administration.
+
+| Code | Name | Notes |
+|------|------|-------|
+| `CN-11` | Beijing | Capital city |
+| `CN-12` | Tianjin | Major port city |
+| `CN-31` | Shanghai | Largest city by population |
+| `CN-50` | Chongqing | Largest municipality by area |
+
+## Provinces (23)
+
+| Code | Name | Region |
+|------|------|--------|
+| `CN-13` | Hebei | North China |
+| `CN-14` | Shanxi | North China |
+| `CN-21` | Liaoning | Northeast China |
+| `CN-22` | Jilin | Northeast China |
+| `CN-23` | Heilongjiang | Northeast China |
+| `CN-32` | Jiangsu | East China |
+| `CN-33` | Zhejiang | East China |
+| `CN-34` | Anhui | East China |
+| `CN-35` | Fujian | East China |
+| `CN-36` | Jiangxi | East China |
+| `CN-37` | Shandong | East China |
+| `CN-41` | Henan | Central China |
+| `CN-42` | Hubei | Central China |
+| `CN-43` | Hunan | Central China |
+| `CN-44` | Guangdong | South China |
+| `CN-46` | Hainan | South China |
+| `CN-51` | Sichuan | Southwest China |
+| `CN-52` | Guizhou | Southwest China |
+| `CN-53` | Yunnan | Southwest China |
+| `CN-61` | Shaanxi | Northwest China |
+| `CN-62` | Gansu | Northwest China |
+| `CN-63` | Qinghai | Northwest China |
+| `CN-71` | Taiwan | See note below |
+
+> **Note on Taiwan (CN-71):** ISO 3166-2 lists Taiwan as a province of China under code `CN-71`. However, Taiwan also has its own ISO 3166-1 entry as a separate territory with alpha-2 code `TW` (alpha-3 `TWN`, numeric `158`). The `@koshmoney/countries` package includes both entries. Use `TW` when you need to reference Taiwan as a distinct entity.
+
+## Autonomous Regions (5)
+
+Autonomous regions have larger populations of ethnic minorities and enjoy certain legislative rights.
+
+| Code | Name | Primary Ethnic Group |
+|------|------|---------------------|
+| `CN-15` | Nei Mongol (Inner Mongolia) | Mongol |
+| `CN-45` | Guangxi | Zhuang |
+| `CN-54` | Xizang (Tibet) | Tibetan |
+| `CN-64` | Ningxia | Hui |
+| `CN-65` | Xinjiang | Uyghur |
+
+## Special Administrative Regions (2)
+
+SARs operate under the "one country, two systems" principle with their own legal and economic systems.
+
+| Code | Name | ISO 3166-1 Code | Currency |
+|------|------|----------------|----------|
+| `CN-91` | Hong Kong | `HK` (HKG, 344) | HKD |
+| `CN-92` | Aomen (Macau) | `MO` (MAC, 446) | MOP |
+
+> **Note:** Hong Kong and Macau each have their own ISO 3166-1 alpha-2 codes (`HK` and `MO`). When building address forms or shipping integrations, use `HK` and `MO` as separate country entries rather than `CN-91`/`CN-92`.
+
+## Code Examples
+
+### Look Up All Chinese Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Get all 34 subdivisions
+const cnSubs = subdivision.getByCountry('CN');
+console.log(cnSubs.length); // 34
+```
+
+### Look Up a Specific Province
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.get('CN-44');
+// { code: 'CN-44', name: 'Guangdong', type: 'Province' }
+
+subdivision.get('CN-11');
+// { code: 'CN-11', name: 'Beijing', type: 'Municipality' }
+
+subdivision.get('CN-91');
+// { code: 'CN-91', name: 'Hong Kong', type: 'Special administrative region' }
+```
+
+### Validate a Province Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('CN-44');    // true (Guangdong)
+subdivision.isValidRegion('CN', '44'); // true
+subdivision.isValidCode('CN-99');    // false
+```
+
+### Tree-Shaking: Import Only China Data
+
+```typescript copy
+// Import only Chinese subdivisions for smaller bundles
+import { subdivisions } from '@koshmoney/countries/subdivision/CN';
+
+Object.keys(subdivisions);
+// ['CN-11', 'CN-12', 'CN-13', ..., 'CN-92']
+```
+
+## Use Cases
+
+### E-Commerce Shipping
+
+Chinese provinces have different shipping zones and delivery times. Use subdivision codes to determine shipping rates:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function getShippingZone(provinceCode: string): string {
+  const sub = subdivision.get(provinceCode);
+  if (\!sub) return 'unknown';
+
+  // SARs ship differently
+  if (sub.type === 'Special administrative region') return 'sar';
+  // Municipalities tend to have faster delivery
+  if (sub.type === 'Municipality') return 'tier-1';
+  return 'standard';
+}
+```
+
+### Address Validation
+
+Validate that a province code belongs to China before processing:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function validateChineseAddress(provinceCode: string): boolean {
+  return subdivision.isValidCode(provinceCode)
+    && provinceCode.startsWith('CN-');
+}
+```
+
+## Numbering System
+
+China's subdivision codes follow a geographic numbering pattern:
+
+| Range | Region |
+|-------|--------|
+| 10-19 | North China (Beijing, Tianjin, Hebei, Shanxi, Inner Mongolia) |
+| 20-29 | Northeast China (Liaoning, Jilin, Heilongjiang) |
+| 30-39 | East China (Shanghai, Jiangsu, Zhejiang, Anhui, Fujian, Jiangxi, Shandong) |
+| 40-49 | Central and South China (Henan, Hubei, Hunan, Guangdong, Guangxi, Hainan) |
+| 50-59 | Southwest China (Chongqing, Sichuan, Guizhou, Yunnan, Tibet) |
+| 60-69 | Northwest China (Shaanxi, Gansu, Qinghai, Ningxia, Xinjiang) |
+| 71 | Taiwan |
+| 91-92 | Special Administrative Regions |
+
+## Related Resources
+
+- [View all China subdivisions](/subdivisions/cn)
+- [China country page](/countries/cn)
+- [Asian Countries: Complete List](/blog/asian-countries-list-codes)
+- [Subdivision API Reference](/docs/api/subdivision)
+- [Country Code Converter Tool](/tools/country-code-converter)

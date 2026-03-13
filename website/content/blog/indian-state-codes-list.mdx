@@ -1,0 +1,167 @@
+---
+description: "Complete list of all 28 Indian states and 8 union territories with ISO 3166-2:IN codes. Code examples for lookups, validation, and building state dropdowns."
+---
+
+# Indian State and Territory Codes: Complete ISO 3166-2:IN List
+
+India has 28 states and 8 union territories, totaling 36 subdivisions with ISO 3166-2:IN codes. These codes are used in address forms, tax (GST) systems, shipping, and KYC compliance. This reference lists every Indian subdivision with its official ISO code.
+
+## States (28)
+
+| Code | Name | Region Code |
+|------|------|-------------|
+| IN-AP | Andhra Pradesh | AP |
+| IN-AR | Arunachal Pradesh | AR |
+| IN-AS | Assam | AS |
+| IN-BR | Bihar | BR |
+| IN-CT | Chhattisgarh | CT |
+| IN-GA | Goa | GA |
+| IN-GJ | Gujarat | GJ |
+| IN-HP | Himachal Pradesh | HP |
+| IN-HR | Haryana | HR |
+| IN-JH | Jharkhand | JH |
+| IN-KA | Karnataka | KA |
+| IN-KL | Kerala | KL |
+| IN-MH | Maharashtra | MH |
+| IN-ML | Meghalaya | ML |
+| IN-MN | Manipur | MN |
+| IN-MP | Madhya Pradesh | MP |
+| IN-MZ | Mizoram | MZ |
+| IN-NL | Nagaland | NL |
+| IN-OR | Odisha | OR |
+| IN-PB | Punjab | PB |
+| IN-RJ | Rajasthan | RJ |
+| IN-SK | Sikkim | SK |
+| IN-TG | Telangana | TG |
+| IN-TN | Tamil Nadu | TN |
+| IN-TR | Tripura | TR |
+| IN-UP | Uttar Pradesh | UP |
+| IN-UT | Uttarakhand | UT |
+| IN-WB | West Bengal | WB |
+
+## Union Territories (8)
+
+| Code | Name | Region Code |
+|------|------|-------------|
+| IN-AN | Andaman and Nicobar Islands | AN |
+| IN-CH | Chandigarh | CH |
+| IN-DH | Dadra and Nagar Haveli and Daman and Diu | DH |
+| IN-DL | Delhi | DL |
+| IN-JK | Jammu and Kashmir | JK |
+| IN-LA | Ladakh | LA |
+| IN-LD | Lakshadweep | LD |
+| IN-PY | Puducherry | PY |
+
+Delhi (IN-DL) is formally the National Capital Territory. Jammu and Kashmir (IN-JK) and Ladakh (IN-LA) were reorganized from a single state into two union territories in 2019.
+
+## Using Indian State Codes in Code
+
+### Get All Indian Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const all = subdivision.forCountry('IN');
+console.log(all.length);  // 36
+
+// Filter by type
+const states = all.filter(s => s.type === 'State');
+// 28 states
+
+const unionTerritories = all.filter(s => s.type === 'Union territory');
+// 8 union territories
+```
+
+### Look Up a Specific State
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('IN-MH');
+// { code: 'IN-MH', name: 'Maharashtra', type: 'State', countryCode: 'IN', regionCode: 'MH' }
+
+subdivision.where('IN', 'KA');
+// { code: 'IN-KA', name: 'Karnataka', type: 'State', countryCode: 'IN', regionCode: 'KA' }
+```
+
+### Validate a State Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('IN-TN');       // true (Tamil Nadu)
+subdivision.isValidCode('IN-XX');       // false
+subdivision.isValidRegion('IN', 'DL');  // true (Delhi)
+subdivision.isValidRegion('IN', 'CA');  // false (CA is US/Canadian)
+```
+
+### Build a State Dropdown
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const options = subdivision.forCountry('IN')
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .map(s => ({
+    value: s.code.split('-')[1],
+    label: s.name,
+  }));
+
+// [{ value: 'AN', label: 'Andaman and Nicobar Islands' }, { value: 'AP', label: 'Andhra Pradesh' }, ...]
+```
+
+### Tree-Shaking: Load Only Indian Data
+
+```typescript copy
+import '@koshmoney/countries/subdivision/IN';
+import { forCountry } from '@koshmoney/countries/subdivision';
+
+const states = forCountry('IN');  // 36 subdivisions
+```
+
+## PIN Code Validation
+
+India uses 6-digit PIN (Postal Index Number) codes:
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('IN', '110001');  // true (New Delhi)
+postalCode.isValid('IN', '400001');  // true (Mumbai)
+postalCode.isValid('IN', '12345');   // false (only 5 digits)
+
+postalCode.getName('IN');    // 'PIN Code'
+postalCode.getFormat('IN');  // 'NNNNNN'
+```
+
+### PIN Code Ranges by State
+
+The first digit of a PIN code indicates the postal zone:
+
+| First Digit | Zone | States Covered |
+|-------------|------|---------------|
+| 1 | Delhi, Haryana, Punjab, HP, J&K, Ladakh, Chandigarh | Northern India |
+| 2 | UP, Uttarakhand | Northern India |
+| 3 | Rajasthan, Gujarat, DH, DD | Western India |
+| 4 | Maharashtra, Goa, MP, CT | Western/Central India |
+| 5 | AP, Telangana, Karnataka | Southern India |
+| 6 | Kerala, TN, Puducherry, Lakshadweep | Southern India |
+| 7 | WB, Odisha, NE states, AN, Sikkim | Eastern India |
+| 8 | Bihar, Jharkhand | Eastern India |
+| 9 | Army Post Office (APO) / Field Post Office (FPO) | Military |
+
+## Country Data
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha2('IN');
+// { name: 'India', alpha2: 'IN', alpha3: 'IND', numeric: '356' }
+```
+
+## Related Resources
+
+- [Subdivision API Reference](/docs/api/subdivision) -- Full subdivision module API
+- [India Country Page](/countries/in) -- Full India reference
+- [Asian Countries with ISO Codes](/blog/asian-countries-list-codes) -- Asian country reference
+- [Country Dropdown Guide](/docs/guides/country-dropdown) -- Build dropdowns with subdivisions

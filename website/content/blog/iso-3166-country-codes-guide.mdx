@@ -1,0 +1,493 @@
+---
+description: "Learn everything about ISO 3166 country codes including alpha-2, alpha-3, numeric formats, subdivision codes, and how to use them in JavaScript and TypeScript applications."
+---
+
+# ISO 3166 Country Codes: The Complete Developer Guide
+
+If you build software that handles addresses, currencies, shipping, or compliance, you will encounter ISO 3166 country codes. This guide covers everything developers need to know: the standard itself, the three parts of ISO 3166, how to use country codes in JavaScript and TypeScript, and practical patterns for databases and APIs.
+
+## What Is ISO 3166?
+
+ISO 3166 is an international standard published by the [International Organization for Standardization (ISO)](https://www.iso.org/iso-3166-country-codes.html) that defines codes for the names of countries, dependent territories, and special areas of geographical interest, as well as their principal subdivisions (states, provinces, regions).
+
+The standard was first published in 1974 and is maintained by the ISO 3166 Maintenance Agency (ISO 3166/MA). It is updated regularly to reflect geopolitical changes such as country name changes, independence declarations, and territorial reorganizations.
+
+ISO 3166 is divided into three parts:
+
+| Part | Name | Purpose |
+|------|------|---------|
+| ISO 3166-1 | Country codes | Codes for countries and dependent territories |
+| ISO 3166-2 | Subdivision codes | Codes for states, provinces, regions, and similar |
+| ISO 3166-3 | Historical codes | Codes for formerly used country names |
+
+## ISO 3166-1: Country Codes
+
+ISO 3166-1 defines three different code formats for each country. Each format serves a different purpose in software systems.
+
+### Alpha-2 Codes
+
+Alpha-2 codes are two-letter codes and are the most commonly used format in software. You see them everywhere: internet country code top-level domains (`.us`, `.de`, `.jp`), language locales (`en-US`, `fr-FR`), and web APIs.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereAlpha2('DE');
+// { name: 'Germany', alpha2: 'DE', alpha3: 'DEU', numeric: '276' }
+
+country.whereAlpha2('JP');
+// { name: 'Japan', alpha2: 'JP', alpha3: 'JPN', numeric: '392' }
+```
+
+Here is a reference table of commonly used alpha-2 codes:
+
+| Alpha-2 | Country | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| US | United States | USA | 840 |
+| GB | United Kingdom | GBR | 826 |
+| DE | Germany | DEU | 276 |
+| FR | France | FRA | 250 |
+| JP | Japan | JPN | 392 |
+| CN | China | CHN | 156 |
+| IN | India | IND | 356 |
+| BR | Brazil | BRA | 076 |
+| CA | Canada | CAN | 124 |
+| AU | Australia | AUS | 036 |
+| MX | Mexico | MEX | 484 |
+| KR | South Korea | KOR | 410 |
+| SG | Singapore | SGP | 702 |
+| AE | United Arab Emirates | ARE | 784 |
+| NG | Nigeria | NGA | 566 |
+
+**When to use alpha-2:** User-facing interfaces, URL parameters, HTML `lang` attributes, browser locale detection, and most REST APIs. Alpha-2 is the default choice unless you have a specific reason to use another format.
+
+### Alpha-3 Codes
+
+Alpha-3 codes are three-letter codes that are more readable than alpha-2 in some contexts. They are used in international trade documents, the Olympic Games, FIFA country designations, and the United Nations.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha3('USA');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereAlpha3('GBR');
+// { name: 'United Kingdom', alpha2: 'GB', alpha3: 'GBR', numeric: '826' }
+
+// Convert between formats
+country.alpha2ToAlpha3('US'); // 'USA'
+country.alpha3ToAlpha2('GBR'); // 'GB'
+```
+
+**When to use alpha-3:** International shipping documents, customs declarations, financial reporting (SWIFT/BIC codes use alpha-2, but many banking standards reference alpha-3), and anywhere human readability is prioritized over compactness.
+
+### Numeric Codes
+
+Numeric codes are three-digit codes that are independent of any script or alphabet. This makes them useful in systems that need to avoid character encoding issues or where data must be language-neutral.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereNumeric(840);
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+// Convert between formats
+country.alpha2ToNumeric('US'); // '840'
+country.numericToAlpha2(840);  // 'US'
+```
+
+**When to use numeric:** Legacy systems, EDI (Electronic Data Interchange), UN statistics, and systems serving multilingual audiences where letter-based codes may cause confusion.
+
+### Validation
+
+You can validate any country code format programmatically:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Validate specific formats
+country.isAlpha2('US');    // true
+country.isAlpha3('USA');   // true
+country.isNumeric(840);   // true
+
+// Validate any format
+country.isValid('US');     // true
+country.isValid('USA');    // true
+country.isValid('XX');     // false
+
+// Detect which format a code is in
+country.detectFormat('US');  // 'alpha2'
+country.detectFormat('USA'); // 'alpha3'
+```
+
+## ISO 3166-2: Subdivision Codes
+
+ISO 3166-2 defines codes for the principal subdivisions of countries. "Subdivision" is a generic term that covers states (US), provinces (Canada), regions (France), federal states (Germany), prefectures (Japan), and many other administrative division types.
+
+### Code Format
+
+Subdivision codes follow the format `{country-alpha2}-{subdivision-code}`:
+
+```
+US-CA    (United States - California)
+GB-ENG   (United Kingdom - England)
+DE-BY    (Germany - Bavaria)
+JP-13    (Japan - Tokyo)
+IN-MH    (India - Maharashtra)
+CA-ON    (Canada - Ontario)
+```
+
+The subdivision portion varies in length and format by country. Some use alphabetic codes (US-CA), some use numeric (JP-13), and some use a mix.
+
+### Working with Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Look up by full code
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State',
+//   countryCode: 'US', countryName: 'United States', regionCode: 'CA' }
+
+// Look up by country + region code
+subdivision.where('US', 'CA');
+// Same result as above
+
+// Look up by name
+subdivision.whereName('US', 'California');
+// Same result as above
+
+// Get all subdivisions for a country
+const usStates = subdivision.forCountry('US');
+// Array of 50 states + DC + territories
+```
+
+### Subdivision Types by Country
+
+Different countries use different terminology for their subdivisions:
+
+| Country | Type | Count | Examples |
+|---------|------|-------|---------|
+| United States | State | 50 + DC + territories | US-CA, US-NY, US-TX |
+| United Kingdom | Country / Province | 4 + regions | GB-ENG, GB-SCT, GB-WLS |
+| Germany | Land (Federal State) | 16 | DE-BY, DE-BE, DE-HH |
+| Japan | Prefecture | 47 | JP-13, JP-27, JP-01 |
+| India | State / Union Territory | 28 + 8 | IN-MH, IN-DL, IN-KA |
+| Canada | Province / Territory | 13 | CA-ON, CA-BC, CA-QC |
+| France | Region | 18 | FR-IDF, FR-PAC, FR-ARA |
+| Australia | State / Territory | 8 | AU-NSW, AU-VIC, AU-QLD |
+
+For a complete reference of US state codes, see the [US State Codes List](/blog/us-state-codes-list).
+
+### Validation
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('US-CA');            // true
+subdivision.isValidCode('US-XX');            // false
+subdivision.isValidRegion('US', 'CA');       // true
+subdivision.isValidName('US', 'California'); // true
+subdivision.hasSubdivisions('US');           // true
+```
+
+## ISO 3166-3: Historical Codes
+
+ISO 3166-3 defines codes for country names that have been removed from ISO 3166-1. When a country changes its name, merges with another country, or splits into multiple countries, the old code is retired and a new four-letter code is assigned in ISO 3166-3.
+
+Examples of historical changes:
+
+| Old Code | Old Country | New Code(s) | Year |
+|----------|-------------|-------------|------|
+| SU | Soviet Union | RU, UA, BY, ... | 1992 |
+| CS | Czechoslovakia | CZ, SK | 1993 |
+| YU | Yugoslavia | RS, ME, HR, ... | 2003 |
+| AN | Netherlands Antilles | BQ, CW, SX | 2010 |
+
+ISO 3166-3 is mostly relevant for data migration and historical data analysis. Most modern applications only need ISO 3166-1 and ISO 3166-2.
+
+## Using ISO 3166 in Software
+
+### JavaScript and TypeScript
+
+The `@koshmoney/countries` package provides a complete, tree-shakeable implementation of ISO 3166-1 and ISO 3166-2 with full TypeScript support. Install it with:
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+The package is organized into core modules (included in the main bundle) and specialized modules (imported separately for optimal bundle size):
+
+```typescript copy
+// Core modules from main bundle
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+// Specialized modules via subpath imports
+import { currency } from '@koshmoney/countries/currency';
+import { membership } from '@koshmoney/countries/membership';
+import { geography } from '@koshmoney/countries/geography';
+```
+
+For full API documentation, see the [API Reference](/docs/api/country).
+
+### Database Schema Recommendations
+
+When storing country and subdivision codes in your database, use these patterns:
+
+**Country codes:**
+
+```sql
+CREATE TABLE customers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  -- Store as uppercase alpha-2 (most compact, widely used)
+  country_code CHAR(2) NOT NULL,
+  -- Optional: store subdivision code
+  subdivision_code VARCHAR(6),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Add a check constraint for valid format
+ALTER TABLE customers
+  ADD CONSTRAINT chk_country_code
+  CHECK (country_code ~ '^[A-Z]{2}$');
+
+-- Index for country-based queries
+CREATE INDEX idx_customers_country ON customers(country_code);
+```
+
+**Key recommendations:**
+- Use `CHAR(2)` for alpha-2 codes (fixed-width, compact)
+- Store codes in uppercase
+- Add check constraints to enforce the format
+- Index country columns if you query by country frequently
+- Store subdivision codes as `VARCHAR(6)` to accommodate varying lengths (e.g., `US-CA` vs `GB-ENG`)
+
+**Do not** store full country names in the database. Store the code and look up the name at runtime:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// In your API response builder
+function formatCustomer(row: CustomerRow) {
+  return {
+    ...row,
+    countryName: country.toName(row.countryCode),
+  };
+}
+```
+
+### API Design Patterns
+
+When designing REST APIs that include country data, follow these conventions:
+
+**Request format -- accept alpha-2 codes:**
+
+```json
+{
+  "country": "US",
+  "subdivision": "CA",
+  "postalCode": "90210"
+}
+```
+
+**Response format -- include both code and name:**
+
+```json
+{
+  "country": {
+    "code": "US",
+    "name": "United States"
+  },
+  "subdivision": {
+    "code": "US-CA",
+    "name": "California",
+    "type": "State"
+  }
+}
+```
+
+**Server-side validation with @koshmoney/countries:**
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+function validateAddress(input: AddressInput): string[] {
+  const errors: string[] = [];
+
+  if (!country.isValid(input.country)) {
+    errors.push(`Invalid country code: ${input.country}`);
+  }
+
+  if (input.subdivision && !subdivision.isValidRegion(input.country, input.subdivision)) {
+    errors.push(`Invalid subdivision "${input.subdivision}" for country ${input.country}`);
+  }
+
+  if (input.postalCode && !postalCode.isValid(input.country, input.postalCode)) {
+    errors.push(`Invalid postal code "${input.postalCode}" for country ${input.country}`);
+  }
+
+  return errors;
+}
+```
+
+**Provide lookup endpoints for client applications:**
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+// GET /api/countries
+app.get('/api/countries', (req, res) => {
+  res.json(country.all());
+});
+
+// GET /api/countries/:code/subdivisions
+app.get('/api/countries/:code/subdivisions', (req, res) => {
+  const subs = subdivision.forCountry(req.params.code);
+  res.json(subs);
+});
+```
+
+## Common Mistakes to Avoid
+
+### 1. Hardcoding Country Lists
+
+Never manually maintain a list of countries in your code. Countries change names, gain independence, and merge. Use a maintained library like `@koshmoney/countries` instead.
+
+```typescript
+// Bad: hardcoded, will go stale
+const countries = [
+  { code: 'US', name: 'United States' },
+  { code: 'GB', name: 'United Kingdom' },
+  // ... 200+ more entries to maintain
+];
+
+// Good: always up to date
+import { country } from '@koshmoney/countries';
+const countries = country.all();
+```
+
+### 2. Confusing Alpha-2 and Alpha-3
+
+Some codes look valid in both formats but refer to different countries. For example, `IN` is India in alpha-2, but there is no `IN` in alpha-3 (India is `IND`). Always be explicit about which format you expect.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Be explicit about format
+const result = country.whereAlpha2('IN');  // India
+// NOT country.whereAlpha3('IN') -- would return null
+```
+
+### 3. Assuming All Countries Have Subdivisions
+
+Not all countries or territories in ISO 3166-1 have subdivisions defined in ISO 3166-2. Always check before trying to load subdivision data:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+if (subdivision.hasSubdivisions('US')) {
+  const states = subdivision.forCountry('US'); // 50+ entries
+}
+
+// Some small territories may not have subdivisions
+subdivision.hasSubdivisions('MC'); // Monaco -- check before using
+```
+
+### 4. Not Validating at System Boundaries
+
+Always validate country codes when receiving input from users or external APIs. Invalid codes can cause cascading errors in downstream systems:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+function processOrder(countryCode: string) {
+  if (!country.isValid(countryCode)) {
+    throw new Error(`Invalid country code: ${countryCode}`);
+  }
+  // Safe to proceed
+}
+```
+
+### 5. Ignoring Case Sensitivity
+
+ISO 3166 alpha codes are officially uppercase, but user input may come in any case. The `@koshmoney/countries` package handles case normalization automatically:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// All of these work
+country.whereAlpha2('us'); // Normalized to 'US' internally
+country.whereAlpha2('Us'); // Same result
+country.whereAlpha2('US'); // Same result
+```
+
+## Comprehensive Reference Tables
+
+### G7 Countries
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Canada | CA | CAN | 124 |
+| France | FR | FRA | 250 |
+| Germany | DE | DEU | 276 |
+| Italy | IT | ITA | 380 |
+| Japan | JP | JPN | 392 |
+| United Kingdom | GB | GBR | 826 |
+| United States | US | USA | 840 |
+
+### BRICS Countries
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Brazil | BR | BRA | 076 |
+| Russia | RU | RUS | 643 |
+| India | IN | IND | 356 |
+| China | CN | CHN | 156 |
+| South Africa | ZA | ZAF | 710 |
+
+### Common Gotchas
+
+Some country codes are not intuitive:
+
+| Country | Alpha-2 | Why? |
+|---------|---------|------|
+| United Kingdom | GB | "Great Britain" historically |
+| Germany | DE | "Deutschland" in German |
+| Switzerland | CH | "Confoederatio Helvetica" in Latin |
+| Spain | ES | "Espana" in Spanish |
+| South Korea | KR | "Korea, Republic of" |
+| China | CN | "China" |
+| Japan | JP | "Japan" |
+| Austria | AT | Not AU (that is Australia) |
+| Philippines | PH | Not PI or PL (that is Poland) |
+
+## Further Reading
+
+- [ISO 3166 Maintenance Agency](https://www.iso.org/iso-3166-country-codes.html) -- the official source
+- [US State Codes List](/blog/us-state-codes-list) -- complete reference for ISO 3166-2:US
+- [React Country Dropdown Tutorial](/blog/react-country-dropdown-typescript) -- build a country selector component
+- [ISO Country Codes for KYC Compliance](/blog/iso-country-codes-kyc-compliance) -- fintech and compliance applications
+- [Getting Started with @koshmoney/countries](/docs/getting-started) -- installation and quick start guide
+
+## Get Started
+
+Start using standardized ISO 3166 codes in your project today:
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+const us = country.whereAlpha2('US');
+console.log(us.name); // 'United States'
+
+const california = subdivision.whereCode('US-CA');
+console.log(california.name); // 'California'
+```
+
+Browse the full [API documentation](/docs/api/country) or explore the [installation guide](/docs/installation).

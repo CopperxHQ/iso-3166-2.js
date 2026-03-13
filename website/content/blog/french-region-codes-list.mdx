@@ -1,0 +1,277 @@
+---
+description: "Complete guide to French region and department codes (ISO 3166-2:FR). All 13 metropolitan regions, 96 departments, overseas territories, and TypeScript examples."
+---
+
+# French Region and Department Codes: Complete ISO 3166-2 Guide
+
+France has one of the most detailed subdivision structures in ISO 3166-2, with over 120 entries covering metropolitan regions, departments, overseas departments, and overseas collectivities. These codes are used in address forms, shipping, tax calculations, and EU compliance.
+
+This page covers the key subdivision levels and shows how to work with them using `@koshmoney/countries`.
+
+## Metropolitan Regions (13)
+
+France's 13 metropolitan regions are the primary administrative divisions since the 2016 territorial reform:
+
+| Code | Name | Administrative Center |
+|------|------|-----------------------|
+| FR-ARA | Auvergne-Rhone-Alpes | Lyon |
+| FR-BFC | Bourgogne-Franche-Comte | Dijon |
+| FR-BRE | Bretagne | Rennes |
+| FR-CVL | Centre-Val de Loire | Orleans |
+| FR-GES | Grand Est | Strasbourg |
+| FR-HDF | Hauts-de-France | Lille |
+| FR-IDF | Ile-de-France | Paris |
+| FR-NAQ | Nouvelle-Aquitaine | Bordeaux |
+| FR-NOR | Normandie | Rouen |
+| FR-OCC | Occitanie | Toulouse |
+| FR-PAC | Provence-Alpes-Cote d'Azur | Marseille |
+| FR-PDL | Pays de la Loire | Nantes |
+
+Plus Corsica with a special status:
+
+| Code | Name | Type |
+|------|------|------|
+| FR-COR | Corse | Metropolitan collectivity |
+
+## Overseas Departments (5)
+
+These have the same status as metropolitan departments and are part of the EU:
+
+| Code | Name | Type |
+|------|------|------|
+| FR-GF | Guyane (French Guiana) | Overseas department |
+| FR-GP | Guadeloupe | Overseas department |
+| FR-MQ | Martinique | Overseas department |
+| FR-RE | La Reunion | Overseas department |
+| FR-YT | Mayotte | Overseas department |
+
+## Overseas Collectivities
+
+These have varying degrees of autonomy and are generally NOT part of the EU:
+
+| Code | Name | Type |
+|------|------|------|
+| FR-BL | Saint-Barthelemy | Overseas territorial collectivity |
+| FR-MF | Saint-Martin | Overseas territorial collectivity |
+| FR-NC | Nouvelle-Caledonie | Overseas territorial collectivity |
+| FR-PF | Polynesie francaise | Overseas territorial collectivity |
+| FR-PM | Saint-Pierre-et-Miquelon | Overseas territorial collectivity |
+| FR-TF | Terres australes francaises | Overseas territorial collectivity |
+| FR-WF | Wallis-et-Futuna | Overseas territorial collectivity |
+
+Plus the dependency:
+
+| Code | Name | Type |
+|------|------|------|
+| FR-CP | Clipperton | Dependency |
+
+## Metropolitan Departments (Selected)
+
+France has 96 metropolitan departments numbered 01 through 95 (plus 2A and 2B for Corsica). Here are the most commonly referenced:
+
+| Code | Name | Region |
+|------|------|--------|
+| FR-75 | Paris | Ile-de-France |
+| FR-13 | Bouches-du-Rhone | Provence-Alpes-Cote d'Azur |
+| FR-69 | Rhone | Auvergne-Rhone-Alpes |
+| FR-31 | Haute-Garonne | Occitanie |
+| FR-33 | Gironde | Nouvelle-Aquitaine |
+| FR-59 | Nord | Hauts-de-France |
+| FR-67 | Bas-Rhin | Grand Est |
+| FR-06 | Alpes-Maritimes | Provence-Alpes-Cote d'Azur |
+| FR-44 | Loire-Atlantique | Pays de la Loire |
+| FR-34 | Herault | Occitanie |
+| FR-2A | Corse-du-Sud | Corse |
+| FR-2B | Haute-Corse | Corse |
+
+> [!NOTE]
+> Department numbers 20 was split into 2A (Corse-du-Sud) and 2B (Haute-Corse). The numbering skips from 19 to 21 for regular departments.
+
+## Understanding French Subdivision Codes
+
+France uses two code patterns in ISO 3166-2:
+
+**Departments** use numeric codes (matching the historical department number):
+| Component | Example | Meaning |
+|-----------|---------|---------|
+| Country prefix | FR | France |
+| Separator | - | Standard delimiter |
+| Department number | 75 | Paris |
+| Full code | FR-75 | Paris, France |
+
+**Regions** use 3-letter alphabetic codes:
+| Component | Example | Meaning |
+|-----------|---------|---------|
+| Country prefix | FR | France |
+| Separator | - | Standard delimiter |
+| Region code | IDF | Ile-de-France |
+| Full code | FR-IDF | Ile-de-France, France |
+
+## Using French Codes in Code
+
+### Look Up a Subdivision
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Region
+subdivision.whereCode('FR-IDF');
+// { code: 'FR-IDF', name: 'Ile-de-France', type: 'Metropolitan region', countryCode: 'FR' }
+
+// Department
+subdivision.whereCode('FR-75');
+// { code: 'FR-75', name: 'Paris', type: 'Metropolitan department', countryCode: 'FR' }
+
+// Overseas
+subdivision.whereCode('FR-GP');
+// { code: 'FR-GP', name: 'Guadeloupe', type: 'Overseas department', countryCode: 'FR' }
+```
+
+### Get All French Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const allFR = subdivision.forCountry('FR');
+
+// Filter by type
+const regions = allFR.filter(s => s.type === 'Metropolitan region');
+console.log(regions.length);  // 12
+
+const departments = allFR.filter(s => s.type === 'Metropolitan department');
+console.log(departments.length);  // 96
+
+const overseas = allFR.filter(s =>
+  s.type === 'Overseas department' || s.type === 'Overseas territorial collectivity'
+);
+```
+
+### Validate a Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('FR-IDF');   // true (Ile-de-France)
+subdivision.isValidCode('FR-75');    // true (Paris)
+subdivision.isValidCode('FR-XX');    // false
+
+subdivision.isValidRegion('FR', 'PAC');  // true (Provence-Alpes-Cote d'Azur)
+```
+
+### Tree-Shaking for French Data Only
+
+```typescript copy
+import '@koshmoney/countries/subdivision/FR';
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+
+const paris = whereCode('FR-75');
+const allFR = forCountry('FR');
+```
+
+## Postal Code System
+
+France uses a 5-digit postal code system. The first two digits correspond to the department number:
+
+| First Digits | Department / Area |
+|-------------|-------------------|
+| 75 | Paris |
+| 13 | Bouches-du-Rhone (Marseille) |
+| 69 | Rhone (Lyon) |
+| 31 | Haute-Garonne (Toulouse) |
+| 33 | Gironde (Bordeaux) |
+| 59 | Nord (Lille) |
+| 67 | Bas-Rhin (Strasbourg) |
+| 97 | Overseas departments |
+| 20 | Corsica (20000-20999) |
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('FR', '75001');  // true (Paris 1er)
+postalCode.isValid('FR', '13001');  // true (Marseille)
+postalCode.isValid('FR', '97100');  // true (Guadeloupe)
+postalCode.isValid('FR', '1234');   // false (only 4 digits)
+```
+
+## EU Membership and Related Data
+
+France is a founding EU member and belongs to all major European groupings:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.getMemberships('FR');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+```
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+
+country.whereAlpha2('FR');
+// { name: 'France', alpha2: 'FR', alpha3: 'FRA', numeric: '250' }
+
+currency.getCurrency('FR');
+// { code: 'EUR', symbol: '\u20ac', name: 'Euro' }
+```
+
+> [!TIP]
+> While metropolitan France and overseas departments use the Euro and are in the EU, some overseas collectivities use the CFP franc (XPF) and are not part of the EU. Always check the specific territory.
+
+## Common Use Cases
+
+### Address Forms
+
+French address forms typically require the department (via postal code) but not the region. For e-commerce targeting metropolitan France:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const allFR = subdivision.forCountry('FR');
+
+// For a region dropdown (13 metropolitan regions + Corsica)
+const regions = allFR.filter(s =>
+  s.type === 'Metropolitan region' || s.type === 'Metropolitan collectivity'
+);
+
+const dropdown = regions.map(r => ({
+  label: r.name,
+  value: r.code,
+}));
+```
+
+### Metropolitan vs Overseas Shipping
+
+Shipping to overseas departments (DOM) and collectivities (COM/TOM) has different rates and customs requirements:
+
+```typescript copy
+const overseasDepartments = new Set(['FR-GF', 'FR-GP', 'FR-MQ', 'FR-RE', 'FR-YT']);
+const overseasCollectivities = new Set(['FR-BL', 'FR-MF', 'FR-NC', 'FR-PF', 'FR-PM', 'FR-WF']);
+
+function getShippingZone(code: string): 'metro' | 'dom' | 'com' {
+  if (overseasDepartments.has(code)) return 'dom';
+  if (overseasCollectivities.has(code)) return 'com';
+  return 'metro';
+}
+```
+
+### VAT Handling
+
+Standard French VAT (TVA) is 20%, but overseas departments have different rates. Corsica also has reduced rates on certain products:
+
+```typescript copy
+function getVATRate(subdivisionCode: string): number {
+  if (subdivisionCode === 'FR-COR') return 13; // Corsica reduced rate (varies by product)
+  if (['FR-GP', 'FR-MQ', 'FR-RE'].includes(subdivisionCode)) return 8.5; // DOM rate
+  if (subdivisionCode === 'FR-GF') return 0; // French Guiana exempt
+  return 20; // Standard metropolitan rate
+}
+```
+
+## Related Resources
+
+- [Country Code Converter Tool](/tools/country-code-converter) -- look up FR and all other codes
+- [European Countries List](/blog/european-countries-list-codes) -- all countries in Europe
+- [Eurozone Countries](/blog/eurozone-countries-list) -- all 20 Euro-using countries
+- [German State Codes](/blog/german-state-codes-list) -- similar guide for Germany
+- [Subdivision API Reference](/docs/api/subdivision) -- full subdivision API documentation

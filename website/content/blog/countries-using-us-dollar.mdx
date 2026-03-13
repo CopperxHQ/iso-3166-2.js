@@ -1,0 +1,163 @@
+---
+description: "Complete list of all countries and territories that use the US Dollar (USD) as their official currency. ISO codes, code examples, and currency lookup with TypeScript."
+---
+
+# Countries Using the US Dollar: Complete List with ISO Codes
+
+The US Dollar (USD) is not only the currency of the United States -- it is the official currency in 18 countries and territories worldwide. Beyond official adoption, it serves as the world's primary reserve currency and is widely accepted in dozens more countries. If you build payment, e-commerce, or financial applications, knowing which countries officially use USD is important for currency display, payment processing, and compliance logic.
+
+This reference lists every country and territory that uses the US Dollar as its official currency, with ISO codes and code examples.
+
+## Quick Access with Code
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+
+// Find all countries using the US Dollar
+const usdCountries = currency.getCountriesByCurrency('USD');
+// ['AQ', 'AS', 'BQ', 'EC', 'FM', 'GU', 'IO', 'MH', 'MP',
+//  'PR', 'PW', 'SV', 'TC', 'TL', 'UM', 'US', 'VG', 'VI']
+
+console.log(usdCountries.length); // 18
+
+// Check a specific country
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.getCurrency('EC');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.usesCurrency('EC', 'USD'); // true
+```
+
+## All Countries and Territories Using USD
+
+### United States and US Territories
+
+| Country / Territory | Alpha-2 | Alpha-3 | Numeric | Continent |
+|---------------------|---------|---------|---------|-----------|
+| United States | US | USA | 840 | North America |
+| American Samoa | AS | ASM | 016 | Oceania |
+| Guam | GU | GUM | 316 | Oceania |
+| Northern Mariana Islands | MP | MNP | 580 | Oceania |
+| Puerto Rico | PR | PRI | 630 | North America |
+| U.S. Virgin Islands | VI | VIR | 850 | North America |
+| United States Minor Outlying Islands | UM | UMI | 581 | Oceania |
+
+These are US territories that use USD by default. They have their own ISO 3166 codes, which matters for address forms, shipping, and tax calculations -- Puerto Rico (PR) has different tax rules than mainland US states, for example.
+
+### Sovereign Nations Using USD
+
+| Country | Alpha-2 | Alpha-3 | Numeric | Continent | Notes |
+|---------|---------|---------|---------|-----------|-------|
+| Ecuador | EC | ECU | 218 | South America | Adopted 2000, replaced Sucre |
+| El Salvador | SV | SLV | 222 | North America | Adopted 2001, replaced Colon |
+| East Timor | TL | TLS | 626 | Asia | Adopted 2000 at independence |
+| Marshall Islands | MH | MHL | 584 | Oceania | Compact of Free Association |
+| Micronesia, Federated States Of | FM | FSM | 583 | Oceania | Compact of Free Association |
+| Palau | PW | PLW | 585 | Oceania | Compact of Free Association |
+
+Ecuador and El Salvador are the two largest economies that have adopted USD as their sole legal tender, a process called "dollarization." The three Pacific island nations (Marshall Islands, Micronesia, Palau) use USD through their Compact of Free Association with the United States.
+
+> [!NOTE]
+> El Salvador also recognizes Bitcoin as legal tender alongside the US Dollar since 2021, but USD remains the primary currency for everyday transactions and the one recorded in ISO 4217.
+
+### Other Territories Using USD
+
+| Territory | Alpha-2 | Alpha-3 | Numeric | Administered By |
+|-----------|---------|---------|---------|-----------------|
+| British Virgin Islands | VG | VGB | 092 | United Kingdom |
+| Turks & Caicos Islands | TC | TCA | 796 | United Kingdom |
+| Bonaire, Sint Eustatius and Saba | BQ | BES | 535 | Netherlands |
+| British Indian Ocean Territory | IO | IOT | 086 | United Kingdom |
+| Antarctica | AQ | ATA | 010 | International |
+
+Several non-US territories use the US Dollar. The British Virgin Islands (VG) and Turks & Caicos Islands (TC) are British Overseas Territories that adopted USD due to their proximity to the US and tourism-heavy economies. Bonaire, Sint Eustatius, and Saba (BQ) are Dutch municipalities in the Caribbean that switched from the Netherlands Antillean Guilder to USD in 2011.
+
+## USD as Currency vs USD Acceptance
+
+There is an important distinction between countries where USD is the **official currency** (listed above) and countries where USD is **widely accepted** but not the official currency. Many countries in Latin America, the Caribbean, and Southeast Asia accept US Dollars informally, but their official currency is different:
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+// Panama uses the Balboa officially (pegged 1:1 to USD)
+// USD circulates freely but PAB is the ISO 4217 currency
+currency.getCurrency('PA');
+// { code: 'PAB', symbol: 'B/.', name: 'Panamanian Balboa' }
+
+// Cambodia uses the Riel officially, but USD is widely used
+currency.getCurrency('KH');
+// { code: 'KHR', symbol: '៛', name: 'Cambodian Riel' }
+
+// Zimbabwe uses multiple currencies; the data reflects the official one
+currency.getCurrency('ZW');
+// { code: 'ZWL', symbol: '$', name: 'Zimbabwean Dollar' }
+```
+
+## Working with USD Country Data
+
+### Build a USD country selector
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+
+const usdCountries = currency.getCountriesByCurrency('USD');
+
+const options = usdCountries
+  .map((code) => ({
+    value: code,
+    label: country.toName(code),
+  }))
+  .filter((c) => c.label)
+  .sort((a, b) => a.label!.localeCompare(b.label!));
+```
+
+### Check if USD pricing applies
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+function shouldShowUSD(countryCode: string): boolean {
+  return currency.getCurrencyCode(countryCode) === 'USD';
+}
+
+shouldShowUSD('US'); // true
+shouldShowUSD('EC'); // true
+shouldShowUSD('PR'); // true
+shouldShowUSD('GB'); // false
+```
+
+### Group countries by currency for a multi-currency app
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+import { geography } from '@koshmoney/countries/geography';
+
+// Get all USD countries in the Americas
+const usdCountries = currency.getCountriesByCurrency('USD');
+const americasUSD = usdCountries.filter((code) => {
+  const continent = geography.getContinent(code);
+  return continent === 'North America' || continent === 'South America';
+});
+
+americasUSD.map((code) => country.toName(code));
+// ['Ecuador', 'El Salvador', 'Puerto Rico', 'United States', ...]
+```
+
+## Summary
+
+The US Dollar is the official currency in 18 countries and territories listed in ISO 3166. This includes the United States and its territories, several sovereign nations that adopted USD through dollarization (Ecuador, El Salvador, East Timor), Pacific island nations with Compact of Free Association agreements, and a handful of British and Dutch territories. The `@koshmoney/countries` library provides `currency.getCountriesByCurrency('USD')` to find all of them programmatically.
+
+---
+
+## Related
+
+- [Currency API](/docs/api/currency) -- Full currency module reference
+- [Countries Using the Euro](/blog/countries-using-euro) -- All EUR countries
+- [South American Countries List](/blog/south-american-countries-list-codes) -- South American country codes
+- [North American Countries List](/blog/north-american-countries-list-codes) -- North American country codes
+- [Oceania Countries List](/blog/oceania-countries-list-codes) -- Oceania country codes

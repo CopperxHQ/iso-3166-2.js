@@ -1,0 +1,427 @@
+---
+description: "Complete API reference for country functions in @koshmoney/countries. Lookup, convert, and validate ISO 3166-1 country codes."
+---
+
+# Country API
+
+All country functions are available via the `country` namespace from the main bundle, or as direct named imports from the `country` subpath.
+
+```typescript copy
+// Namespace import (recommended)
+import { country } from '@koshmoney/countries';
+country.whereAlpha2('US');
+
+// Direct import (tree-shakeable)
+import { whereAlpha2 } from '@koshmoney/countries/country';
+whereAlpha2('US');
+```
+
+## Types
+
+```typescript
+interface Country {
+  name: string;      // "United States"
+  alpha2: string;    // "US"
+  alpha3: string;    // "USA"
+  numeric: string;   // "840"
+}
+
+interface CountryWithSubdivisions extends Country {
+  subdivisions: Record<string, SubdivisionInfo>;
+}
+
+type CountryCodeFormat = 'alpha2' | 'alpha3' | 'numeric';
+```
+
+---
+
+## Lookups
+
+### `whereAlpha2(code)`
+
+Lookup a country by ISO 3166-1 alpha-2 code.
+
+**Parameters:**
+- `code: string` -- 2-letter country code (case-insensitive)
+
+**Returns:** `Country | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereAlpha2('us'); // case-insensitive
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereAlpha2('XX');
+// null
+```
+
+---
+
+### `whereAlpha3(code)`
+
+Lookup a country by ISO 3166-1 alpha-3 code.
+
+**Parameters:**
+- `code: string` -- 3-letter country code (case-insensitive)
+
+**Returns:** `Country | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha3('USA');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereAlpha3('XXX');
+// null
+```
+
+---
+
+### `whereNumeric(code)`
+
+Lookup a country by ISO 3166-1 numeric code.
+
+**Parameters:**
+- `code: string | number` -- Numeric country code
+
+**Returns:** `Country | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereNumeric('840');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereNumeric(840);
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereNumeric(4); // Handles missing leading zeros
+// { name: 'Afghanistan', alpha2: 'AF', alpha3: 'AFG', numeric: '004' }
+```
+
+---
+
+### `whereName(name)`
+
+Lookup a country by name (case-insensitive).
+
+**Parameters:**
+- `name: string` -- Country name
+
+**Returns:** `Country | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereName('United States');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereName('SWEDEN'); // case-insensitive
+// { name: 'Sweden', alpha2: 'SE', alpha3: 'SWE', numeric: '752' }
+
+country.whereName('Narnia');
+// null
+```
+
+---
+
+### `all()`
+
+Get all 249 countries, sorted by alpha-2 code.
+
+**Returns:** `Country[]`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+const countries = country.all();
+// [{ name: 'Afghanistan', alpha2: 'AF', ... }, { name: 'Aland Islands', alpha2: 'AX', ... }, ...]
+console.log(countries.length); // 249
+```
+
+---
+
+### `withSubdivisions(code)`
+
+Get a country with all its subdivisions.
+
+**Parameters:**
+- `code: string` -- Country code (alpha-2 or alpha-3)
+
+**Returns:** `CountryWithSubdivisions | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.withSubdivisions('US');
+// {
+//   name: 'United States',
+//   alpha2: 'US',
+//   alpha3: 'USA',
+//   numeric: '840',
+//   subdivisions: {
+//     'US-CA': { name: 'California', type: 'State' },
+//     'US-TX': { name: 'Texas', type: 'State' },
+//     ...
+//   }
+// }
+
+country.withSubdivisions('XX');
+// null
+```
+
+---
+
+## Conversions
+
+### `alpha2ToAlpha3(code)`
+
+Convert an alpha-2 code to alpha-3.
+
+**Parameters:** `code: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.alpha2ToAlpha3('US'); // 'USA'
+country.alpha2ToAlpha3('SE'); // 'SWE'
+country.alpha2ToAlpha3('XX'); // null
+```
+
+---
+
+### `alpha3ToAlpha2(code)`
+
+Convert an alpha-3 code to alpha-2.
+
+**Parameters:** `code: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.alpha3ToAlpha2('USA'); // 'US'
+country.alpha3ToAlpha2('XXX'); // null
+```
+
+---
+
+### `alpha2ToNumeric(code)`
+
+Convert an alpha-2 code to numeric.
+
+**Parameters:** `code: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.alpha2ToNumeric('US'); // '840'
+```
+
+---
+
+### `alpha3ToNumeric(code)`
+
+Convert an alpha-3 code to numeric.
+
+**Parameters:** `code: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.alpha3ToNumeric('USA'); // '840'
+```
+
+---
+
+### `numericToAlpha2(code)`
+
+Convert a numeric code to alpha-2.
+
+**Parameters:** `code: string | number`
+**Returns:** `string | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.numericToAlpha2('840'); // 'US'
+country.numericToAlpha2(840);   // 'US'
+```
+
+---
+
+### `numericToAlpha3(code)`
+
+Convert a numeric code to alpha-3.
+
+**Parameters:** `code: string | number`
+**Returns:** `string | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.numericToAlpha3('840'); // 'USA'
+country.numericToAlpha3(840);   // 'USA'
+```
+
+---
+
+### `toName(code)`
+
+Get a country name from any code format (alpha-2, alpha-3, or numeric).
+
+**Parameters:** `code: string | number`
+**Returns:** `string | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.toName('US');  // 'United States'
+country.toName('USA'); // 'United States'
+country.toName(840);   // 'United States'
+country.toName('XX');  // null
+```
+
+---
+
+### `convert(code, from, to)`
+
+Convert between any two country code formats.
+
+**Parameters:**
+- `code: string | number` -- The code to convert
+- `from: CountryCodeFormat` -- Source format (`'alpha2'`, `'alpha3'`, or `'numeric'`)
+- `to: CountryCodeFormat` -- Target format
+
+**Returns:** `string | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.convert('US', 'alpha2', 'alpha3');   // 'USA'
+country.convert('USA', 'alpha3', 'numeric'); // '840'
+country.convert('840', 'numeric', 'alpha2'); // 'US'
+```
+
+---
+
+## Validation
+
+### `isAlpha2(code)`
+
+Check if a string is a valid ISO 3166-1 alpha-2 code.
+
+**Parameters:** `code: string`
+**Returns:** `boolean`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.isAlpha2('US');  // true
+country.isAlpha2('USA'); // false (that's alpha-3)
+country.isAlpha2('XX');  // false
+```
+
+---
+
+### `isAlpha3(code)`
+
+Check if a string is a valid ISO 3166-1 alpha-3 code.
+
+**Parameters:** `code: string`
+**Returns:** `boolean`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.isAlpha3('USA'); // true
+country.isAlpha3('US');  // false (that's alpha-2)
+country.isAlpha3('XXX'); // false
+```
+
+---
+
+### `isNumeric(code)`
+
+Check if a value is a valid ISO 3166-1 numeric code.
+
+**Parameters:** `code: string | number`
+**Returns:** `boolean`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.isNumeric('840'); // true
+country.isNumeric(840);   // true
+country.isNumeric('999'); // false
+```
+
+---
+
+### `isCountryName(name)`
+
+Check if a string is a valid country name.
+
+**Parameters:** `name: string`
+**Returns:** `boolean`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.isCountryName('United States'); // true
+country.isCountryName('Narnia');        // false
+```
+
+---
+
+### `isValid(value)`
+
+Check if a value is any valid country identifier (alpha-2, alpha-3, numeric, or name).
+
+**Parameters:** `value: string | number`
+**Returns:** `boolean`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.isValid('US');            // true
+country.isValid('USA');           // true
+country.isValid(840);             // true
+country.isValid('United States'); // true
+country.isValid('XX');            // false
+```
+
+---
+
+### `detectFormat(code)`
+
+Detect the format of a country code.
+
+**Parameters:** `code: string | number`
+**Returns:** `CountryCodeFormat | 'name' | null`
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.detectFormat('US');            // 'alpha2'
+country.detectFormat('USA');           // 'alpha3'
+country.detectFormat('840');           // 'numeric'
+country.detectFormat('United States'); // 'name'
+country.detectFormat('XX');            // null
+```
+
+---
+
+## Related
+
+- [Subdivision API](/docs/api/subdivision) -- Look up states, provinces, and regions
+- [Country Dropdown Guide](/docs/guides/country-dropdown) -- Build a country selector
+- [Tree Shaking](/docs/guides/tree-shaking) -- Import only country data for smaller bundles

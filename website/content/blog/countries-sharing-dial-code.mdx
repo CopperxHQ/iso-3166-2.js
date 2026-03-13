@@ -1,0 +1,228 @@
+---
+description: "Which countries share the same international dialing code? Complete guide to shared country calling codes like +1, +7, and +44 with ISO codes and TypeScript examples."
+---
+
+# Countries Sharing the Same Dial Code: A Developer's Guide
+
+Most countries have their own unique international dialing code, but several groups of countries and territories share a single code. This is relevant for developers building phone number validation, country detection from phone prefixes, and telecom applications. A dialing code alone does not always identify a country.
+
+This guide covers every major shared dialing code, why they are shared, and how to handle them in code.
+
+## +1: The North American Numbering Plan
+
+The most widely shared dialing code is +1, used by the United States, Canada, and 18 Caribbean nations and territories under the North American Numbering Plan (NANP). Each country or territory within the NANP has unique area codes that distinguish them:
+
+| Country / Territory | Alpha-2 | Alpha-3 | Area Codes (examples) |
+|---------------------|---------|---------|----------------------|
+| United States | US | USA | 201-989 (various) |
+| Canada | CA | CAN | 204, 226, 236, 249, ... |
+| Bahamas | BS | BHS | 242 |
+| Barbados | BB | BRB | 246 |
+| Anguilla | AI | AIA | 264 |
+| Antigua and Barbuda | AG | ATG | 268 |
+| British Virgin Islands | VG | VGB | 284 |
+| Cayman Islands | KY | CYM | 345 |
+| Bermuda | BM | BMU | 441 |
+| Grenada | GD | GRD | 473 |
+| U.S. Virgin Islands | VI | VIR | 340 |
+| Turks & Caicos Islands | TC | TCA | 649 |
+| Jamaica | JM | JAM | 876 |
+| Montserrat | MS | MSR | 664 |
+| Saint Lucia | LC | LCA | 758 |
+| Dominican Republic | DO | DOM | 809, 829, 849 |
+| Saint Kitts And Nevis | KN | KNA | 869 |
+| Trinidad and Tobago | TT | TTO | 868 |
+| Saint Vincent And The Grenadines | VC | VCT | 784 |
+| Puerto Rico | PR | PRI | 787, 939 |
+
+This means you **cannot determine the country from +1 alone** -- you need the area code as well.
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// All of these return '+1'
+dialCode.getDialCode('US'); // '+1'
+dialCode.getDialCode('CA'); // '+1'
+dialCode.getDialCode('JM'); // '+1'
+dialCode.getDialCode('BS'); // '+1'
+dialCode.getDialCode('BB'); // '+1'
+```
+
+> [!NOTE]
+> Within the NANP, calls between participating countries are dialed as domestic calls (1 + area code + number) without needing the international dialing prefix. This is why the format looks identical for US and Canadian numbers.
+
+## +7: Russia and Kazakhstan
+
+Russia and Kazakhstan share the +7 dialing code, a legacy of the Soviet telephone system:
+
+| Country | Alpha-2 | Alpha-3 | Code Prefix |
+|---------|---------|---------|-------------|
+| Russia | RU | RUS | +7 (most area codes) |
+| Kazakhstan | KZ | KAZ | +7 6xx, +7 7xx |
+
+Kazakhstan uses area codes starting with 6 and 7 (e.g., +7 701, +7 727), while Russian area codes use other prefixes. Since December 2023, Kazakhstan has been transitioning to its own +997 code, but +7 remains operational during the transition period.
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.getDialCode('RU'); // '+7'
+dialCode.getDialCode('KZ'); // '+7'
+```
+
+## +44: United Kingdom and Crown Dependencies
+
+The UK dialing code +44 is shared with several Crown Dependencies and overseas territories:
+
+| Country / Territory | Alpha-2 | Alpha-3 | Notes |
+|---------------------|---------|---------|-------|
+| United Kingdom | GB | GBR | Main +44 user |
+| Guernsey | GG | GGY | Crown Dependency |
+| Isle of Man | IM | IMN | Crown Dependency |
+| Jersey | JE | JEY | Crown Dependency |
+
+The Crown Dependencies (Guernsey, Isle of Man, Jersey) have their own ISO 3166 codes but share the +44 dialing code with the UK. They have distinct area code ranges within the +44 numbering plan.
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.getDialCode('GB'); // '+44'
+dialCode.getDialCode('GG'); // '+44'
+dialCode.getDialCode('IM'); // '+44'
+dialCode.getDialCode('JE'); // '+44'
+```
+
+## +47: Norway and Svalbard
+
+| Country / Territory | Alpha-2 | Alpha-3 |
+|---------------------|---------|---------|
+| Norway | NO | NOR |
+| Svalbard & Jan Mayen | SJ | SJM |
+
+Svalbard and Jan Mayen Islands are under Norwegian sovereignty and share Norway's +47 dialing code.
+
+## +61: Australia and Territories
+
+| Country / Territory | Alpha-2 | Alpha-3 |
+|---------------------|---------|---------|
+| Australia | AU | AUS |
+| Christmas Island | CX | CXR |
+| Cocos Islands | CC | CCK |
+
+Australia's external territories share the +61 dialing code, with Christmas Island using the area code 08 9164 and Cocos Islands using 08 9162.
+
+## +64: New Zealand and Territories
+
+| Country / Territory | Alpha-2 | Alpha-3 |
+|---------------------|---------|---------|
+| New Zealand | NZ | NZL |
+| Pitcairn | PN | PCN |
+
+Pitcairn Islands use the +64 code through a New Zealand satellite link.
+
+## Why This Matters for Developers
+
+### Phone number validation
+
+When validating phone numbers, a dialing code alone is not enough to determine the country. You need additional logic:
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { country } from '@koshmoney/countries';
+
+// WARNING: This function is incomplete for shared dial codes
+// For production use, use libphonenumber-js directly for full parsing
+function getCountryFromDialCode(code: string): string[] {
+  const allCountries = dialCode.getSupportedCountries();
+  return allCountries.filter((cc) => dialCode.getDialCode(cc) === code);
+}
+
+getCountryFromDialCode('+1');
+// ['AG', 'AI', 'AS', 'BB', 'BM', 'BS', 'CA', 'DM', 'DO', 'GD',
+//  'GU', 'JM', 'KN', 'KY', 'LC', 'MP', 'MS', 'PR', 'SX', 'TC',
+//  'TT', 'US', 'VC', 'VG', 'VI']
+
+getCountryFromDialCode('+44');
+// ['GB', 'GG', 'IM', 'JE']
+
+getCountryFromDialCode('+49');
+// ['DE'] -- Germany has a unique code
+```
+
+### Country selector for phone inputs
+
+When building a phone number input with a country selector, display both the country name and dial code. For countries sharing a dial code, the user must select the specific country:
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { country } from '@koshmoney/countries';
+
+const phoneCountries = dialCode.getSupportedCountries()
+  .map((code) => ({
+    value: code,
+    label: country.toName(code),
+    dialCode: dialCode.getDialCode(code),
+  }))
+  .filter((c) => c.label && c.dialCode)
+  .sort((a, b) => a.label!.localeCompare(b.label!));
+
+// In your UI, display as:
+// "United States (+1)"
+// "Canada (+1)"
+// "Jamaica (+1)"
+// "Germany (+49)"
+// This lets users disambiguate shared codes
+```
+
+### SMS routing
+
+SMS providers need the full phone number (including area code) to route messages correctly within shared dial code zones. When sending to +1 numbers, the area code determines whether the message routes to the US, Canada, or a Caribbean carrier:
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+function validatePhoneForSMS(countryCode: string, phoneNumber: string): boolean {
+  // Verify the country supports phone operations
+  if (!dialCode.isValidPhoneCountry(countryCode)) {
+    return false;
+  }
+
+  const code = dialCode.getDialCode(countryCode);
+  if (!code) return false;
+
+  // For NANP countries, ensure we have 10 digits after the +1
+  if (code === '+1') {
+    const digits = phoneNumber.replace(/\D/g, '');
+    return digits.length === 10 || digits.length === 11;
+  }
+
+  return phoneNumber.length > 4; // Basic length check for other countries
+}
+```
+
+## Complete List of Shared Dial Codes
+
+| Dial Code | Countries | Count |
+|-----------|-----------|-------|
+| +1 | US, CA, and 18+ Caribbean nations | 20+ |
+| +7 | Russia, Kazakhstan | 2 |
+| +44 | UK, Guernsey, Isle of Man, Jersey | 4 |
+| +47 | Norway, Svalbard & Jan Mayen | 2 |
+| +61 | Australia, Christmas Island, Cocos Islands | 3 |
+| +64 | New Zealand, Pitcairn | 2 |
+| +262 | Reunion, Mayotte | 2 |
+| +590 | Guadeloupe, St. Barthelemy, St. Martin | 3 |
+
+Most other countries have unique dialing codes. The vast majority of the world's 200+ countries can be identified by their dialing code alone -- the shared codes listed above are the exceptions.
+
+## Summary
+
+While most countries have unique international dialing codes, several groups share codes due to historical, political, or geographic reasons. The largest shared code is +1 (NANP), covering 20+ countries. For developers, the key takeaway is that a dialing code alone does not always identify a country -- you need area codes or user selection to disambiguate. The `@koshmoney/countries` library provides `dialCode.getDialCode()` for code lookups and `dialCode.getSupportedCountries()` for building phone input components.
+
+---
+
+## Related
+
+- [International Dialing Codes List](/blog/international-dialing-codes-list) -- Complete dial code reference by continent
+- [Dial Code API](/docs/api/dial-code) -- Full dial code module reference
+- [Country Code Converter](/tools/country-code-converter) -- Interactive lookup tool
+- [North American Countries List](/blog/north-american-countries-list-codes) -- All North American country codes

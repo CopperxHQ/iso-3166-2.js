@@ -1,0 +1,216 @@
+---
+description: "Build a country and state/province dropdown in React and Vue using @koshmoney/countries with TypeScript."
+---
+
+# Country Dropdown Guide
+
+Build accessible country and subdivision dropdowns using `@koshmoney/countries`.
+
+## React: Country Dropdown
+
+A simple country selector that returns the ISO alpha-2 code.
+
+```tsx copy
+import { useState } from 'react';
+import { country } from '@koshmoney/countries';
+
+function CountrySelect({ value, onChange }: {
+  value: string;
+  onChange: (code: string) => void;
+}) {
+  const countries = country.all();
+
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)}>
+      <option value="">Select a country</option>
+      {countries.map((c) => (
+        <option key={c.alpha2} value={c.alpha2}>
+          {c.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+```
+
+## React: Country + State Dropdown
+
+A cascading dropdown where the state list updates based on the selected country.
+
+```tsx copy
+import { useState } from 'react';
+import { country, subdivision } from '@koshmoney/countries';
+
+function AddressForm() {
+  const [countryCode, setCountryCode] = useState('');
+  const [regionCode, setRegionCode] = useState('');
+
+  const countries = country.all();
+  const subdivisions = countryCode
+    ? subdivision.forCountry(countryCode)
+    : [];
+
+  return (
+    <form>
+      <label>
+        Country
+        <select
+          value={countryCode}
+          onChange={(e) => {
+            setCountryCode(e.target.value);
+            setRegionCode(''); // Reset state when country changes
+          }}
+        >
+          <option value="">Select a country</option>
+          {countries.map((c) => (
+            <option key={c.alpha2} value={c.alpha2}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {subdivisions.length > 0 && (
+        <label>
+          {subdivisions[0]?.type || 'State/Province'}
+          <select
+            value={regionCode}
+            onChange={(e) => setRegionCode(e.target.value)}
+          >
+            <option value="">Select {subdivisions[0]?.type?.toLowerCase() || 'state'}</option>
+            {subdivisions.map((s) => (
+              <option key={s.code} value={s.regionCode}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+    </form>
+  );
+}
+```
+
+## React: Country with Dial Code
+
+A phone input with country dial code prefix.
+
+```tsx copy
+import { useState } from 'react';
+import { country } from '@koshmoney/countries';
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+function PhoneInput() {
+  const [countryCode, setCountryCode] = useState('US');
+  const [phone, setPhone] = useState('');
+
+  const countries = country.all();
+  const code = dialCode.getDialCode(countryCode);
+
+  return (
+    <div style={{ display: 'flex', gap: '8px' }}>
+      <select
+        value={countryCode}
+        onChange={(e) => setCountryCode(e.target.value)}
+      >
+        {countries.map((c) => {
+          const dc = dialCode.getDialCode(c.alpha2);
+          return (
+            <option key={c.alpha2} value={c.alpha2}>
+              {c.name} ({dc})
+            </option>
+          );
+        })}
+      </select>
+      <span>{code}</span>
+      <input
+        type="tel"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        placeholder="Phone number"
+      />
+    </div>
+  );
+}
+```
+
+## Vue: Country Dropdown
+
+The same pattern works in Vue with `v-model`.
+
+```vue copy
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { country, subdivision } from '@koshmoney/countries';
+
+const countryCode = ref('');
+const regionCode = ref('');
+
+const countries = country.all();
+const subdivisions = computed(() =>
+  countryCode.value ? subdivision.forCountry(countryCode.value) : []
+);
+
+function onCountryChange() {
+  regionCode.value = '';
+}
+</script>
+
+<template>
+  <form>
+    <label>
+      Country
+      <select v-model="countryCode" @change="onCountryChange">
+        <option value="">Select a country</option>
+        <option
+          v-for="c in countries"
+          :key="c.alpha2"
+          :value="c.alpha2"
+        >
+          {{ c.name }}
+        </option>
+      </select>
+    </label>
+
+    <label v-if="subdivisions.length > 0">
+      {{ subdivisions[0]?.type || 'State/Province' }}
+      <select v-model="regionCode">
+        <option value="">Select {{ subdivisions[0]?.type?.toLowerCase() }}</option>
+        <option
+          v-for="s in subdivisions"
+          :key="s.code"
+          :value="s.regionCode"
+        >
+          {{ s.name }}
+        </option>
+      </select>
+    </label>
+  </form>
+</template>
+```
+
+## Tree-Shaking for Specific Countries
+
+If you only support a few countries and want to minimize bundle size, import subdivisions selectively:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import '@koshmoney/countries/subdivision/US';
+import '@koshmoney/countries/subdivision/CA';
+import '@koshmoney/countries/subdivision/GB';
+import { forCountry } from '@koshmoney/countries/subdivision';
+
+// Only US, CA, and GB subdivisions are loaded (~5KB instead of ~55KB)
+const states = forCountry('US');     // Works
+const provinces = forCountry('CA');  // Works
+const regions = forCountry('DE');    // Returns [] (not imported)
+```
+
+---
+
+## Related
+
+- [Country API](/docs/api/country) -- `country.all()` and lookup functions
+- [Subdivision API](/docs/api/subdivision) -- `subdivision.forCountry()` and lookups
+- [React Examples](/docs/examples/react) -- More React patterns
+- [Tree Shaking](/docs/guides/tree-shaking) -- Optimize bundle size

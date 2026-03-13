@@ -1,0 +1,549 @@
+---
+description: "Complete reference of international phone country codes (dial codes) organized by prefix region. Includes ITU-T E.164 format, code examples with @koshmoney/countries, and common gotchas like +1 and +44."
+---
+
+# Phone Country Codes: Complete International Dial Code Reference (2026)
+
+Every international phone call begins with a country calling code — the numeric prefix that tells the telephone network which country to route to. These codes are standardized by the ITU-T (International Telecommunication Union) under Recommendation E.164, the global standard for international telephone numbers.
+
+This reference covers every country calling code, organized by prefix region, with TypeScript code examples using `@koshmoney/countries`.
+
+## What Is a Country Calling Code?
+
+A country calling code (also called a dial code, IDD code, or international dialing prefix) is a 1–3 digit number prefixed with `+` that identifies a country or territory in the global telephone numbering plan.
+
+**Example:** To call a UK number `020 7946 0000` from abroad:
+- Dial your exit code (e.g., `011` in the US, `00` in most of Europe)
+- Then the country code: `44`
+- Then the number without its leading zero: `20 7946 0000`
+- Result: `+44 20 7946 0000`
+
+The E.164 format standardizes this as: `+[country code][subscriber number]`, with no spaces or special characters, up to 15 digits total.
+
+## Quick Lookup
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.getDialCode('US'); // '+1'
+dialCode.getDialCode('GB'); // '+44'
+dialCode.getDialCode('DE'); // '+49'
+dialCode.getDialCode('JP'); // '+81'
+dialCode.getDialCode('IN'); // '+91'
+dialCode.getDialCode('BR'); // '+55'
+dialCode.getDialCode('AU'); // '+61'
+dialCode.getDialCode('CN'); // '+86'
+
+// Returns null for invalid codes
+dialCode.getDialCode('XX'); // null
+```
+
+## Zone +1: North America (NANP)
+
+The North American Numbering Plan (NANP) is unique: over 25 countries and territories share the `+1` prefix. They are differentiated by their 3-digit area codes, not their country code.
+
+| Country / Territory | Alpha-2 | Dial Code |
+|--------------------|---------|-----------|
+| United States | US | +1 |
+| Canada | CA | +1 |
+| Bahamas | BS | +1 |
+| Barbados | BB | +1 |
+| Bermuda | BM | +1 |
+| British Virgin Islands | VG | +1 |
+| Cayman Islands | KY | +1 |
+| Dominica | DM | +1 |
+| Dominican Republic | DO | +1 |
+| Grenada | GD | +1 |
+| Guam | GU | +1 |
+| Jamaica | JM | +1 |
+| Montserrat | MS | +1 |
+| Puerto Rico | PR | +1 |
+| Saint Kitts and Nevis | KN | +1 |
+| Saint Lucia | LC | +1 |
+| Saint Vincent and the Grenadines | VC | +1 |
+| Sint Maarten | SX | +1 |
+| Trinidad and Tobago | TT | +1 |
+| Turks and Caicos Islands | TC | +1 |
+| U.S. Virgin Islands | VI | +1 |
+
+> **Gotcha:** When receiving a `+1` number, you cannot determine the country from the dial code alone. You need to look up the area code. See [countries sharing the same dial code](/blog/countries-sharing-dial-code) for full NANP area code mappings.
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// All NANP countries share +1
+dialCode.getDialCode('US'); // '+1'
+dialCode.getDialCode('CA'); // '+1'
+dialCode.getDialCode('JM'); // '+1'
+
+// Get all countries with a specific dial code
+dialCode.getCountriesByDialCode('+1');
+// ['US', 'CA', 'BS', 'BB', 'BM', ...]
+```
+
+## Zone +2x: Africa
+
+| Country | Alpha-2 | Dial Code |
+|---------|---------|-----------|
+| Egypt | EG | +20 |
+| South Africa | ZA | +27 |
+| Morocco | MA | +212 |
+| Algeria | DZ | +213 |
+| Tunisia | TN | +216 |
+| Libya | LY | +218 |
+| Gambia | GM | +220 |
+| Senegal | SN | +221 |
+| Mauritania | MR | +222 |
+| Mali | ML | +223 |
+| Guinea | GN | +224 |
+| Ivory Coast | CI | +225 |
+| Burkina Faso | BF | +226 |
+| Niger | NE | +227 |
+| Togo | TG | +228 |
+| Benin | BJ | +229 |
+| Mauritius | MU | +230 |
+| Liberia | LR | +231 |
+| Sierra Leone | SL | +232 |
+| Ghana | GH | +233 |
+| Nigeria | NG | +234 |
+| Chad | TD | +235 |
+| Central African Republic | CF | +236 |
+| Cameroon | CM | +237 |
+| Cape Verde | CV | +238 |
+| Sao Tome and Principe | ST | +239 |
+| Equatorial Guinea | GQ | +240 |
+| Gabon | GA | +241 |
+| Republic of the Congo | CG | +242 |
+| DR Congo | CD | +243 |
+| Angola | AO | +244 |
+| Guinea-Bissau | GW | +245 |
+| British Indian Ocean Territory | IO | +246 |
+| Ascension Island | AC | +247 |
+| Seychelles | SC | +248 |
+| Sudan | SD | +249 |
+| Rwanda | RW | +250 |
+| Ethiopia | ET | +251 |
+| Somalia | SO | +252 |
+| Djibouti | DJ | +253 |
+| Kenya | KE | +254 |
+| Tanzania | TZ | +255 |
+| Uganda | UG | +256 |
+| Burundi | BI | +257 |
+| Mozambique | MZ | +258 |
+| Zambia | ZM | +260 |
+| Madagascar | MG | +261 |
+| Reunion | RE | +262 |
+| Zimbabwe | ZW | +263 |
+| Namibia | NA | +264 |
+| Malawi | MW | +265 |
+| Lesotho | LS | +266 |
+| Botswana | BW | +267 |
+| Eswatini | SZ | +268 |
+| Comoros | KM | +269 |
+| Saint Helena | SH | +290 |
+| Eritrea | ER | +291 |
+| Aruba | AW | +297 |
+| Faroe Islands | FO | +298 |
+| Greenland | GL | +299 |
+
+## Zone +3x: Europe (Western)
+
+| Country | Alpha-2 | Dial Code |
+|---------|---------|-----------|
+| Greece | GR | +30 |
+| Netherlands | NL | +31 |
+| Belgium | BE | +32 |
+| France | FR | +33 |
+| Spain | ES | +34 |
+| Hungary | HU | +36 |
+| Italy | IT | +39 |
+
+## Zone +4x: Europe (Northern/Central)
+
+| Country | Alpha-2 | Dial Code |
+|---------|---------|-----------|
+| Romania | RO | +40 |
+| Switzerland | CH | +41 |
+| Austria | AT | +43 |
+| United Kingdom | GB | +44 |
+| Denmark | DK | +45 |
+| Sweden | SE | +46 |
+| Norway | NO | +47 |
+| Poland | PL | +48 |
+| Germany | DE | +49 |
+
+> **Gotcha:** The UK's `+44` also covers the Isle of Man (`+44 1624`), Jersey (`+44 1534`), and Guernsey (`+44 1481`). These Crown Dependencies use the same prefix as mainland UK numbers.
+
+## Zone +5x: Americas (Central and South)
+
+| Country | Alpha-2 | Dial Code |
+|---------|---------|-----------|
+| Peru | PE | +51 |
+| Mexico | MX | +52 |
+| Cuba | CU | +53 |
+| Argentina | AR | +54 |
+| Brazil | BR | +55 |
+| Chile | CL | +56 |
+| Colombia | CO | +57 |
+| Venezuela | VE | +58 |
+| Belize | BZ | +501 |
+| Guatemala | GT | +502 |
+| El Salvador | SV | +503 |
+| Honduras | HN | +504 |
+| Nicaragua | NI | +505 |
+| Costa Rica | CR | +506 |
+| Panama | PA | +507 |
+| Haiti | HT | +509 |
+| Bolivia | BO | +591 |
+| Guyana | GY | +592 |
+| Ecuador | EC | +593 |
+| Paraguay | PY | +595 |
+| Suriname | SR | +597 |
+| Uruguay | UY | +598 |
+
+## Zone +6x: Asia-Pacific
+
+| Country | Alpha-2 | Dial Code |
+|---------|---------|-----------|
+| Malaysia | MY | +60 |
+| Australia | AU | +61 |
+| Indonesia | ID | +62 |
+| Philippines | PH | +63 |
+| New Zealand | NZ | +64 |
+| Singapore | SG | +65 |
+| Thailand | TH | +66 |
+| Japan | JP | +81 |
+| South Korea | KR | +82 |
+| Viet Nam | VN | +84 |
+| China | CN | +86 |
+| Turkey | TR | +90 |
+| India | IN | +91 |
+| Pakistan | PK | +92 |
+| Afghanistan | AF | +93 |
+| Sri Lanka | LK | +94 |
+| Myanmar | MM | +95 |
+| Iran | IR | +98 |
+| East Timor | TL | +670 |
+| Antarctica | AQ | +672 |
+| Norfolk Island | NF | +672 |
+| Brunei | BN | +673 |
+| Papua New Guinea | PG | +675 |
+| Tonga | TO | +676 |
+| Solomon Islands | SB | +677 |
+| Vanuatu | VU | +678 |
+| Fiji | FJ | +679 |
+| Palau | PW | +680 |
+| Wallis and Futuna | WF | +681 |
+| Cook Islands | CK | +682 |
+| Niue | NU | +683 |
+| Samoa | WS | +685 |
+| Kiribati | KI | +686 |
+| New Caledonia | NC | +687 |
+| French Polynesia | PF | +689 |
+| Micronesia | FM | +691 |
+| Marshall Islands | MH | +692 |
+| North Korea | KP | +850 |
+| Hong Kong | HK | +852 |
+| Macau | MO | +853 |
+| Cambodia | KH | +855 |
+| Laos | LA | +856 |
+| Bangladesh | BD | +880 |
+| Taiwan | TW | +886 |
+| Maldives | MV | +960 |
+| Lebanon | LB | +961 |
+| Jordan | JO | +962 |
+| Syria | SY | +963 |
+| Iraq | IQ | +964 |
+| Kuwait | KW | +965 |
+| Saudi Arabia | SA | +966 |
+| Yemen | YE | +967 |
+| Oman | OM | +968 |
+| United Arab Emirates | AE | +971 |
+| Israel | IL | +972 |
+| Bahrain | BH | +973 |
+| Qatar | QA | +974 |
+| Bhutan | BT | +975 |
+| Mongolia | MN | +976 |
+| Nepal | NP | +977 |
+| Tajikistan | TJ | +992 |
+| Turkmenistan | TM | +993 |
+| Azerbaijan | AZ | +994 |
+| Georgia | GE | +995 |
+| Kyrgyzstan | KG | +996 |
+| Uzbekistan | UZ | +998 |
+
+## Zone +7: Russia and CIS
+
+| Country | Alpha-2 | Dial Code |
+|---------|---------|-----------|
+| Russia | RU | +7 |
+| Kazakhstan | KZ | +7 |
+
+> **Gotcha:** Russia and Kazakhstan both use `+7`. They share the same country code under the old Soviet numbering plan, differentiated by their area codes (Russia uses codes like 495, Kazakhstan uses 7xx).
+
+## Zone +8x: East Asia and Special Services
+
+| Country / Service | Alpha-2 | Dial Code |
+|------------------|---------|-----------|
+| International Freephone | — | +800 |
+| International Shared Cost | — | +808 |
+| Japan (some services) | JP | +81 |
+| South Korea (some services) | KR | +82 |
+
+## Zone +9x: South and West Asia, Europe (Eastern)
+
+| Country | Alpha-2 | Dial Code |
+|---------|---------|-----------|
+| Albania | AL | +355 |
+| Bulgaria | BG | +359 |
+| Croatia | HR | +385 |
+| Slovenia | SI | +386 |
+| Bosnia and Herzegovina | BA | +387 |
+| Serbia | RS | +381 |
+| Kosovo | XK | +383 |
+| North Macedonia | MK | +389 |
+| Estonia | EE | +372 |
+| Latvia | LV | +371 |
+| Lithuania | LT | +370 |
+| Ukraine | UA | +380 |
+| Belarus | BY | +375 |
+| Moldova | MD | +373 |
+| Armenia | AM | +374 |
+| Iceland | IS | +354 |
+| Finland | FI | +358 |
+| Czech Republic | CZ | +420 |
+| Slovakia | SK | +421 |
+| Luxembourg | LU | +352 |
+| Ireland | IE | +353 |
+| Portugal | PT | +351 |
+
+## Code Examples
+
+### Build a Phone Input Component
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { country } from '@koshmoney/countries';
+
+// Get all countries with dial codes for a phone input dropdown
+const phoneCountryOptions = dialCode
+  .getSupportedCountries()
+  .map((code) => ({
+    value: code,
+    label: country.toName(code) ?? code,
+    dialCode: dialCode.getDialCode(code)!,
+    flag: code, // use with a flag library
+  }))
+  .filter((c) => c.label && c.dialCode)
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+// [
+//   { value: 'AF', label: 'Afghanistan', dialCode: '+93' },
+//   { value: 'AL', label: 'Albania', dialCode: '+355' },
+//   ...
+// ]
+```
+
+### Look Up a Dial Code by Country
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// Get dial code for a country
+const usCode = dialCode.getDialCode('US');     // '+1'
+const deCode = dialCode.getDialCode('DE');     // '+49'
+const jpCode = dialCode.getDialCode('JP');     // '+81'
+
+// Get full info object
+const info = dialCode.getDialCodeInfo('GB');
+// { dialCode: '+44', countryCode: 'GB' }
+
+// Check if a country has a registered dial code
+dialCode.isValidPhoneCountry('US');  // true
+dialCode.isValidPhoneCountry('XX');  // false
+```
+
+### Reverse Lookup: Countries by Dial Code
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// Find all countries that share a dial code
+dialCode.getCountriesByDialCode('+1');
+// ['US', 'CA', 'BS', 'BB', 'BM', 'VG', 'KY', 'DM', ...]
+
+dialCode.getCountriesByDialCode('+7');
+// ['RU', 'KZ']
+
+dialCode.getCountriesByDialCode('+44');
+// ['GB']
+```
+
+### Parse and Format E.164 Phone Numbers
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// Format a local number into international E.164 format
+function toE164(countryCode: string, localNumber: string): string | null {
+  const prefix = dialCode.getDialCode(countryCode);
+  if (!prefix) return null;
+
+  // Remove leading zeros and non-digit characters from local number
+  const digits = localNumber.replace(/\D/g, '').replace(/^0+/, '');
+  return `${prefix}${digits}`;
+}
+
+toE164('US', '202-555-0147');   // '+12025550147'
+toE164('GB', '020 7946 0000');  // '+442079460000'
+toE164('DE', '030 12345678');   // '+493012345678'
+toE164('JP', '03-1234-5678');   // '+81312345678'
+```
+
+### Validate International Phone Format
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { country } from '@koshmoney/countries';
+
+interface PhoneValidationResult {
+  isValid: boolean;
+  countryCode?: string;
+  dialCode?: string;
+  error?: string;
+}
+
+function validatePhoneCountry(
+  countryAlpha2: string,
+  phoneNumber: string
+): PhoneValidationResult {
+  // Validate country code
+  if (!country.isValid(countryAlpha2)) {
+    return { isValid: false, error: `Unknown country code: ${countryAlpha2}` };
+  }
+
+  const prefix = dialCode.getDialCode(countryAlpha2);
+  if (!prefix) {
+    return { isValid: false, error: `No dial code for: ${countryAlpha2}` };
+  }
+
+  // Check that phone number starts with the expected dial code
+  const e164 = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+  if (!e164.startsWith(prefix)) {
+    return {
+      isValid: false,
+      error: `Expected prefix ${prefix} for ${countryAlpha2}`,
+    };
+  }
+
+  return { isValid: true, countryCode: countryAlpha2, dialCode: prefix };
+}
+
+validatePhoneCountry('US', '+12025551234');
+// { isValid: true, countryCode: 'US', dialCode: '+1' }
+
+validatePhoneCountry('DE', '+12025551234');
+// { isValid: false, error: 'Expected prefix +49 for DE' }
+```
+
+## How to Format International Phone Numbers
+
+The E.164 standard (ITU-T) defines the canonical format:
+
+```
++[country code][national number]
+```
+
+Key rules:
+- Always start with `+` followed by the country code
+- No leading zeros in the national number
+- No spaces, hyphens, or parentheses
+- Maximum 15 digits total (including country code)
+
+**Examples:**
+
+| Country | Local Format | E.164 Format |
+|---------|-------------|-------------|
+| United States | (202) 555-0147 | +12025550147 |
+| United Kingdom | 020 7946 0000 | +442079460000 |
+| Germany | 030 12345678 | +493012345678 |
+| Japan | 03-1234-5678 | +81312345678 |
+| India | 098765 43210 | +919876543210 |
+| Brazil | (11) 98765-4321 | +5511987654321 |
+
+## Common Gotchas
+
+### +1 Is Shared by 20+ Countries
+
+The North American Numbering Plan (NANP) assigns `+1` to the United States, Canada, and 19+ Caribbean territories. When you receive a `+1` number, you cannot determine which country it comes from based on the dial code alone — you must look at the 3-digit area code.
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// All return '+1'
+dialCode.getDialCode('US'); // '+1'
+dialCode.getDialCode('CA'); // '+1'
+dialCode.getDialCode('JM'); // '+1' (Jamaica)
+dialCode.getDialCode('PR'); // '+1' (Puerto Rico)
+```
+
+### +7 Is Shared by Russia and Kazakhstan
+
+Russia and Kazakhstan both use `+7` due to the legacy Soviet telephone network. Kazakhstan was assigned `+76` and `+77` as distinctive area codes within the +7 zone.
+
+### +44 Covers UK Crown Dependencies
+
+While `+44` is assigned to the United Kingdom, the Crown Dependencies (Isle of Man, Jersey, Guernsey) are not part of the UK for ISO 3166 purposes — they each have their own alpha-2 codes (`IM`, `JE`, `GG`) — but they share the `+44` dial code.
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.getDialCode('GB'); // '+44'
+dialCode.getDialCode('IM'); // '+44' (Isle of Man)
+dialCode.getDialCode('JE'); // '+44' (Jersey)
+dialCode.getDialCode('GG'); // '+44' (Guernsey)
+```
+
+### +61 Covers Australia and Cocos Islands / Christmas Island
+
+Australia (`AU`), Cocos (Keeling) Islands (`CC`), and Christmas Island (`CX`) all use `+61`.
+
+### Some Territories Use Different Codes Than Their Parent Nation
+
+French overseas territories use their own dial codes, not France's `+33`:
+- French Guiana: `+594`
+- Guadeloupe: `+590`
+- Martinique: `+596`
+- Reunion: `+262`
+- Mayotte: `+262`
+
+## Get Started
+
+Install `@koshmoney/countries` to use dial codes in your application. The dial code module is tree-shakeable and only loaded when you import it — it does not add bundle weight to projects that don't need phone features.
+
+```bash
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+// Get a dial code
+const code = dialCode.getDialCode('JP'); // '+81'
+
+// Check if a country is supported
+const isSupported = dialCode.isValidPhoneCountry('KR'); // true
+
+// Get all supported country codes
+const allCountries = dialCode.getSupportedCountries();
+```
+
+---
+
+## Related
+
+- [Dial Code API Reference](/docs/api/dial-code)
+- [Countries Sharing the Same Dial Code](/blog/countries-sharing-dial-code)
+- [International Dialing Codes: Every Country](/blog/international-dialing-codes-list)
+- [Country Code FAQ](/blog/country-code-faq)
+- [Country Code Converter Tool](/tools/country-code-converter)

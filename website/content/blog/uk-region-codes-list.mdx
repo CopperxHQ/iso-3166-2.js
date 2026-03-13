@@ -1,0 +1,221 @@
+---
+description: "Complete list of UK countries and regions with ISO 3166-2:GB codes. England, Scotland, Wales, Northern Ireland, and all council areas, counties, and boroughs."
+---
+
+# UK Region and Country Codes: Complete ISO 3166-2:GB List
+
+The United Kingdom has over 200 ISO 3166-2:GB subdivision codes covering its four constituent countries (England, Scotland, Wales, Northern Ireland) and their individual council areas, counties, boroughs, and unitary authorities. This reference covers the structure and how to work with UK subdivision data.
+
+## UK Countries
+
+The top-level subdivisions of the United Kingdom are its four constituent countries:
+
+| Code | Name | Type |
+|------|------|------|
+| GB-ENG | England | Country |
+| GB-SCT | Scotland | Country |
+| GB-WLS | Wales | Country |
+| GB-NIR | Northern Ireland | Province |
+
+There are also two grouping codes:
+
+| Code | Name | Type |
+|------|------|------|
+| GB-EAW | England and Wales | Nation |
+| GB-GBN | Great Britain | Nation |
+| GB-UKM | United Kingdom | Nation |
+
+## Subdivision Types
+
+The UK uses several types of administrative divisions:
+
+| Type | Count | Found In |
+|------|-------|----------|
+| London borough | 32 | England |
+| Metropolitan district | 36 | England |
+| Unitary authority | 55+ | England, Wales |
+| Two-tier county | 24 | England |
+| Council area | 32 | Scotland |
+| District council area | 26 | Northern Ireland |
+| City corporation | 1 | England (City of London) |
+| Country/Province/Nation | 7 | UK-wide |
+
+## Key Regions
+
+### England
+
+England has the most subdivisions, organized into London boroughs, metropolitan districts, unitary authorities, and two-tier counties. Some notable ones:
+
+| Code | Name | Type |
+|------|------|------|
+| GB-LND | London, City of | City corporation |
+| GB-WSM | Westminster | London borough |
+| GB-CMD | Camden | London borough |
+| GB-MAN | Manchester | Metropolitan district |
+| GB-BIR | Birmingham | Metropolitan district |
+| GB-LDS | Leeds | Metropolitan district |
+| GB-LIV | Liverpool | Metropolitan district |
+| GB-SHF | Sheffield | Metropolitan district |
+| GB-BST | Bristol, City of | Unitary authority |
+| GB-OXF | Oxfordshire | Two-tier county |
+| GB-CAM | Cambridgeshire | Two-tier county |
+
+### Scotland
+
+Scotland is divided into 32 council areas:
+
+| Code | Name | Type |
+|------|------|------|
+| GB-EDH | Edinburgh, City of | Council area |
+| GB-GLG | Glasgow City | Council area |
+| GB-ABE | Aberdeen City | Council area |
+| GB-DND | Dundee City | Council area |
+| GB-HLD | Highland | Council area |
+| GB-FIF | Fife | Council area |
+
+### Wales
+
+Wales uses 22 unitary authorities:
+
+| Code | Name | Type |
+|------|------|------|
+| GB-CRF | Cardiff | Unitary authority |
+| GB-SWA | Swansea | Unitary authority |
+| GB-NWP | Newport | Unitary authority |
+| GB-GWN | Gwynedd | Unitary authority |
+| GB-POW | Powys | Unitary authority |
+| GB-PEM | Pembrokeshire | Unitary authority |
+
+### Northern Ireland
+
+Northern Ireland uses 26 district council areas:
+
+| Code | Name | Type |
+|------|------|------|
+| GB-BFS | Belfast | District council area |
+| GB-DRY | Derry | District council area |
+| GB-LSB | Lisburn | District council area |
+| GB-ANT | Antrim | District council area |
+| GB-ARM | Armagh | District council area |
+
+## Using UK Subdivision Codes in Code
+
+### Get All UK Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const all = subdivision.forCountry('GB');
+console.log(all.length);  // 200+
+```
+
+### Get UK Countries Only
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const ukCountries = subdivision.forCountry('GB')
+  .filter(s => s.type === 'Country' || s.type === 'Province');
+
+// [
+//   { code: 'GB-ENG', name: 'England', type: 'Country' },
+//   { code: 'GB-NIR', name: 'Northern Ireland', type: 'Province' },
+//   { code: 'GB-SCT', name: 'Scotland', type: 'Country' },
+//   { code: 'GB-WLS', name: 'Wales', type: 'Country' },
+// ]
+```
+
+### Look Up a Specific Region
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('GB-MAN');
+// { code: 'GB-MAN', name: 'Manchester', type: 'Metropolitan district', countryCode: 'GB', regionCode: 'MAN' }
+
+subdivision.where('GB', 'EDH');
+// { code: 'GB-EDH', name: 'Edinburgh, City of', type: 'Council area', countryCode: 'GB', regionCode: 'EDH' }
+```
+
+### Validate Subdivision Codes
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('GB-ENG');      // true (England)
+subdivision.isValidCode('GB-SCT');      // true (Scotland)
+subdivision.isValidCode('GB-LON');      // false (not a valid code)
+
+subdivision.isValidRegion('GB', 'WLS'); // true (Wales)
+```
+
+### Build a UK Countries Dropdown
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Simple 4-option dropdown for UK countries
+const ukCountryOptions = [
+  { value: 'ENG', label: 'England' },
+  { value: 'SCT', label: 'Scotland' },
+  { value: 'WLS', label: 'Wales' },
+  { value: 'NIR', label: 'Northern Ireland' },
+];
+
+// Or dynamically from data
+const options = subdivision.forCountry('GB')
+  .filter(s => s.type === 'Country' || s.type === 'Province')
+  .map(s => ({
+    value: s.code.split('-')[1],
+    label: s.name,
+  }));
+```
+
+## UK Postcode Validation
+
+UK postcodes follow a complex format (e.g., SW1A 1AA, EC2R 8AH):
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('GB', 'SW1A 1AA');   // true (Westminster)
+postalCode.isValid('GB', 'EC2R 8AH');   // true (City of London)
+postalCode.isValid('GB', 'EH1 1YZ');    // true (Edinburgh)
+postalCode.isValid('GB', '12345');       // false (not UK format)
+
+postalCode.getName('GB');    // 'Postcode'
+postalCode.getFormat('GB');  // 'AA9A 9AA'
+```
+
+## GB vs UK: The ISO Code
+
+The ISO 3166 alpha-2 code for the United Kingdom is **GB** (from Great Britain), not UK. This is one of the most common country code mistakes:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha2('GB');
+// { name: 'United Kingdom', alpha2: 'GB', alpha3: 'GBR', numeric: '826' }
+
+country.isAlpha2('UK');  // false -- UK is not a valid ISO code
+```
+
+## SEPA and Post-Brexit Status
+
+The UK left the EU in 2020 but remains a SEPA member:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEU('GB');       // false (left the EU)
+membership.isSEPA('GB');     // true (still in SEPA)
+membership.isEurozone('GB'); // false
+membership.isSchengen('GB'); // false
+```
+
+## Related Resources
+
+- [Subdivision API Reference](/docs/api/subdivision) -- Full subdivision module API
+- [United Kingdom Country Page](/countries/gb) -- Full UK reference
+- [European Countries with ISO Codes](/blog/european-countries-list-codes) -- European country reference
+- [SEPA Countries List](/blog/sepa-countries-list) -- SEPA membership reference

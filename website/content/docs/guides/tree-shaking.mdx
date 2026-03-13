@@ -1,0 +1,151 @@
+---
+description: "Optimize your bundle size with tree-shakeable imports. Import only the country and subdivision data you need."
+---
+
+# Tree Shaking
+
+`@koshmoney/countries` supports true tree-shaking via subpath exports, allowing you to import only the data you need.
+
+## Import Patterns
+
+### Full Library (~60KB gzipped)
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+```
+
+Use this when you need access to all countries and all subdivisions.
+
+### Country Only (~8KB gzipped)
+
+```typescript copy
+import { whereAlpha2, alpha2ToAlpha3, isAlpha2 } from '@koshmoney/countries/country';
+
+whereAlpha2('US');      // Works
+alpha2ToAlpha3('US');   // 'USA'
+isAlpha2('US');         // true
+```
+
+Use this when you only need country codes and don't need subdivision data.
+
+### Specific Subdivisions (~1-2KB each)
+
+```typescript copy
+import { whereAlpha2 } from '@koshmoney/countries/country';
+import '@koshmoney/countries/subdivision/US';  // Registers US subdivisions
+import '@koshmoney/countries/subdivision/CA';  // Registers Canada subdivisions
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+
+whereAlpha2('US');        // Works
+whereCode('US-CA');       // Works - US is registered
+forCountry('CA');         // Works - CA is registered
+whereCode('GB-ENG');      // Returns null - GB not registered
+```
+
+Use this when you only need subdivisions for specific countries.
+
+### Direct Data Access
+
+```typescript copy
+import { subdivisions as usStates } from '@koshmoney/countries/subdivision/US';
+import { subdivisions as seCounties } from '@koshmoney/countries/subdivision/SE';
+
+console.log(usStates['US-CA'].name);  // 'California'
+console.log(seCounties['SE-O'].name); // 'Vastra Gotalands lan'
+```
+
+Use this when you just need raw data without the lookup functions.
+
+## Bundle Size Reference
+
+| Import | Approximate Size (gzipped) |
+|--------|---------------------------|
+| `@koshmoney/countries` (full) | ~60KB |
+| `@koshmoney/countries/country` | ~8KB |
+| `@koshmoney/countries/subdivision` (all) | ~55KB |
+| `@koshmoney/countries/subdivision/US` | ~1.5KB |
+| `@koshmoney/countries/subdivision/SE` | ~0.5KB |
+| `@koshmoney/countries/subdivision/GB` | ~2KB |
+| Country + US + CA | ~10KB |
+
+## How It Works
+
+1. **Separate files**: Each country's subdivisions are in a separate file
+2. **Self-registering**: Subdivision files register themselves when imported
+3. **Runtime registry**: Lookup functions use a runtime registry
+4. **Bundler elimination**: Unimported files are eliminated by the bundler
+
+When you import a subdivision file, it automatically registers its data:
+
+```typescript copy
+import '@koshmoney/countries/subdivision/US';
+```
+
+The subdivision lookup functions then use this registry. Countries that aren't imported return `null` instead of throwing errors:
+
+```typescript copy
+import '@koshmoney/countries/subdivision/US';
+import { whereCode } from '@koshmoney/countries/subdivision';
+
+whereCode('US-CA');  // Works
+whereCode('GB-ENG'); // Returns null (GB not imported)
+```
+
+## Common Patterns
+
+### Application with US and EU Countries
+
+```typescript copy
+import { whereAlpha2 } from '@koshmoney/countries/country';
+
+// Import only the subdivisions you need
+import '@koshmoney/countries/subdivision/US';
+import '@koshmoney/countries/subdivision/CA';
+import '@koshmoney/countries/subdivision/GB';
+import '@koshmoney/countries/subdivision/DE';
+import '@koshmoney/countries/subdivision/FR';
+
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+```
+
+### Country Dropdown Only
+
+```typescript copy
+import { all } from '@koshmoney/countries/country';
+
+// Get all countries for a dropdown (~8KB, no subdivision data loaded)
+const countries = all();
+```
+
+### Single Country Application
+
+```typescript copy
+import { whereAlpha2, toName } from '@koshmoney/countries/country';
+import '@koshmoney/countries/subdivision/US';
+import { forCountry, whereName } from '@koshmoney/countries/subdivision';
+
+// US-only application
+const states = forCountry('US');
+const california = whereName('US', 'California');
+```
+
+## Verifying Tree-Shaking
+
+### Using source-map-explorer
+
+```bash copy
+npm run build
+npx source-map-explorer dist/bundle.js
+```
+
+### Using bundlephobia
+
+Check the package size at [bundlephobia.com](https://bundlephobia.com/).
+
+---
+
+## Related
+
+- [Installation](/docs/installation) -- Module format and import paths
+- [Country API](/docs/api/country) -- Direct country imports
+- [Subdivision API](/docs/api/subdivision) -- Per-country subdivision imports

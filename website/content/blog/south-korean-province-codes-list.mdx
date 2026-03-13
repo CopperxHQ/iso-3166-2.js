@@ -1,0 +1,297 @@
+---
+description: "Complete list of all 17 South Korean administrative divisions with ISO 3166-2:KR codes. Special cities, metropolitan cities, provinces, and special autonomous entities with Korean romanization."
+---
+
+# South Korean Province Codes: Complete ISO 3166-2:KR Reference (2026)
+
+South Korea has 17 first-level administrative divisions, each with an ISO 3166-2:KR code. These include one special city (the capital), six metropolitan cities, nine provinces, one special autonomous city, and one special autonomous province.
+
+## Overview
+
+| Division Type | Count | Examples |
+|--------------|-------|---------|
+| Special City | 1 | Seoul (KR-11) |
+| Metropolitan Cities | 6 | Busan, Incheon, Daegu, Daejeon, Gwangju, Ulsan |
+| Provinces | 9 | Gyeonggi, South Chungcheong, North Gyeongsang, etc. |
+| Special Autonomous City | 1 | Sejong (KR-50) |
+| Special Autonomous Province | 1 | Jeju (KR-49) |
+| **Total** | **17** | |
+
+## Special City (1)
+
+Seoul is the capital and only special city in South Korea. It is under direct central government administration and classified separately from metropolitan cities.
+
+| Code | Name (English) | Name (Romanized) | Name (Korean) | Type |
+|------|----------------|------------------|---------------|------|
+| `KR-11` | Seoul | Seoul Teukbyeolsi | 서울특별시 | Special City |
+
+## Metropolitan Cities (6)
+
+Metropolitan cities are large urban areas with populations typically exceeding 1 million, governed independently from surrounding provinces.
+
+| Code | Name (English) | Name (Romanized) | Name (Korean) | Population (approx.) |
+|------|----------------|------------------|---------------|----------------------|
+| `KR-26` | Busan | Busan Gwangyeoksi | 부산광역시 | 3.4 million |
+| `KR-27` | Daegu | Daegu Gwangyeoksi | 대구광역시 | 2.4 million |
+| `KR-28` | Incheon | Incheon Gwangyeoksi | 인천광역시 | 3.0 million |
+| `KR-29` | Gwangju | Gwangju Gwangyeoksi | 광주광역시 | 1.5 million |
+| `KR-30` | Daejeon | Daejeon Gwangyeoksi | 대전광역시 | 1.5 million |
+| `KR-31` | Ulsan | Ulsan Gwangyeoksi | 울산광역시 | 1.1 million |
+
+## Provinces (9)
+
+Provinces (_Do_) are the main regional divisions of South Korea and surround or contain the major metropolitan cities.
+
+| Code | Name (English) | Name (Romanized) | Name (Korean) | Region |
+|------|----------------|------------------|---------------|--------|
+| `KR-41` | Gyeonggi | Gyeonggi-do | 경기도 | Central |
+| `KR-42` | Gangwon | Gangwon-do | 강원도 | Northeast |
+| `KR-43` | North Chungcheong | Chungcheongbuk-do | 충청북도 | Central |
+| `KR-44` | South Chungcheong | Chungcheongnam-do | 충청남도 | Central-West |
+| `KR-45` | North Jeolla | Jeollabuk-do | 전라북도 | Southwest |
+| `KR-46` | South Jeolla | Jeollanam-do | 전라남도 | Southwest |
+| `KR-47` | North Gyeongsang | Gyeongsangbuk-do | 경상북도 | Southeast |
+| `KR-48` | South Gyeongsang | Gyeongsangnam-do | 경상남도 | Southeast |
+| `KR-50` | Sejong | Sejong Teukbyeoljachisi | 세종특별자치시 | Central |
+
+> **Note on Sejong (KR-50):** Sejong is officially a Special Autonomous City, not a province, but shares the numeric range with provinces. It was designated as a planned administrative capital in 2012 to relieve population pressure on Seoul.
+
+## Special Autonomous Entities (2)
+
+### Special Autonomous City
+
+| Code | Name (English) | Name (Romanized) | Name (Korean) | Type |
+|------|----------------|------------------|---------------|------|
+| `KR-50` | Sejong | Sejong Teukbyeoljachisi | 세종특별자치시 | Special Autonomous City |
+
+### Special Autonomous Province
+
+| Code | Name (English) | Name (Romanized) | Name (Korean) | Type |
+|------|----------------|------------------|---------------|------|
+| `KR-49` | Jeju | Jeju Teukbyeoljachido | 제주특별자치도 | Special Autonomous Province |
+
+> Jeju Island was elevated to Special Autonomous Province status in 2006, giving it broader self-governance rights than regular provinces. It is South Korea's largest island and a major international tourism destination.
+
+## Complete Reference Table
+
+All 17 South Korean subdivisions in a single table for quick reference:
+
+| Code | Name (English) | Name (Romanized) | Type |
+|------|----------------|------------------|------|
+| `KR-11` | Seoul | Seoul Teukbyeolsi | Special City |
+| `KR-26` | Busan | Busan Gwangyeoksi | Metropolitan City |
+| `KR-27` | Daegu | Daegu Gwangyeoksi | Metropolitan City |
+| `KR-28` | Incheon | Incheon Gwangyeoksi | Metropolitan City |
+| `KR-29` | Gwangju | Gwangju Gwangyeoksi | Metropolitan City |
+| `KR-30` | Daejeon | Daejeon Gwangyeoksi | Metropolitan City |
+| `KR-31` | Ulsan | Ulsan Gwangyeoksi | Metropolitan City |
+| `KR-41` | Gyeonggi | Gyeonggi-do | Province |
+| `KR-42` | Gangwon | Gangwon-do | Province |
+| `KR-43` | North Chungcheong | Chungcheongbuk-do | Province |
+| `KR-44` | South Chungcheong | Chungcheongnam-do | Province |
+| `KR-45` | North Jeolla | Jeollabuk-do | Province |
+| `KR-46` | South Jeolla | Jeollanam-do | Province |
+| `KR-47` | North Gyeongsang | Gyeongsangbuk-do | Province |
+| `KR-48` | South Gyeongsang | Gyeongsangnam-do | Province |
+| `KR-49` | Jeju | Jeju Teukbyeoljachido | Special Autonomous Province |
+| `KR-50` | Sejong | Sejong Teukbyeoljachisi | Special Autonomous City |
+
+## Code Examples
+
+### Get All South Korean Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Get all 17 subdivisions of South Korea
+const krSubs = subdivision.getByCountry('KR');
+console.log(krSubs.length); // 17
+
+// Each subdivision has: code, name, type
+krSubs.forEach((sub) => {
+  console.log(`${sub.code}: ${sub.name} (${sub.type})`);
+});
+```
+
+### Look Up a Specific Province
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.get('KR-11');
+// { code: 'KR-11', name: 'Seoul', type: 'Special city' }
+
+subdivision.get('KR-26');
+// { code: 'KR-26', name: 'Busan', type: 'Metropolitan city' }
+
+subdivision.get('KR-41');
+// { code: 'KR-41', name: 'Gyeonggi', type: 'Province' }
+
+subdivision.get('KR-49');
+// { code: 'KR-49', name: 'Jeju', type: 'Special self-governing province' }
+```
+
+### Validate a Korean Province Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('KR-11');     // true (Seoul)
+subdivision.isValidCode('KR-41');     // true (Gyeonggi)
+subdivision.isValidCode('KR-99');     // false
+subdivision.isValidRegion('KR', '26'); // true (Busan)
+```
+
+### Filter by Division Type
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const krSubs = subdivision.getByCountry('KR');
+
+// Get only provinces
+const provinces = krSubs.filter((s) => s.type === 'Province');
+console.log(provinces.length); // 9
+
+// Get metropolitan cities
+const metros = krSubs.filter((s) => s.type === 'Metropolitan city');
+console.log(metros.length); // 6
+```
+
+### Tree-Shaking: Import Only South Korea Data
+
+```typescript copy
+// Import only Korean subdivisions for smaller bundles
+import { subdivisions } from '@koshmoney/countries/subdivision/KR';
+
+Object.keys(subdivisions);
+// ['KR-11', 'KR-26', 'KR-27', ..., 'KR-50']
+```
+
+## Use Cases
+
+### K-Commerce Shipping
+
+South Korea is one of the world's largest e-commerce markets. Province codes are essential for calculating shipping rates, estimating delivery times, and determining regional surcharges.
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+type ShippingTier = 'metropolitan' | 'province' | 'island' | 'unknown';
+
+function getKoreanShippingTier(subdivisionCode: string): ShippingTier {
+  const sub = subdivision.get(subdivisionCode);
+  if (!sub) return 'unknown';
+
+  // Jeju Island has additional shipping surcharges
+  if (subdivisionCode === 'KR-49') return 'island';
+
+  if (sub.type === 'Metropolitan city' || sub.type === 'Special city') {
+    return 'metropolitan';
+  }
+
+  return 'province';
+}
+
+getKoreanShippingTier('KR-11'); // 'metropolitan' (Seoul)
+getKoreanShippingTier('KR-41'); // 'province' (Gyeonggi)
+getKoreanShippingTier('KR-49'); // 'island' (Jeju - surcharge applies)
+```
+
+### Address Validation
+
+Validate Korean addresses submitted through a form before processing an order:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+interface KoreanAddress {
+  subdivisionCode: string;
+  postalCode: string;
+  addressLine: string;
+}
+
+function validateKoreanAddress(address: KoreanAddress): boolean {
+  // Validate the subdivision code belongs to South Korea
+  const isValidSubdivision =
+    subdivision.isValidCode(address.subdivisionCode) &&
+    address.subdivisionCode.startsWith('KR-');
+
+  // Korean postal codes are 5 digits
+  const isValidPostalCode = /^\d{5}$/.test(address.postalCode);
+
+  return isValidSubdivision && isValidPostalCode;
+}
+```
+
+### Build a Korean Province Selector
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Build options for an address form dropdown
+const krProvinceOptions = subdivision
+  .getByCountry('KR')
+  .map((sub) => ({
+    value: sub.code,
+    label: sub.name,
+    type: sub.type,
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+// Group by type for a grouped select element
+const grouped = {
+  'Special City': krProvinceOptions.filter((o) => o.type === 'Special city'),
+  'Metropolitan Cities': krProvinceOptions.filter((o) => o.type === 'Metropolitan city'),
+  'Provinces': krProvinceOptions.filter((o) => o.type === 'Province'),
+  'Special Autonomous': krProvinceOptions.filter((o) =>
+    o.type?.includes('Special') && o.type !== 'Special city'
+  ),
+};
+```
+
+## Understanding Korean Administrative Divisions
+
+South Korea's administrative system has three main tiers:
+
+1. **First-level** (17 units): Special city, metropolitan cities, provinces, special autonomous entities — covered in this reference
+2. **Second-level**: Cities (_si_), counties (_gun_), autonomous districts (_gu_)
+3. **Third-level**: Towns (_eup_), townships (_myeon_), neighborhoods (_dong_)
+
+### Code Numbering Pattern
+
+| Code Range | Division Type |
+|------------|--------------|
+| `KR-11` | Seoul (Special City) |
+| `KR-26` to `KR-31` | Metropolitan Cities |
+| `KR-41` to `KR-48` | Provinces |
+| `KR-49` | Jeju (Special Autonomous Province) |
+| `KR-50` | Sejong (Special Autonomous City) |
+
+## Get Started
+
+Install `@koshmoney/countries` to use Korean province codes in your application:
+
+```bash
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Validate a Korean province code from user input
+function isValidKoreanProvince(code: string): boolean {
+  return subdivision.isValidCode(code) && code.startsWith('KR-');
+}
+```
+
+---
+
+## Related
+
+- [View all South Korea subdivisions](/subdivisions/kr)
+- [South Korea country page](/countries/kr)
+- [Asian Countries: Complete List](/blog/asian-countries-list-codes)
+- [Japanese Prefecture Codes](/blog/japanese-prefecture-codes-list)
+- [Chinese Province Codes](/blog/chinese-province-codes-list)
+- [Subdivision API Reference](/docs/api/subdivision)

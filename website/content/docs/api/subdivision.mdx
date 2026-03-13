@@ -1,0 +1,336 @@
+---
+description: "Complete API reference for subdivision functions. Lookup, convert, and validate ISO 3166-2 subdivision codes for states, provinces, and regions."
+---
+
+# Subdivision API
+
+All subdivision functions are available via the `subdivision` namespace from the main bundle, or as direct named imports from the `subdivision` subpath.
+
+```typescript copy
+// Namespace import (recommended)
+import { subdivision } from '@koshmoney/countries';
+subdivision.whereCode('US-CA');
+
+// Direct import (tree-shakeable)
+import { whereCode } from '@koshmoney/countries/subdivision';
+whereCode('US-CA');
+```
+
+## Types
+
+```typescript
+interface Subdivision {
+  code: string;        // "US-CA"
+  name: string;        // "California"
+  type: string;        // "State"
+  countryCode: string; // "US"
+  countryName: string; // "United States"
+  regionCode: string;  // "CA"
+}
+
+interface SubdivisionInfo {
+  name: string;  // "California"
+  type: string;  // "State"
+}
+```
+
+---
+
+## Lookups
+
+### `whereCode(code)`
+
+Lookup a subdivision by its full ISO 3166-2 code. Accepts alpha-3 country prefixes and subdivision names.
+
+**Parameters:**
+- `code: string` -- Full subdivision code (e.g., `"US-CA"`)
+
+**Returns:** `Subdivision | null`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('US-CA');
+// {
+//   code: 'US-CA',
+//   name: 'California',
+//   type: 'State',
+//   countryCode: 'US',
+//   countryName: 'United States',
+//   regionCode: 'CA'
+// }
+
+subdivision.whereCode('USA-CA'); // Works with alpha-3 country codes
+// { code: 'US-CA', name: 'California', ... }
+
+subdivision.whereCode('US-California'); // Works with subdivision names
+// { code: 'US-CA', name: 'California', ... }
+
+subdivision.whereCode('XX-YY');
+// null
+```
+
+---
+
+### `where(countryCode, regionCode)`
+
+Lookup a subdivision by country code and region code.
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 or alpha-3 country code
+- `regionCode: string` -- Region code
+
+**Returns:** `Subdivision | null`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.where('US', 'CA');
+// { code: 'US-CA', name: 'California', type: 'State', ... }
+
+subdivision.where('USA', 'CA'); // Works with alpha-3
+// { code: 'US-CA', name: 'California', ... }
+
+subdivision.where('GB', 'ENG');
+// { code: 'GB-ENG', name: 'England', type: 'Country', ... }
+```
+
+---
+
+### `whereName(countryCode, name)`
+
+Lookup a subdivision by country code and subdivision name (case-insensitive).
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 or alpha-3 country code
+- `name: string` -- Subdivision name
+
+**Returns:** `Subdivision | null`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereName('US', 'California');
+// { code: 'US-CA', name: 'California', type: 'State', ... }
+
+subdivision.whereName('US', 'california'); // case-insensitive
+// { code: 'US-CA', name: 'California', ... }
+
+subdivision.whereName('DE', 'Berlin');
+// { code: 'DE-BE', name: 'Berlin', type: 'Land', ... }
+```
+
+---
+
+### `forCountry(countryCode)`
+
+Get all subdivisions for a country.
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 or alpha-3 country code
+
+**Returns:** `Subdivision[]`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const states = subdivision.forCountry('US');
+// [
+//   { code: 'US-AL', name: 'Alabama', type: 'State', ... },
+//   { code: 'US-AK', name: 'Alaska', type: 'State', ... },
+//   ...
+// ]
+
+subdivision.forCountry('XX'); // []
+```
+
+---
+
+### `all()`
+
+Get all subdivisions from all countries (5,000+).
+
+**Returns:** `Subdivision[]`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const allSubs = subdivision.all();
+console.log(allSubs.length); // 5000+
+```
+
+---
+
+### `hasSubdivisions(countryCode)`
+
+Check if a country has subdivisions registered.
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 or alpha-3 country code
+
+**Returns:** `boolean`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.hasSubdivisions('US');  // true
+subdivision.hasSubdivisions('USA'); // true
+subdivision.hasSubdivisions('XX');  // false
+```
+
+---
+
+## Conversions
+
+### `toRegionCode(code)`
+
+Extract the region code from a full subdivision code.
+
+**Parameters:** `code: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.toRegionCode('US-CA');  // 'CA'
+subdivision.toRegionCode('GB-EAW'); // 'EAW'
+subdivision.toRegionCode('invalid'); // null
+```
+
+---
+
+### `toFullCode(countryCode, regionCode)`
+
+Build a full subdivision code from country and region codes. Returns `null` if the combination is invalid.
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 or alpha-3 country code
+- `regionCode: string` -- Region code
+
+**Returns:** `string | null`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.toFullCode('US', 'CA');  // 'US-CA'
+subdivision.toFullCode('USA', 'CA'); // 'US-CA' (normalizes alpha-3)
+subdivision.toFullCode('US', 'XX');  // null (invalid region)
+```
+
+---
+
+### `toName(code)`
+
+Get the subdivision name from a full subdivision code.
+
+**Parameters:** `code: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.toName('US-CA'); // 'California'
+subdivision.toName('GB-ENG'); // 'England'
+subdivision.toName('XX-YY'); // null
+```
+
+---
+
+### `toNameFrom(countryCode, regionCode)`
+
+Get the subdivision name from country and region codes.
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 or alpha-3 country code
+- `regionCode: string` -- Region code
+
+**Returns:** `string | null`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.toNameFrom('US', 'CA');  // 'California'
+subdivision.toNameFrom('USA', 'CA'); // 'California'
+```
+
+---
+
+### `toCountryCode(code)`
+
+Extract the country code from a full subdivision code.
+
+**Parameters:** `code: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.toCountryCode('US-CA');  // 'US'
+subdivision.toCountryCode('USA-CA'); // 'US' (normalizes)
+subdivision.toCountryCode('invalid'); // null
+```
+
+---
+
+## Validation
+
+### `isValidCode(code)`
+
+Check if a string is a valid full subdivision code.
+
+**Parameters:** `code: string`
+**Returns:** `boolean`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('US-CA'); // true
+subdivision.isValidCode('GB-ENG'); // true
+subdivision.isValidCode('XX-YY'); // false
+```
+
+---
+
+### `isValidRegion(countryCode, regionCode)`
+
+Check if a region code is valid for a given country.
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 or alpha-3 country code
+- `regionCode: string` -- Region code
+
+**Returns:** `boolean`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidRegion('US', 'CA'); // true
+subdivision.isValidRegion('US', 'XX'); // false
+```
+
+---
+
+### `isValidName(countryCode, name)`
+
+Check if a subdivision name exists in a country.
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 or alpha-3 country code
+- `name: string` -- Subdivision name
+
+**Returns:** `boolean`
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidName('US', 'California'); // true
+subdivision.isValidName('US', 'Narnia');     // false
+```
+
+---
+
+## Related
+
+- [Country API](/docs/api/country) -- Look up country data
+- [Country Dropdown Guide](/docs/guides/country-dropdown) -- Build a country/state dropdown
+- [Tree Shaking](/docs/guides/tree-shaking) -- Load subdivisions for specific countries only

@@ -1,0 +1,285 @@
+---
+description: "How tree-shaking reduces country data bundle size from 60KB to 8KB. Registry pattern, subpath exports, and bundle optimization with @koshmoney/countries."
+---
+
+# Tree-Shaking Country Data: From 60KB to 8KB
+
+Country data libraries are a hidden source of bundle bloat. A typical country + subdivision dataset weighs 60-200KB gzipped, and most libraries load all of it even when your app only needs a handful of countries. For applications that only need to validate US addresses or build a country dropdown, that is a lot of wasted bytes.
+
+This article explains how `@koshmoney/countries` solves this problem using subpath exports and a registry pattern, and how you can cut your country data payload by 85% or more.
+
+## The Bundle Size Problem
+
+Consider what happens when you install a typical country data library:
+
+```typescript copy
+// This single import loads EVERY country and EVERY subdivision
+import countries from 'some-country-library';
+
+// You only needed this:
+const us = countries.find(c => c.code === 'US');
+```
+
+The bundler cannot remove the data you are not using because it is all exported from a single entry point. Tree-shaking only works when unused exports are in separate modules that can be eliminated.
+
+Here is what typical country libraries look like in your bundle:
+
+| Library | Full Bundle (gzipped) | Tree-shakeable? |
+|---|---|---|
+| `i18n-iso-countries` (all locales) | ~200KB | No |
+| `country-state-city` (with cities) | ~8MB raw / ~2MB gzipped | Partial |
+| `countries-list` | ~30KB | No |
+| `@koshmoney/countries` (full) | ~60KB | Yes |
+| `@koshmoney/countries` (country only) | ~8KB | Yes |
+| `@koshmoney/countries` (country + US) | ~10KB | Yes |
+
+The difference is architectural: `@koshmoney/countries` separates its data into independent modules that bundlers can eliminate.
+
+## How Tree-Shaking Works in @koshmoney/countries
+
+### Subpath Exports
+
+The package uses Node.js subpath exports to expose each module as an independent entry point:
+
+```json
+{
+  "exports": {
+    ".": "./dist/index.js",
+    "./country": "./dist/country/index.js",
+    "./subdivision": "./dist/subdivision/index.js",
+    "./subdivision/US": "./dist/subdivision/data/US.js",
+    "./subdivision/CA": "./dist/subdivision/data/CA.js",
+    "./currency": "./dist/currency/index.js",
+    "./membership": "./dist/membership/index.js"
+  }
+}
+```
+
+Each subpath is a separate file. When you import from a subpath, the bundler only includes that file and its dependencies.
+
+### The Registry Pattern
+
+Subdivision data uses a self-registering registry pattern. Each country's subdivision file registers its data into a shared registry when imported:
+
+```typescript copy
+// Inside subdivision/data/US.ts
+import { register } from '../registry';
+
+export const subdivisions = {
+  'US-AL': { name: 'Alabama', type: 'State' },
+  'US-AK': { name: 'Alaska', type: 'State' },
+  // ...
+};
+
+// Auto-register on import
+register('US', 'United States', subdivisions);
+```
+
+The lookup functions query this registry at runtime:
+
+```typescript copy
+// Inside subdivision/lookup.ts
+import { getSubdivisions } from './registry';
+
+export function whereCode(code: string) {
+  const [countryCode] = code.split('-');
+  const subs = getSubdivisions(countryCode);
+  return subs?.[code] ?? null;
+}
+```
+
+If you never import `subdivision/US`, the US data file is never included in your bundle, and `whereCode('US-CA')` returns `null` instead of throwing an error.
+
+## Import Patterns by Use Case
+
+### Country Dropdown Only (~8KB)
+
+If you only need a list of country names and codes for a dropdown:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+const options = country.all().map(c => ({
+  value: c.alpha2,
+  label: c.name,
+}));
+```
+
+No subdivision data is loaded. Bundle impact: ~8KB gzipped.
+
+### Country + Single Country Subdivisions (~10KB)
+
+For a US-only application with state selection:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import '@koshmoney/countries/subdivision/US';
+import { forCountry } from '@koshmoney/countries/subdivision';
+
+const states = forCountry('US');
+```
+
+Bundle impact: ~10KB gzipped (8KB country + 1.5KB US subdivisions + registry overhead).
+
+### Country + Several Countries (~12-15KB)
+
+For a North American shipping app:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import '@koshmoney/countries/subdivision/US';
+import '@koshmoney/countries/subdivision/CA';
+import '@koshmoney/countries/subdivision/MX';
+import { forCountry, whereCode } from '@koshmoney/countries/subdivision';
+```
+
+Bundle impact: ~12KB gzipped.
+
+### Specialized Modules Only
+
+If you only need currency or membership data:
+
+```typescript copy
+// Only currency data, no country or subdivision
+import { getCurrency, countriesUsingCurrency } from '@koshmoney/countries/currency';
+
+getCurrency('US');  // { code: 'USD', symbol: '$', name: 'US Dollar' }
+```
+
+```typescript copy
+// Only membership checks
+import { isEU, isEEA } from '@koshmoney/countries/membership';
+
+isEU('FR');   // true
+isEEA('NO');  // true
+```
+
+### Full Library (~60KB)
+
+When you genuinely need everything:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { membership } from '@koshmoney/countries/membership';
+import { geography } from '@koshmoney/countries/geography';
+import { dialCode } from '@koshmoney/countries/dialCode';
+```
+
+## Bundle Size Reference
+
+| What You Import | Approximate Size (gzipped) |
+|---|---|
+| Full library (all modules) | ~60KB |
+| Country data only | ~8KB |
+| Subdivision lookup (all countries) | ~55KB |
+| Single country subdivisions (US) | ~1.5KB |
+| Single country subdivisions (SE) | ~0.5KB |
+| Single country subdivisions (GB) | ~2KB |
+| Country + US + CA | ~10KB |
+| Currency module | ~5KB |
+| Membership module | ~1KB |
+| Geography module | ~3KB |
+
+## Verifying Your Bundle
+
+### Using source-map-explorer
+
+After building your application, inspect what ended up in the bundle:
+
+```bash copy
+npm run build
+npx source-map-explorer dist/bundle.js
+```
+
+Look for `@koshmoney/countries` in the visualization. You should only see the modules you imported.
+
+### Using bundlephobia
+
+Check the package size before installing:
+
+```
+https://bundlephobia.com/package/@koshmoney/countries
+```
+
+### Webpack Bundle Analyzer
+
+For webpack-based projects:
+
+```typescript copy
+// webpack.config.js
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+module.exports = {
+  plugins: [new BundleAnalyzerPlugin()],
+};
+```
+
+## Caveats
+
+### Graceful Degradation
+
+If you import subdivision functions but not a specific country's data, lookups for that country return `null`:
+
+```typescript copy
+import '@koshmoney/countries/subdivision/US';
+import { whereCode } from '@koshmoney/countries/subdivision';
+
+whereCode('US-CA');   // Works
+whereCode('GB-ENG');  // Returns null (GB not imported)
+```
+
+This is by design. Your application can handle the `null` return gracefully rather than crashing.
+
+### TypeScript Configuration
+
+Subpath imports require `moduleResolution` set to `"node16"`, `"nodenext"`, or `"bundler"` in your tsconfig.json. For older `"node"` resolution, the package includes `typesVersions` fallback.
+
+### CommonJS Support
+
+The package ships both ESM and CJS formats. Tree-shaking works best with ESM, but CJS consumers still benefit from subpath imports that avoid loading unnecessary modules.
+
+## Comparison with Other Approaches
+
+### All-in-One Export (No Tree-Shaking)
+
+```typescript copy
+// Bad: loads everything
+import { getCountry, getState } from 'monolithic-country-lib';
+// Bundle: 200KB
+```
+
+### Manual Data Files (DIY)
+
+```typescript copy
+// Tedious: maintain your own data
+const US_STATES = [
+  { code: 'AL', name: 'Alabama' },
+  // ...50 more entries
+];
+// Bundle: minimal, but unmaintained
+```
+
+### Subpath Exports (What We Do)
+
+```typescript copy
+// Best: maintained data, minimal bundle
+import '@koshmoney/countries/subdivision/US';
+import { forCountry } from '@koshmoney/countries/subdivision';
+// Bundle: ~10KB, always up to date
+```
+
+## Summary
+
+- Country data libraries often add 60-200KB to your bundle
+- `@koshmoney/countries` uses subpath exports and a registry pattern to enable true tree-shaking
+- Import only what you need: country data alone is ~8KB, a single country's subdivisions adds ~1-2KB
+- Unimported data is completely eliminated from your bundle
+- All lookup functions handle missing data gracefully by returning `null`
+
+## Related Resources
+
+- [Tree-Shaking Guide](/docs/guides/tree-shaking) -- detailed tree-shaking documentation
+- [Installation Guide](/docs/installation) -- getting started with subpath imports
+- [Bundle Size Comparison](/compare/i18n-iso-countries) -- how we compare to other packages
+- [Country API Reference](/docs/api/country) -- country module documentation

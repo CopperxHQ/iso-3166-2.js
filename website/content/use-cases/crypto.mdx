@@ -1,0 +1,249 @@
+---
+description: "Geofencing, MiCA compliance, and sanctions screening for crypto and stablecoin applications using ISO country codes."
+---
+
+# Country Data for Crypto and Stablecoin Applications
+
+Crypto and stablecoin platforms face unique compliance challenges. Regulations vary dramatically by jurisdiction, sanctions lists must be checked in real time, and new frameworks like MiCA introduce region-wide requirements that change how your application behaves based on the user's country.
+
+`@koshmoney/countries` provides the country, subdivision, and membership data you need to implement geofencing, sanctions screening, and jurisdiction-aware features.
+
+## Use Case 1: Geofencing and Jurisdiction Checks
+
+Block or restrict access based on the user's country. This is required for OFAC compliance and increasingly for regional regulations like MiCA:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+type AccessLevel = 'full' | 'restricted' | 'blocked';
+
+interface JurisdictionResult {
+  access: AccessLevel;
+  reason: string;
+  regulations: string[];
+}
+
+// Sanctioned countries (consult actual OFAC SDN list)
+const SANCTIONED = new Set(['CU', 'IR', 'KP', 'SY']);
+
+// Countries with specific crypto restrictions
+const RESTRICTED = new Set(['CN', 'BD', 'NP', 'QA']);
+
+function checkJurisdiction(countryCode: string): JurisdictionResult {
+  if (!country.isValid(countryCode)) {
+    return { access: 'blocked', reason: 'Invalid country code', regulations: [] };
+  }
+
+  if (SANCTIONED.has(countryCode)) {
+    return {
+      access: 'blocked',
+      reason: 'OFAC sanctioned jurisdiction',
+      regulations: ['OFAC'],
+    };
+  }
+
+  if (RESTRICTED.has(countryCode)) {
+    return {
+      access: 'restricted',
+      reason: 'Jurisdiction has crypto-specific restrictions',
+      regulations: ['Local crypto regulation'],
+    };
+  }
+
+  const regulations: string[] = [];
+
+  // MiCA applies to EEA
+  if (membership.isEEA(countryCode)) {
+    regulations.push('MiCA');
+  }
+
+  // UK has its own crypto regulatory framework
+  if (countryCode === 'GB') {
+    regulations.push('UK FCA');
+  }
+
+  // US has federal and state-level requirements
+  if (countryCode === 'US') {
+    regulations.push('FinCEN', 'State MTL');
+  }
+
+  return {
+    access: 'full',
+    reason: 'Allowed jurisdiction',
+    regulations,
+  };
+}
+
+checkJurisdiction('US');
+// { access: 'full', reason: 'Allowed jurisdiction', regulations: ['FinCEN', 'State MTL'] }
+
+checkJurisdiction('DE');
+// { access: 'full', reason: 'Allowed jurisdiction', regulations: ['MiCA'] }
+
+checkJurisdiction('KP');
+// { access: 'blocked', reason: 'OFAC sanctioned jurisdiction', regulations: ['OFAC'] }
+```
+
+## Use Case 2: MiCA Compliance for EU Operations
+
+The Markets in Crypto-Assets Regulation (MiCA) applies to all EEA countries. If your platform serves EU users, you need to detect them and apply MiCA requirements:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+interface MiCARequirements {
+  applicable: boolean;
+  requireWhitepaper: boolean;
+  requireLicensing: boolean;
+  travelRuleThreshold: number; // EUR
+  requireReserveAudit: boolean;
+}
+
+function getMiCARequirements(
+  countryCode: string,
+  productType: 'exchange' | 'stablecoin' | 'wallet'
+): MiCARequirements {
+  const isMiCA = membership.isEEA(countryCode);
+
+  if (!isMiCA) {
+    return {
+      applicable: false,
+      requireWhitepaper: false,
+      requireLicensing: false,
+      travelRuleThreshold: Infinity,
+      requireReserveAudit: false,
+    };
+  }
+
+  return {
+    applicable: true,
+    requireWhitepaper: productType === 'stablecoin',
+    requireLicensing: true,
+    travelRuleThreshold: 1000, // EUR 1,000 threshold for travel rule
+    requireReserveAudit: productType === 'stablecoin',
+  };
+}
+
+getMiCARequirements('DE', 'stablecoin');
+// { applicable: true, requireWhitepaper: true, requireLicensing: true, ... }
+
+getMiCARequirements('US', 'exchange');
+// { applicable: false, ... }
+```
+
+## Use Case 3: Sanctions Screening
+
+Check whether a user's country or address components match known sanctioned jurisdictions:
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+interface ScreeningResult {
+  passed: boolean;
+  flags: string[];
+}
+
+function screenAddress(
+  countryCode: string,
+  stateCode?: string
+): ScreeningResult {
+  const flags: string[] = [];
+
+  if (!country.isValid(countryCode)) {
+    return { passed: false, flags: ['Invalid country code'] };
+  }
+
+  // Country-level sanctions
+  if (SANCTIONED.has(countryCode)) {
+    flags.push(`Country ${countryCode} is on the sanctions list`);
+  }
+
+  // US state-level restrictions (e.g., some states restrict crypto)
+  if (countryCode === 'US' && stateCode) {
+    const RESTRICTED_STATES = new Set(['NY']); // Example: BitLicense required
+    if (RESTRICTED_STATES.has(stateCode)) {
+      flags.push(`State ${stateCode} requires additional licensing`);
+    }
+  }
+
+  // Crimea region check (UA-43)
+  if (countryCode === 'UA' && stateCode === '43') {
+    flags.push('Crimea region is sanctioned');
+  }
+
+  return {
+    passed: flags.length === 0,
+    flags,
+  };
+}
+```
+
+## Use Case 4: Region-Based Feature Gating
+
+Enable or disable features based on the user's jurisdiction:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { geography } from '@koshmoney/countries/geography';
+
+interface FeatureSet {
+  canTrade: boolean;
+  canStake: boolean;
+  canUseFiatOnRamp: boolean;
+  canUseDebitCard: boolean;
+  maxLeverage: number;
+}
+
+function getFeatureSet(countryCode: string): FeatureSet {
+  const isEEA = membership.isEEA(countryCode);
+
+  // EEA: MiCA limits leverage, requires specific disclosures
+  if (isEEA) {
+    return {
+      canTrade: true,
+      canStake: true,
+      canUseFiatOnRamp: true,
+      canUseDebitCard: membership.isSEPA(countryCode),
+      maxLeverage: 2, // MiCA retail limit
+    };
+  }
+
+  // US: state-by-state, conservative defaults
+  if (countryCode === 'US') {
+    return {
+      canTrade: true,
+      canStake: false, // SEC concerns
+      canUseFiatOnRamp: true,
+      canUseDebitCard: true,
+      maxLeverage: 1, // No leverage for US retail
+    };
+  }
+
+  // Rest of world
+  return {
+    canTrade: true,
+    canStake: true,
+    canUseFiatOnRamp: true,
+    canUseDebitCard: false,
+    maxLeverage: 10,
+  };
+}
+```
+
+## Best Practices
+
+**Update sanctions lists frequently.** Country data from `@koshmoney/countries` is stable (ISO codes rarely change), but sanctions lists change regularly. Keep them in a separate, frequently updated data source.
+
+**Log jurisdiction checks.** Compliance audits require proof that you checked the user's jurisdiction at onboarding and at transaction time. Log every check with the country code, timestamp, and result.
+
+**Use EEA checks for MiCA, not EU.** MiCA applies to the entire EEA (30 countries), not just the EU (27 countries). Use `membership.isEEA()` to avoid missing Norway, Iceland, and Liechtenstein.
+
+**Implement subdivision-level checks for the US.** US crypto regulation is state-by-state. New York's BitLicense, Wyoming's DAO laws, and other state-specific rules require checking both country and state.
+
+## Related Resources
+
+- [GDPR and EU Countries](/blog/gdpr-eu-countries-developers) -- privacy compliance for crypto platforms
+- [EU Country Codes](/blog/eu-country-codes-list) -- EU, EEA, and SEPA membership tables
+- [Fintech Use Cases](/use-cases/fintech) -- KYC and payment compliance patterns
+- [Membership API Reference](/docs/api/membership) -- EU, EEA, and SEPA membership checks

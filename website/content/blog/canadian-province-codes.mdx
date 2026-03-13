@@ -1,0 +1,237 @@
+---
+description: "Complete list of all 13 Canadian province and territory codes (ISO 3166-2:CA). Lookup table, TypeScript code examples, and common use cases for developers."
+---
+
+# Canadian Province and Territory Codes (ISO 3166-2:CA)
+
+Canada has 13 subdivisions: 10 provinces and 3 territories. Each one has an official ISO 3166-2 code that follows the format `CA-XX`, where `XX` is a two-letter region code. If you are building address forms, shipping zone logic, or tax calculators for Canada, you need these codes.
+
+This guide covers every code, explains the difference between provinces and territories, and shows how to use them programmatically with `@koshmoney/countries`.
+
+## Complete Table of Canadian Province and Territory Codes
+
+### Provinces (10)
+
+| ISO 3166-2 Code | Region Code | Name | Capital |
+|---|---|---|---|
+| CA-AB | AB | Alberta | Edmonton |
+| CA-BC | BC | British Columbia | Victoria |
+| CA-MB | MB | Manitoba | Winnipeg |
+| CA-NB | NB | New Brunswick | Fredericton |
+| CA-NL | NL | Newfoundland and Labrador | St. John's |
+| CA-NS | NS | Nova Scotia | Halifax |
+| CA-ON | ON | Ontario | Toronto |
+| CA-PE | PE | Prince Edward Island | Charlottetown |
+| CA-QC | QC | Quebec | Quebec City |
+| CA-SK | SK | Saskatchewan | Regina |
+
+### Territories (3)
+
+| ISO 3166-2 Code | Region Code | Name | Capital |
+|---|---|---|---|
+| CA-NT | NT | Northwest Territories | Yellowknife |
+| CA-NU | NU | Nunavut | Iqaluit |
+| CA-YT | YT | Yukon | Whitehorse |
+
+## Provinces vs. Territories
+
+The distinction matters for regulatory and legal purposes. Provinces have constitutional powers granted under the Constitution Act of 1867. Territories receive their authority from the federal government through devolution agreements. In practice, this means:
+
+- **Tax rules differ.** Some provinces charge a Provincial Sales Tax (PST) on top of the federal GST. Others use a Harmonized Sales Tax (HST). Territories use GST only.
+- **Regulatory frameworks vary.** Employment standards, privacy legislation, and business registration rules depend on the subdivision type.
+- **Shipping considerations.** Territories (NT, NU, YT) are remote and often require special shipping arrangements or surcharges.
+
+## Using Canadian Province Codes in TypeScript
+
+### Installation
+
+```typescript copy
+npm install @koshmoney/countries
+```
+
+### Get All Canadian Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const provinces = subdivision.forCountry('CA');
+console.log(provinces);
+// [
+//   { code: 'CA-AB', name: 'Alberta', type: 'Province', countryCode: 'CA', ... },
+//   { code: 'CA-BC', name: 'British Columbia', type: 'Province', ... },
+//   ...
+// ]
+```
+
+### Look Up a Specific Province
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// By full ISO code
+const ontario = subdivision.whereCode('CA-ON');
+// { code: 'CA-ON', name: 'Ontario', type: 'Province', countryCode: 'CA', regionCode: 'ON' }
+
+// By region code
+const bc = subdivision.where('CA', 'BC');
+// { code: 'CA-BC', name: 'British Columbia', type: 'Province', ... }
+
+// By name
+const quebec = subdivision.whereName('CA', 'Quebec');
+// { code: 'CA-QC', name: 'Quebec', type: 'Province', ... }
+```
+
+### Validate a Province Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('CA-ON');       // true
+subdivision.isValidCode('CA-XX');       // false
+subdivision.isValidRegion('CA', 'BC');  // true
+subdivision.isValidRegion('CA', 'ZZ');  // false
+```
+
+### Filter by Type (Province vs. Territory)
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const all = subdivision.forCountry('CA');
+
+const provinces = all.filter(s => s.type === 'Province');
+// 10 provinces
+
+const territories = all.filter(s => s.type === 'Territory');
+// 3 territories: NT, NU, YT
+```
+
+### Tree-Shaking: Load Only Canadian Data
+
+If you only need Canadian subdivisions and want the smallest possible bundle, import the CA data file directly:
+
+```typescript copy
+import '@koshmoney/countries/subdivision/CA';
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+
+forCountry('CA');         // Works - CA data is loaded
+whereCode('CA-ON');       // Works
+whereCode('US-CA');       // Returns null - US data not loaded
+```
+
+This loads approximately 0.5KB instead of the full 55KB subdivision dataset.
+
+## Common Use Cases
+
+### Building a Province Dropdown
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function getProvinceOptions() {
+  return subdivision.forCountry('CA').map(prov => ({
+    value: prov.regionCode,
+    label: prov.name,
+  }));
+}
+
+// Returns: [{ value: 'AB', label: 'Alberta' }, { value: 'BC', label: 'British Columbia' }, ...]
+```
+
+### Canadian Postal Code Validation
+
+Canadian postal codes follow the format `A1A 1A1` (letter-digit-letter space digit-letter-digit). You can validate them alongside province codes:
+
+```typescript copy
+import { postalCode, subdivision } from '@koshmoney/countries';
+
+function validateCanadianAddress(provinceCode: string, postal: string) {
+  const validProvince = subdivision.isValidRegion('CA', provinceCode);
+  const validPostal = postalCode.isValid('CA', postal);
+
+  return { validProvince, validPostal };
+}
+
+validateCanadianAddress('ON', 'K1A 0B1');
+// { validProvince: true, validPostal: true }
+
+validateCanadianAddress('XX', '12345');
+// { validProvince: false, validPostal: false }
+```
+
+### Shipping Zone Classification
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+type ShippingZone = 'western' | 'central' | 'atlantic' | 'northern';
+
+const ZONE_MAP: Record<string, ShippingZone> = {
+  BC: 'western', AB: 'western', SK: 'western', MB: 'western',
+  ON: 'central', QC: 'central',
+  NB: 'atlantic', NS: 'atlantic', PE: 'atlantic', NL: 'atlantic',
+  YT: 'northern', NT: 'northern', NU: 'northern',
+};
+
+function getShippingZone(regionCode: string): ShippingZone | null {
+  if (!subdivision.isValidRegion('CA', regionCode)) return null;
+  return ZONE_MAP[regionCode] ?? null;
+}
+
+getShippingZone('ON');  // 'central'
+getShippingZone('YT');  // 'northern'
+```
+
+### Sales Tax Calculation
+
+```typescript copy
+const TAX_RATES: Record<string, { type: string; rate: number }> = {
+  AB: { type: 'GST', rate: 0.05 },
+  BC: { type: 'GST+PST', rate: 0.12 },
+  MB: { type: 'GST+PST', rate: 0.12 },
+  NB: { type: 'HST', rate: 0.15 },
+  NL: { type: 'HST', rate: 0.15 },
+  NS: { type: 'HST', rate: 0.15 },
+  NT: { type: 'GST', rate: 0.05 },
+  NU: { type: 'GST', rate: 0.05 },
+  ON: { type: 'HST', rate: 0.13 },
+  PE: { type: 'HST', rate: 0.15 },
+  QC: { type: 'GST+QST', rate: 0.14975 },
+  SK: { type: 'GST+PST', rate: 0.11 },
+  YT: { type: 'GST', rate: 0.05 },
+};
+
+function calculateTax(regionCode: string, amount: number) {
+  const tax = TAX_RATES[regionCode];
+  if (!tax) return null;
+  return {
+    ...tax,
+    taxAmount: Math.round(amount * tax.rate * 100) / 100,
+    total: Math.round(amount * (1 + tax.rate) * 100) / 100,
+  };
+}
+
+calculateTax('ON', 100);
+// { type: 'HST', rate: 0.13, taxAmount: 13, total: 113 }
+```
+
+## Frequently Asked Questions
+
+**How many provinces does Canada have?**
+Canada has 10 provinces and 3 territories, for a total of 13 subdivisions under ISO 3166-2:CA.
+
+**What is the difference between CA-NL and CA-NF?**
+CA-NL is the current ISO code for Newfoundland and Labrador. The older code CA-NF was deprecated when the province changed its official name. Always use CA-NL in new applications.
+
+**Are Canadian province codes case-sensitive?**
+The ISO standard uses uppercase, but `@koshmoney/countries` normalizes input automatically. Both `subdivision.where('CA', 'on')` and `subdivision.where('CA', 'ON')` return Ontario.
+
+**Should I store the full code (CA-ON) or just the region code (ON)?**
+Store the full ISO code (`CA-ON`) in your database. It is unambiguous -- `ON` alone could be confused with subdivision codes from other countries. The `regionCode` field is useful for display and user-facing forms.
+
+## Related Resources
+
+- [ISO 3166 Country Codes Guide](/blog/iso-3166-country-codes-guide) -- understand the full ISO 3166 standard
+- [US State Codes List](/blog/us-state-codes-list) -- the equivalent reference for US states
+- [Building Address Forms with Validation](/docs/guides/address-validation) -- end-to-end address form tutorial
+- [API Reference: Subdivision](/docs/api/subdivision) -- full subdivision API documentation

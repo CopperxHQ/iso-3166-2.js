@@ -1,0 +1,188 @@
+---
+description: "Complete list of all North American countries and territories with ISO 3166-1 alpha-2, alpha-3, and numeric codes. Organized by UN M49 subregion with code examples."
+---
+
+# North American Countries: Complete List with ISO 3166 Codes
+
+North America under the UN M49 classification includes not just the United States, Canada, and Mexico, but also the Caribbean islands and Central American nations. This gives the continent 39 entries in the ISO 3166 standard, spanning sovereign states and dependent territories. This reference lists every North American country and territory with their ISO codes, organized by subregion.
+
+## Quick Access with Code
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { country } from '@koshmoney/countries';
+
+const northAmericanCodes = geography.getCountriesByContinent('North America');
+// ['AG', 'AI', 'AW', 'BB', 'BL', 'BM', 'BQ', 'BS', 'BZ', 'CA', ...]
+
+const northAmericanCountries = northAmericanCodes.map((code) => country.whereAlpha2(code));
+console.log(northAmericanCountries.length); // 39
+```
+
+## Northern America
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Bermuda | BM | BMU | 060 |
+| Canada | CA | CAN | 124 |
+| Greenland | GL | GRL | 304 |
+| St. Pierre & Miquelon | PM | SPM | 666 |
+| United States | US | USA | 840 |
+| United States Minor Outlying Islands | UM | UMI | 581 |
+
+The United States (US) and Canada (CA) are the two largest countries in North America by both area and population. Greenland (GL) is geographically part of North America but is an autonomous territory of Denmark.
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByRegion('Northern America');
+// ['BM', 'CA', 'GL', 'PM', 'UM', 'US']
+```
+
+> [!NOTE]
+> Mexico (MX) is classified under Central America in the UN M49 standard, not Northern America. This is a common source of confusion -- the UN geographic classification differs from the colloquial meaning of "North America."
+
+## Central America
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Belize | BZ | BLZ | 084 |
+| Costa Rica | CR | CRI | 188 |
+| El Salvador | SV | SLV | 222 |
+| Guatemala | GT | GTM | 320 |
+| Honduras | HN | HND | 340 |
+| Mexico | MX | MEX | 484 |
+| Nicaragua | NI | NIC | 558 |
+| Panama | PA | PAN | 591 |
+
+Central America connects North and South America, with 8 countries sharing a land bridge. Mexico (MX) is the largest and most populous country in the subregion, and the third largest in the Americas overall.
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByRegion('Central America');
+// ['BZ', 'CR', 'GT', 'HN', 'MX', 'NI', 'PA', 'SV']
+```
+
+## Caribbean
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Anguilla | AI | AIA | 660 |
+| Antigua and Barbuda | AG | ATG | 028 |
+| Aruba | AW | ABW | 533 |
+| Bahamas | BS | BHS | 044 |
+| Barbados | BB | BRB | 052 |
+| Bonaire, Sint Eustatius and Saba | BQ | BES | 535 |
+| British Virgin Islands | VG | VGB | 092 |
+| Cayman Islands | KY | CYM | 136 |
+| Cuba | CU | CUB | 192 |
+| Curacao | CW | CUW | 531 |
+| Dominica | DM | DMA | 212 |
+| Dominican Republic | DO | DOM | 214 |
+| Grenada | GD | GRD | 308 |
+| Guadeloupe | GP | GLP | 312 |
+| Haiti | HT | HTI | 332 |
+| Jamaica | JM | JAM | 388 |
+| Martinique | MQ | MTQ | 474 |
+| Montserrat | MS | MSR | 500 |
+| Puerto Rico | PR | PRI | 630 |
+| St. Barthelemy | BL | BLM | 652 |
+| Saint Kitts And Nevis | KN | KNA | 659 |
+| Saint Lucia | LC | LCA | 662 |
+| St. Martin | MF | MAF | 663 |
+| Saint Vincent And The Grenadines | VC | VCT | 670 |
+| St. Maarten | SX | SXM | 534 |
+| Trinidad and Tobago | TT | TTO | 780 |
+| Turks & Caicos Islands | TC | TCA | 796 |
+| U.S. Virgin Islands | VI | VIR | 850 |
+
+The Caribbean is the largest subregion with 28 entries, reflecting the many island nations and dependent territories. Cuba (CU) is the largest Caribbean island, while the Dominican Republic (DO) and Haiti (HT) share the island of Hispaniola.
+
+> [!NOTE]
+> Several Caribbean territories have their own ISO codes despite being dependencies: Puerto Rico (PR) and the U.S. Virgin Islands (VI) are US territories, while Guadeloupe (GP) and Martinique (MQ) are French overseas departments. Treat them as separate entries in address forms and shipping APIs.
+
+## Currencies
+
+North America has significant currency diversity, with the US Dollar being the most widely used currency in the region:
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.getCurrency('MX');
+// { code: 'MXN', symbol: '$', name: 'Mexican Peso' }
+
+currency.getCurrency('JM');
+// { code: 'JMD', symbol: '$', name: 'Jamaican Dollar' }
+
+// Several Caribbean countries use the East Caribbean Dollar
+currency.getCurrency('AG');
+// { code: 'XCD', symbol: '$', name: 'East Caribbean Dollar' }
+```
+
+Several Caribbean island nations share the East Caribbean Dollar (XCD): Anguilla, Antigua and Barbuda, Dominica, Grenada, Montserrat, Saint Kitts and Nevis, Saint Lucia, and Saint Vincent and the Grenadines.
+
+## Working with North American Data
+
+### Build a North American country dropdown
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { country } from '@koshmoney/countries';
+
+const naCodes = geography.getCountriesByContinent('North America');
+
+const countryOptions = naCodes
+  .map((code) => ({
+    value: code,
+    label: country.toName(code),
+  }))
+  .filter((c) => c.label)
+  .sort((a, b) => a.label!.localeCompare(b.label!));
+```
+
+### Get subdivisions for major countries
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const usStates = subdivision.forCountry('US');
+// [{ code: 'US-AL', name: 'Alabama', type: 'State', ... }, ...]
+
+const canadianProvinces = subdivision.forCountry('CA');
+// [{ code: 'CA-AB', name: 'Alberta', type: 'Province', ... }, ...]
+
+const mexicanStates = subdivision.forCountry('MX');
+// [{ code: 'MX-AGU', name: 'Aguascalientes', type: 'State', ... }, ...]
+```
+
+### Validate a North American postal code
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('US', '90210');     // true (ZIP Code)
+postalCode.isValid('CA', 'K1A 0B1');   // true (Postal Code)
+postalCode.isValid('MX', '06600');     // true (Codigo postal)
+
+postalCode.getName('US');  // 'ZIP Code'
+postalCode.getName('CA');  // 'Postal code'
+postalCode.getName('MX');  // 'Codigo postal'
+```
+
+## Summary
+
+North America has 39 entries in the ISO 3166 standard across 3 UN M49 subregions: Northern America (6), Central America (8), and the Caribbean (28, the largest subregion). The continent has a mix of large sovereign nations, small island states, and numerous dependent territories, each with their own ISO code. The `@koshmoney/countries` library provides consistent access to all of this data through a unified API.
+
+---
+
+## Related
+
+- [Geography API](/docs/api/geography) -- Continent and region lookups
+- [US State Codes](/blog/us-state-codes-list) -- Complete US state and territory codes
+- [Canadian Province Codes](/blog/canadian-province-codes) -- All Canadian province and territory codes
+- [South American Countries List](/blog/south-american-countries-list-codes) -- South American country codes
+- [Postal Code Formats](/docs/guides/postal-code-formats) -- Complete postal code reference

@@ -1,0 +1,174 @@
+---
+description: "Validate postal codes, ZIP codes, PIN codes, and postcodes for 150+ countries. Format info, pattern access, and local terminology."
+---
+
+# Postal Code API
+
+Validate postal codes for 150+ countries with local terminology support. Available as `postalCode` from the main bundle, with convenience aliases `zipCode`, `pinCode`, and `postcode`.
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+// Aliases (all equivalent)
+import { zipCode } from '@koshmoney/countries';   // US terminology
+import { pinCode } from '@koshmoney/countries';   // India terminology
+import { postcode } from '@koshmoney/countries';  // UK/AU terminology
+```
+
+## Types
+
+```typescript
+interface PostalCodeInfo {
+  regex: RegExp;   // Validation pattern
+  format: string;  // "NNNNN" or "A1A 1A1"
+  name: string;    // "ZIP Code", "PIN Code", "Postcode"
+}
+```
+
+---
+
+## Validation
+
+### `isValid(countryCode, code)`
+
+Validate a postal code for a given country. Lenient -- accepts common variations like missing spaces, lowercase, and extended formats (e.g., ZIP+4).
+
+**Parameters:**
+- `countryCode: string` -- Alpha-2 country code
+- `code: string` -- Postal code to validate
+
+**Returns:** `boolean`
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+// United States
+postalCode.isValid('US', '90210');       // true
+postalCode.isValid('US', '90210-1234');  // true (ZIP+4)
+
+// United Kingdom
+postalCode.isValid('GB', 'SW1A 1AA');   // true
+postalCode.isValid('GB', 'sw1a1aa');    // true (case-insensitive, no space)
+
+// India
+postalCode.isValid('IN', '110001');     // true
+
+// Canada
+postalCode.isValid('CA', 'K1A 0B1');   // true
+
+// Germany
+postalCode.isValid('DE', '10115');     // true
+
+// Japan
+postalCode.isValid('JP', '100-0001');  // true
+
+// Invalid
+postalCode.isValid('US', 'ABCDE');    // false
+postalCode.isValid('XX', '12345');    // false (unknown country)
+```
+
+---
+
+## Information
+
+### `getName(countryCode)`
+
+Get the local terminology for postal codes in a given country.
+
+**Parameters:** `countryCode: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.getName('US');  // 'ZIP Code'
+postalCode.getName('IN');  // 'PIN Code'
+postalCode.getName('GB');  // 'Postcode'
+postalCode.getName('DE');  // 'PLZ'
+postalCode.getName('BR');  // 'CEP'
+postalCode.getName('JP');  // '郵便番号'
+postalCode.getName('KR');  // '우편번호'
+postalCode.getName('FR');  // 'Code postal'
+```
+
+---
+
+### `getFormat(countryCode)`
+
+Get the human-readable postal code format for a country.
+
+**Parameters:** `countryCode: string`
+**Returns:** `string | null`
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.getFormat('US');  // 'NNNNN or NNNNN-NNNN'
+postalCode.getFormat('GB');  // 'AA9A 9AA'
+postalCode.getFormat('CA');  // 'A1A 1A1'
+postalCode.getFormat('DE');  // 'NNNNN'
+```
+
+---
+
+### `getPattern(countryCode)`
+
+Get the regex pattern used for validation.
+
+**Parameters:** `countryCode: string`
+**Returns:** `RegExp | null`
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.getPattern('US');  // /^\d{5}(-\d{4})?$/
+postalCode.getPattern('GB');  // RegExp for UK postcodes
+```
+
+---
+
+### `getInfo(countryCode)`
+
+Get full postal code information for a country.
+
+**Parameters:** `countryCode: string`
+**Returns:** `PostalCodeInfo | null`
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.getInfo('US');
+// {
+//   regex: /^\d{5}(-\d{4})?$/,
+//   format: 'NNNNN or NNNNN-NNNN',
+//   name: 'ZIP Code'
+// }
+
+postalCode.getInfo('XX');
+// null
+```
+
+---
+
+### `hasPostalCode(countryCode)`
+
+Check if a country uses postal codes at all.
+
+**Parameters:** `countryCode: string`
+**Returns:** `boolean`
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.hasPostalCode('US');  // true
+postalCode.hasPostalCode('HK');  // false (Hong Kong has no postal codes)
+postalCode.hasPostalCode('AE');  // false (UAE has no postal codes)
+```
+
+---
+
+## Related
+
+- [Address Validation Guide](/docs/guides/address-validation) -- Server-side validation patterns
+- [Country API](/docs/api/country) -- Country lookups
+- [Node.js Examples](/docs/examples/nodejs) -- Express validation middleware

@@ -1,0 +1,276 @@
+---
+description: "Complete list of all 36 SEPA member countries with ISO codes. Understand SEPA vs EU vs Eurozone, validate SEPA membership programmatically, and build compliant payment flows."
+---
+
+# SEPA Countries List: All 36 Members with ISO Codes
+
+The Single Euro Payments Area (SEPA) is a payment integration initiative that standardizes euro-denominated bank transfers across 36 European countries and territories. If you are building payment infrastructure, fintech applications, or compliance systems that handle European bank transfers, you need to know which countries participate in SEPA.
+
+This guide lists every SEPA member, explains how SEPA relates to other European groupings, and shows how to check membership programmatically.
+
+## What is SEPA?
+
+SEPA allows individuals and businesses to make euro-denominated payments across member countries under the same conditions, rights, and obligations -- regardless of where they are located within the SEPA zone. This means a bank transfer from Germany to Portugal follows the same rules and pricing as a domestic transfer within Germany.
+
+SEPA covers three payment instruments:
+- **SEPA Credit Transfer (SCT)** -- standard bank transfers
+- **SEPA Direct Debit (SDD)** -- recurring and one-time direct debits
+- **SEPA Instant Credit Transfer (SCT Inst)** -- real-time transfers (settled in seconds)
+
+## Complete SEPA Member List
+
+All 36 SEPA countries and territories, with their ISO 3166-1 codes and membership in related European groupings:
+
+### EU Members in SEPA (27 countries)
+
+All 27 EU member states are automatically SEPA members:
+
+| Country | Alpha-2 | Alpha-3 | Numeric | Eurozone | Schengen |
+|---------|---------|---------|---------|:--------:|:--------:|
+| Austria | AT | AUT | 040 | Yes | Yes |
+| Belgium | BE | BEL | 056 | Yes | Yes |
+| Bulgaria | BG | BGR | 100 | | |
+| Croatia | HR | HRV | 191 | Yes | Yes |
+| Cyprus | CY | CYP | 196 | Yes | |
+| Czech Republic | CZ | CZE | 203 | | Yes |
+| Denmark | DK | DNK | 208 | | Yes |
+| Estonia | EE | EST | 233 | Yes | Yes |
+| Finland | FI | FIN | 246 | Yes | Yes |
+| France | FR | FRA | 250 | Yes | Yes |
+| Germany | DE | DEU | 276 | Yes | Yes |
+| Greece | GR | GRC | 300 | Yes | Yes |
+| Hungary | HU | HUN | 348 | | Yes |
+| Ireland | IE | IRL | 372 | Yes | |
+| Italy | IT | ITA | 380 | Yes | Yes |
+| Latvia | LV | LVA | 428 | Yes | Yes |
+| Lithuania | LT | LTU | 440 | Yes | Yes |
+| Luxembourg | LU | LUX | 442 | Yes | Yes |
+| Malta | MT | MLT | 470 | Yes | Yes |
+| Netherlands | NL | NLD | 528 | Yes | Yes |
+| Poland | PL | POL | 616 | | Yes |
+| Portugal | PT | PRT | 620 | Yes | Yes |
+| Romania | RO | ROU | 642 | | |
+| Slovakia | SK | SVK | 703 | Yes | Yes |
+| Slovenia | SI | SVN | 705 | Yes | Yes |
+| Spain | ES | ESP | 724 | Yes | Yes |
+| Sweden | SE | SWE | 752 | | Yes |
+
+### EEA Members in SEPA (3 additional countries)
+
+Three EEA (European Economic Area) countries that are not in the EU but are SEPA members:
+
+| Country | Alpha-2 | Alpha-3 | Numeric | Schengen |
+|---------|---------|---------|---------|:--------:|
+| Iceland | IS | ISL | 352 | Yes |
+| Liechtenstein | LI | LIE | 438 | Yes |
+| Norway | NO | NOR | 578 | Yes |
+
+### Non-EU, Non-EEA SEPA Members (6 additional countries/territories)
+
+These countries and territories participate in SEPA through bilateral agreements:
+
+| Country/Territory | Alpha-2 | Alpha-3 | Numeric | Notes |
+|-------------------|---------|---------|---------|-------|
+| Andorra | AD | AND | 020 | Joined SEPA in 2019 |
+| Gibraltar | GI | GIB | 292 | British Overseas Territory |
+| Monaco | MC | MCO | 492 | Uses EUR |
+| San Marino | SM | SMR | 674 | Uses EUR |
+| Switzerland | CH | CHE | 756 | Non-EU, non-EEA |
+| United Kingdom | GB | GBR | 826 | Remains in SEPA post-Brexit |
+| Vatican City | VA | VAT | 336 | Uses EUR |
+
+**Note on the UK:** The United Kingdom left the EU on January 31, 2020, but remains a full SEPA member. Euro-denominated SEPA Credit Transfers and Direct Debits to and from UK bank accounts continue to work under SEPA rules. This is a common point of confusion in payment systems -- do not exclude GB from your SEPA validation.
+
+## SEPA vs EU vs EEA vs Eurozone
+
+These terms are related but distinct. Here is how they differ:
+
+| Grouping | Members | What It Covers |
+|----------|---------|----------------|
+| **EU** | 27 countries | Political and economic union |
+| **EEA** | 30 countries | EU + Iceland, Liechtenstein, Norway |
+| **SEPA** | 36 countries/territories | Euro payment standardization |
+| **Eurozone** | 20 countries | EU countries that use EUR as currency |
+| **Schengen** | 27 countries | Passport-free travel zone |
+
+Key relationships:
+- All EU members are in SEPA, but not all SEPA members are in the EU
+- All Eurozone members are in the EU, but not all EU members are in the Eurozone
+- Switzerland is in SEPA and Schengen but not in the EU or EEA
+- The UK is in SEPA but not in the EU, EEA, Eurozone, or Schengen
+
+## Checking SEPA Membership in Code
+
+### Basic Membership Check
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Check if a country is in SEPA
+membership.isSEPA('DE');  // true (Germany - EU member)
+membership.isSEPA('CH');  // true (Switzerland - non-EU)
+membership.isSEPA('GB');  // true (UK - post-Brexit, still SEPA)
+membership.isSEPA('US');  // false (United States)
+membership.isSEPA('UA');  // false (Ukraine)
+```
+
+### Get All SEPA Members
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+const sepaCountries = membership.getMembers('SEPA');
+// Returns all 36 SEPA alpha-2 codes
+// ['AD', 'AT', 'BE', 'BG', 'CH', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GB', 'GI', 'GR', 'HR', 'HU', 'IE', 'IS', 'IT', 'LI', 'LT', 'LU', 'LV', 'MC', 'MT', 'NL', 'NO', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'SM', 'VA']
+```
+
+### Compare Memberships
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Countries in SEPA but not in the EU
+const sepa = new Set(membership.getMembers('SEPA'));
+const eu = new Set(membership.getMembers('EU'));
+
+const sepaOnlyCountries = [...sepa].filter(code => \!eu.has(code));
+// ['AD', 'CH', 'GB', 'GI', 'IS', 'LI', 'MC', 'NO', 'SM', 'VA']
+```
+
+### Cross-Check with Other Groupings
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Is this country in SEPA and uses EUR?
+function canReceiveSepaInEuro(code: string): boolean {
+  return membership.isSEPA(code) && membership.isEurozone(code);
+}
+
+canReceiveSepaInEuro('DE');  // true (Germany - EUR)
+canReceiveSepaInEuro('SE');  // false (Sweden - SEK, but still SEPA)
+canReceiveSepaInEuro('GB');  // false (UK - GBP, but still SEPA)
+canReceiveSepaInEuro('CH');  // false (Switzerland - CHF, but still SEPA)
+
+// SEPA countries that do NOT use EUR
+function sepaWithoutEuro(): string[] {
+  const sepaMembers = membership.getMembers('SEPA');
+  return sepaMembers.filter(code => \!membership.isEurozone(code));
+}
+
+sepaWithoutEuro();
+// ['BG', 'CH', 'CZ', 'DK', 'GB', 'GI', 'HU', 'IS', 'LI', 'NO', 'PL', 'RO', 'SE']
+```
+
+## Building SEPA-Aware Payment Forms
+
+### Country Dropdown for SEPA Transfers
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { country } from '@koshmoney/countries';
+
+function getSepaCountryOptions() {
+  return membership.getMembers('SEPA')
+    .map(code => {
+      const c = country.whereAlpha2(code);
+      return c ? { value: c.alpha2, label: c.name } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+// [{ value: 'AD', label: 'Andorra' }, { value: 'AT', label: 'Austria' }, ...]
+```
+
+### Validate SEPA Transfer Eligibility
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { country } from '@koshmoney/countries';
+
+interface SepaValidation {
+  eligible: boolean;
+  reason?: string;
+  usesEuro: boolean;
+}
+
+function validateSepaEligibility(countryCode: string): SepaValidation {
+  if (\!country.isValid(countryCode)) {
+    return { eligible: false, reason: 'Invalid country code', usesEuro: false };
+  }
+
+  if (\!membership.isSEPA(countryCode)) {
+    return {
+      eligible: false,
+      reason: `${countryCode} is not a SEPA member`,
+      usesEuro: false,
+    };
+  }
+
+  return {
+    eligible: true,
+    usesEuro: membership.isEurozone(countryCode),
+  };
+}
+
+validateSepaEligibility('DE');
+// { eligible: true, usesEuro: true }
+
+validateSepaEligibility('GB');
+// { eligible: true, usesEuro: false }
+
+validateSepaEligibility('US');
+// { eligible: false, reason: 'US is not a SEPA member', usesEuro: false }
+```
+
+### IBAN Country Prefix Validation
+
+SEPA transfers use IBANs. The first two characters of an IBAN are the country code. You can validate that the IBAN country is a SEPA member:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function isSepaIban(iban: string): boolean {
+  const countryCode = iban.substring(0, 2).toUpperCase();
+  return membership.isSEPA(countryCode);
+}
+
+isSepaIban('DE89370400440532013000');  // true (German IBAN)
+isSepaIban('GB29NWBK60161331926819');  // true (UK IBAN)
+isSepaIban('US123456789');             // false (US does not use IBAN)
+```
+
+## Frequently Asked Questions
+
+### Is the UK still in SEPA after Brexit?
+
+Yes. The UK (GB) remains a full SEPA member. UK payment service providers continue to participate in SEPA schemes. Euro-denominated transfers to and from UK accounts follow SEPA rules. Sterling transfers are not covered by SEPA.
+
+### Does SEPA only work with euros?
+
+SEPA transfers are denominated in euros. However, SEPA member countries do not all use the euro as their domestic currency. Countries like Sweden (SEK), Denmark (DKK), Switzerland (CHF), and the UK (GBP) are SEPA members but have their own currencies. SEPA transactions to these countries are still processed in EUR.
+
+### What about EU overseas territories?
+
+Some EU overseas territories participate in SEPA through their parent country. For example, French overseas departments (Guadeloupe, Martinique, French Guiana, Reunion, Mayotte) use French IBANs and are covered by SEPA. These territories do not have separate SEPA membership -- they are covered under France (FR).
+
+### Is Turkey in SEPA?
+
+No. Turkey (TR) is not a SEPA member. While Turkey is partly in Europe geographically, it is not in the EU, EEA, or SEPA.
+
+### When did each country join SEPA?
+
+The original SEPA launch was in January 2008 with EU member states. Non-EU countries joined at different times:
+- **2008**: EU members, Iceland, Liechtenstein, Norway, Switzerland, Monaco
+- **2014**: San Marino
+- **2019**: Andorra
+- The UK joined as an EU member and retained membership after Brexit
+
+## Related Resources
+
+- [Membership API Reference](/docs/api/membership) -- Full membership module API
+- [EU Country Codes List](/blog/eu-country-codes-list) -- EU-specific country codes
+- [European Countries with ISO Codes](/blog/european-countries-list-codes) -- All European countries
+- [GDPR EU Countries for Developers](/blog/gdpr-eu-countries-developers) -- GDPR compliance reference
+- [Address Validation Guide](/docs/guides/address-validation) -- Server-side validation patterns

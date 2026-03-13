@@ -1,0 +1,251 @@
+---
+description: "Compare @koshmoney/countries vs using separate iso-3166-1 and iso-3166-2 packages. Unified API, migration examples, and developer experience."
+---
+
+# @koshmoney/countries vs iso-3166-1 + iso-3166-2
+
+Before unified country data libraries existed, the standard approach was to install separate packages for ISO 3166-1 (countries) and ISO 3166-2 (subdivisions). This works but comes with trade-offs: inconsistent APIs, manual integration, and duplicate country data.
+
+This page compares the separate-package approach with `@koshmoney/countries` and provides migration examples.
+
+## The Separate Package Approach
+
+A typical setup using separate packages looks like this:
+
+```typescript
+// Install two (or more) packages
+npm install iso-3166-1 iso-3166-2
+
+// Two different APIs
+import iso31661 from 'iso-3166-1';
+import iso31662 from 'iso-3166-2';
+
+// Country lookup
+const us = iso31661.whereAlpha2('US');
+// { country: 'United States of America', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+// Subdivision lookup
+const ca = iso31662.subdivision('US-CA');
+// { name: 'California', type: 'state', parent: null, countryCode: 'US', ... }
+```
+
+## Feature Comparison
+
+| Feature | @koshmoney/countries | iso-3166-1 + iso-3166-2 |
+|---|---|---|
+| Countries | 249 (ISO 3166-1) | 249 (ISO 3166-1) |
+| Subdivisions | 5,000+ | 5,000+ |
+| **Single Package** | **Yes** | **No (2+ packages)** |
+| **Unified API** | **Yes** | **No (different APIs)** |
+| Postal Code Validation | 150+ countries | Not included |
+| Currency Data | ISO 4217 | Not included |
+| Phone Dial Codes | Via libphonenumber-js | Not included |
+| EU/SEPA/EEA Membership | Built-in | Not included |
+| Geography (Continent/Region) | UN M49 | Not included |
+| Code Validation | Full suite | Basic |
+| TypeScript Support | Built-in | Varies |
+| Tree-Shaking | Per-country subdivision imports | No |
+| Dependencies | 0 (core) | 0 each |
+
+## Problems with Separate Packages
+
+### 1. Inconsistent APIs
+
+Each package has its own naming conventions, return types, and error handling:
+
+```typescript
+// iso-3166-1: returns array
+iso31661.whereAlpha2('US');
+
+// iso-3166-2: returns object or undefined
+iso31662.subdivision('US-CA');
+
+// Different property names for the same concept
+// iso-3166-1: { country: 'United States of America' }
+// iso-3166-2: { name: 'California' }
+```
+
+With `@koshmoney/countries`, the API is consistent:
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+// Same pattern for both
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State', countryCode: 'US', ... }
+```
+
+### 2. No Cross-Module Features
+
+With separate packages, you cannot easily get a country with its subdivisions, or validate a subdivision against its parent country:
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+// Get a country with all its subdivisions in one call
+country.withSubdivisions('US');
+// { name: 'United States', alpha2: 'US', ..., subdivisions: [...] }
+
+// Validate that a subdivision belongs to a country
+subdivision.isValidRegion('US', 'CA');  // true
+subdivision.isValidRegion('US', 'ON');  // false (ON is Canadian)
+```
+
+### 3. No Additional Data Modules
+
+Separate ISO packages only cover country and subdivision codes. You need even more packages for currencies, dial codes, and membership data:
+
+```bash
+# The separate-package approach
+npm install iso-3166-1 iso-3166-2 iso-4217 libphonenumber-js
+# Plus manual EU/SEPA membership lists
+
+# The unified approach
+npm install @koshmoney/countries
+```
+
+### 4. Version Coordination
+
+When ISO 3166 is updated, separate packages may update at different times, leading to inconsistencies between your country and subdivision data.
+
+## Migration Guide
+
+### Country Lookups
+
+```typescript
+// Before (iso-3166-1)
+import iso31661 from 'iso-3166-1';
+
+iso31661.whereAlpha2('US');
+// { country: 'United States of America', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+iso31661.whereAlpha3('GBR');
+iso31661.whereNumeric('276');
+```
+
+```typescript copy
+// After (@koshmoney/countries)
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereAlpha3('GBR');
+country.whereNumeric(276);  // Note: accepts number, not string
+```
+
+**Key difference:** The property `country` is renamed to `name` for clarity.
+
+### Subdivision Lookups
+
+```typescript
+// Before (iso-3166-2)
+import iso31662 from 'iso-3166-2';
+
+iso31662.subdivision('US-CA');
+// { name: 'California', type: 'state', parent: null, countryCode: 'US', regionCode: 'CA' }
+
+iso31662.country('US');
+// Returns subdivision data grouped by type
+```
+
+```typescript copy
+// After (@koshmoney/countries)
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State', countryCode: 'US', regionCode: 'CA' }
+
+subdivision.forCountry('US');
+// Returns flat array of all US subdivisions
+```
+
+**Key differences:**
+- `subdivision()` becomes `whereCode()`
+- `country()` becomes `forCountry()`
+- Type values are capitalized (`'State'` not `'state'`)
+
+### Code Conversion
+
+```typescript
+// Before
+import iso31661 from 'iso-3166-1';
+// Manual conversion through lookup
+const result = iso31661.whereAlpha2('US');
+const alpha3 = result?.alpha3; // 'USA'
+```
+
+```typescript copy
+// After
+import { country } from '@koshmoney/countries';
+// Direct conversion functions
+country.alpha2ToAlpha3('US');    // 'USA'
+country.alpha3ToAlpha2('GBR');   // 'GB'
+country.alpha2ToNumeric('DE');   // '276'
+country.numericToAlpha2(840);    // 'US'
+```
+
+### Validation
+
+```typescript
+// Before: manual check
+import iso31661 from 'iso-3166-1';
+const isValid = iso31661.whereAlpha2('US') !== undefined;
+```
+
+```typescript copy
+// After: dedicated validation functions
+import { country, subdivision } from '@koshmoney/countries';
+
+country.isAlpha2('US');              // true
+country.isAlpha3('USA');             // true
+country.isValid('US');               // true (any format)
+subdivision.isValidCode('US-CA');    // true
+subdivision.isValidRegion('US', 'CA'); // true
+```
+
+## Bonus Features After Migration
+
+Once you migrate, you get access to modules that separate packages do not provide:
+
+```typescript copy
+// Postal code validation
+import { postalCode } from '@koshmoney/countries';
+postalCode.isValid('US', '90210');      // true
+postalCode.getName('US');               // 'ZIP Code'
+
+// Currency data
+import { currency } from '@koshmoney/countries/currency';
+currency.getCurrency('JP');
+// { code: 'JPY', symbol: '\u00a5', name: 'Japanese Yen' }
+
+// EU/SEPA membership
+import { membership } from '@koshmoney/countries/membership';
+membership.isEU('FR');        // true
+membership.isSEPA('GB');      // true
+
+// Geography
+import { geography } from '@koshmoney/countries/geography';
+geography.getContinent('BR'); // 'South America'
+geography.getRegion('JP');    // 'Eastern Asia'
+```
+
+## When to Stay with Separate Packages
+
+There are valid reasons to keep using separate packages:
+
+- **You already have a large codebase** that uses `iso-3166-1` or `iso-3166-2` extensively and migration cost is high
+- **You need a specific feature** of `iso-3166-2` like parent subdivision relationships
+- **You prefer minimal installs** and only need country codes without any additional features
+
+For new projects, `@koshmoney/countries` provides a better developer experience with a unified API and additional features.
+
+## Related Resources
+
+- [Getting Started](/docs/getting-started) -- quick setup guide
+- [Migration Guide](/docs/guides/migration) -- detailed migration documentation
+- [Country API Reference](/docs/api/country) -- full country module API
+- [Subdivision API Reference](/docs/api/subdivision) -- full subdivision module API

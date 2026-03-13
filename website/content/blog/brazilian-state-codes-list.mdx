@@ -1,0 +1,234 @@
+---
+description: "Complete list of Brazilian state codes (ISO 3166-2:BR). All 26 states and the Federal District with codes organized by region, plus TypeScript examples."
+---
+
+# Brazilian State Codes: Complete List of All 27 Subdivisions
+
+Brazil is divided into 26 states and 1 federal district (Distrito Federal), each with a standardized ISO 3166-2 code. These codes are essential for e-commerce, tax (ICMS) calculations, shipping logistics, and any application that handles Brazilian addresses.
+
+This page lists every Brazilian subdivision code organized by geographic region, and shows how to use them with `@koshmoney/countries`.
+
+## All Brazilian State Codes
+
+Brazil has 27 ISO 3166-2 entries: 26 states (type "State") and 1 federal district (type "Federal district").
+
+### North Region (Norte)
+
+| Code | Name | Capital |
+|------|------|---------|
+| BR-AC | Acre | Rio Branco |
+| BR-AM | Amazonas | Manaus |
+| BR-AP | Amapa | Macapa |
+| BR-PA | Para | Belem |
+| BR-RO | Rondonia | Porto Velho |
+| BR-RR | Roraima | Boa Vista |
+| BR-TO | Tocantins | Palmas |
+
+### Northeast Region (Nordeste)
+
+| Code | Name | Capital |
+|------|------|---------|
+| BR-AL | Alagoas | Maceio |
+| BR-BA | Bahia | Salvador |
+| BR-CE | Ceara | Fortaleza |
+| BR-MA | Maranhao | Sao Luis |
+| BR-PB | Paraiba | Joao Pessoa |
+| BR-PE | Pernambuco | Recife |
+| BR-PI | Piaui | Teresina |
+| BR-RN | Rio Grande do Norte | Natal |
+| BR-SE | Sergipe | Aracaju |
+
+### Central-West Region (Centro-Oeste)
+
+| Code | Name | Capital |
+|------|------|---------|
+| BR-DF | Distrito Federal | Brasilia |
+| BR-GO | Goias | Goiania |
+| BR-MS | Mato Grosso do Sul | Campo Grande |
+| BR-MT | Mato Grosso | Cuiaba |
+
+### Southeast Region (Sudeste)
+
+| Code | Name | Capital |
+|------|------|---------|
+| BR-ES | Espirito Santo | Vitoria |
+| BR-MG | Minas Gerais | Belo Horizonte |
+| BR-RJ | Rio de Janeiro | Rio de Janeiro |
+| BR-SP | Sao Paulo | Sao Paulo |
+
+### South Region (Sul)
+
+| Code | Name | Capital |
+|------|------|---------|
+| BR-PR | Parana | Curitiba |
+| BR-RS | Rio Grande do Sul | Porto Alegre |
+| BR-SC | Santa Catarina | Florianopolis |
+
+## Understanding Brazilian State Codes
+
+Each code follows the ISO 3166-2 format: the country alpha-2 code (BR) followed by a hyphen and a 2-letter state abbreviation.
+
+| Component | Example | Meaning |
+|-----------|---------|---------|
+| Country prefix | BR | Brazil |
+| Separator | - | Standard delimiter |
+| State code | SP | Sao Paulo |
+| Full code | BR-SP | Sao Paulo, Brazil |
+
+> [!NOTE]
+> The Distrito Federal (BR-DF) has the type "Federal district" in ISO 3166-2, distinct from the 26 states. It contains the national capital Brasilia and has a unique governance structure, functioning as both a state and a municipality.
+
+## Using Brazilian State Codes in Code
+
+### Look Up a State
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('BR-SP');
+// { code: 'BR-SP', name: 'Sao Paulo', type: 'State', countryCode: 'BR' }
+
+subdivision.whereCode('BR-DF');
+// { code: 'BR-DF', name: 'Distrito Federal', type: 'Federal district', countryCode: 'BR' }
+```
+
+### Get All Brazilian Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const allBR = subdivision.forCountry('BR');
+// Returns array of 27 subdivisions
+
+// Separate states from federal district
+const states = allBR.filter(s => s.type === 'State');
+const fd = allBR.find(s => s.type === 'Federal district');
+
+console.log(states.length);  // 26
+console.log(fd?.name);       // 'Distrito Federal'
+```
+
+### Validate a State Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('BR-SP');    // true (Sao Paulo)
+subdivision.isValidCode('BR-XX');    // false
+
+subdivision.isValidRegion('BR', 'RJ');  // true (Rio de Janeiro)
+subdivision.isValidRegion('BR', 'CA');  // false
+```
+
+### Tree-Shaking for Brazilian Data Only
+
+```typescript copy
+import '@koshmoney/countries/subdivision/BR';
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+
+const sp = whereCode('BR-SP');
+const allStates = forCountry('BR');
+```
+
+## CEP Postal Code System
+
+Brazil uses an 8-digit postal code called CEP (Codigo de Enderecamento Postal), formatted as XXXXX-XXX. The first digit indicates the region:
+
+| First Digit | Region | States |
+|-------------|--------|--------|
+| 0 | Sao Paulo (capital area) | SP (partial) |
+| 1 | Sao Paulo (interior) | SP (partial) |
+| 2 | Rio de Janeiro, Espirito Santo | RJ, ES |
+| 3 | Minas Gerais | MG |
+| 4 | Bahia, Sergipe | BA, SE |
+| 5 | Pernambuco, Alagoas, Paraiba, Rio Grande do Norte | PE, AL, PB, RN |
+| 6 | Ceara, Piaui, Maranhao, Para, Amazonas, Acre, Amapa, Roraima | CE, PI, MA, PA, AM, AC, AP, RR |
+| 7 | Distrito Federal, Goias, Tocantins, Mato Grosso, Mato Grosso do Sul, Rondonia | DF, GO, TO, MT, MS, RO |
+| 8 | Parana, Santa Catarina | PR, SC |
+| 9 | Rio Grande do Sul | RS |
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('BR', '01001-000');  // true (Sao Paulo centro)
+postalCode.isValid('BR', '20040-020');  // true (Rio de Janeiro)
+postalCode.isValid('BR', '12345');      // false (too few digits)
+```
+
+## Currency and Country Data
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { geography } from '@koshmoney/countries/geography';
+
+country.whereAlpha2('BR');
+// { name: 'Brazil', alpha2: 'BR', alpha3: 'BRA', numeric: '076' }
+
+currency.getCurrency('BR');
+// { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' }
+
+geography.getContinent('BR');  // 'South America'
+geography.getRegion('BR');     // 'South America'
+```
+
+## Common Use Cases
+
+### ICMS Tax Calculation
+
+Brazilian ICMS (Imposto sobre Circulacao de Mercadorias e Servicos) rates vary by state. State codes are essential for determining the correct tax rate:
+
+```typescript copy
+const icmsRates: Record<string, number> = {
+  'BR-SP': 18,
+  'BR-RJ': 20,
+  'BR-MG': 18,
+  'BR-RS': 17,
+  'BR-PR': 19.5,
+  // ... other states
+};
+
+function getICMSRate(stateCode: string): number {
+  return icmsRates[stateCode] ?? 17; // Default interstate rate
+}
+```
+
+### Shipping Zone Calculation
+
+Brazilian logistics providers define zones based on state-to-state distances:
+
+```typescript copy
+const regions: Record<string, string[]> = {
+  sudeste: ['BR-SP', 'BR-RJ', 'BR-MG', 'BR-ES'],
+  sul: ['BR-PR', 'BR-SC', 'BR-RS'],
+  nordeste: ['BR-BA', 'BR-CE', 'BR-PE', 'BR-MA', 'BR-PB', 'BR-PI', 'BR-RN', 'BR-AL', 'BR-SE'],
+  norte: ['BR-AM', 'BR-PA', 'BR-AC', 'BR-RO', 'BR-RR', 'BR-AP', 'BR-TO'],
+  centroOeste: ['BR-DF', 'BR-GO', 'BR-MT', 'BR-MS'],
+};
+
+function getRegion(stateCode: string): string {
+  for (const [region, states] of Object.entries(regions)) {
+    if (states.includes(stateCode)) return region;
+  }
+  return 'unknown';
+}
+```
+
+### Nota Fiscal (Invoice) Generation
+
+Brazilian electronic invoices (NF-e) require the IBGE state code, which maps closely to ISO codes. The state code determines the issuing authority:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function validateInvoiceState(stateCode: string): boolean {
+  return subdivision.isValidCode(stateCode);
+}
+```
+
+## Related Resources
+
+- [Country Code Converter Tool](/tools/country-code-converter) -- look up BR and all other codes
+- [South American Countries List](/blog/south-american-countries-list-codes) -- all countries in South America
+- [Mexican State Codes](/blog/mexican-state-codes-list) -- similar guide for Mexico
+- [Subdivision API Reference](/docs/api/subdivision) -- full subdivision API documentation

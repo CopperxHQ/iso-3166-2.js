@@ -1,0 +1,300 @@
+---
+description: "Complete reference of postal code formats for 160+ countries. Local names (ZIP Code, PIN Code, PLZ, CEP), format patterns, and validation examples using @koshmoney/countries."
+---
+
+# Postal Code Formats by Country
+
+A comprehensive reference of postal code formats, local terminology, and validation patterns for every country supported by `@koshmoney/countries`.
+
+## Quick Usage
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+// Validate any postal code
+postalCode.isValid('US', '90210');       // true
+postalCode.isValid('GB', 'SW1A 1AA');   // true
+postalCode.isValid('JP', '100-0001');   // true
+
+// Get local terminology
+postalCode.getName('US');  // 'ZIP Code'
+postalCode.getName('IN');  // 'PIN Code'
+postalCode.getName('DE');  // 'PLZ'
+
+// Get format description
+postalCode.getFormat('US');  // 'NNNNN or NNNNN-NNNN'
+postalCode.getFormat('CA');  // 'A1A 1A1'
+postalCode.getFormat('GB');  // 'AA9A 9AA'
+
+// Check if country uses postal codes
+postalCode.hasPostalCode('US');  // true
+postalCode.hasPostalCode('HK');  // false
+```
+
+## Format Legend
+
+In the format column:
+- **N** = digit (0-9)
+- **A** = letter (A-Z)
+- **X** = letter or digit
+
+---
+
+## Americas
+
+| Country | Code | Local Name | Format | Example |
+|---------|------|-----------|--------|---------|
+| Argentina | AR | CPA | ANNNNAAA or NNNN | C1420 or 1420 |
+| Bolivia | BO | Codigo postal | NNNN | 0101 |
+| Brazil | BR | CEP | NNNNN-NNN | 01001-000 |
+| Canada | CA | Postal Code | A1A 1A1 | K1A 0B1 |
+| Chile | CL | Codigo postal | NNNNNNN | 8320000 |
+| Colombia | CO | Codigo postal | NNNNNN | 110111 |
+| Costa Rica | CR | Codigo postal | NNNNN | 10101 |
+| Cuba | CU | Codigo postal | NNNNN | 10400 |
+| Dominican Republic | DO | Codigo postal | NNNNN | 10101 |
+| Ecuador | EC | Codigo postal | NNNNNN | 170150 |
+| Guatemala | GT | Codigo postal | NNNNN | 01001 |
+| Honduras | HN | Codigo postal | NNNNN | 11101 |
+| Mexico | MX | Codigo postal | NNNNN | 06600 |
+| Nicaragua | NI | Codigo postal | NNNNN | 11001 |
+| Paraguay | PY | Codigo postal | NNNN | 1209 |
+| Peru | PE | Codigo postal | NNNNN | 15001 |
+| Puerto Rico | PR | ZIP Code | NNNNN or NNNNN-NNNN | 00901 |
+| El Salvador | SV | Codigo postal | NNNN | 1101 |
+| United States | US | ZIP Code | NNNNN or NNNNN-NNNN | 90210 |
+| Uruguay | UY | Codigo postal | NNNNN | 11000 |
+| Venezuela | VE | Codigo postal | NNNN or NNNN-A | 1010 |
+
+## Europe
+
+| Country | Code | Local Name | Format | Example |
+|---------|------|-----------|--------|---------|
+| Andorra | AD | Codi postal | AD999 | AD500 |
+| Austria | AT | PLZ | NNNN | 1010 |
+| Belgium | BE | Postcode | NNNN | 1000 |
+| Bosnia and Herzegovina | BA | Postanski broj | NNNNN | 71000 |
+| Bulgaria | BG | Poshtenksi kod | NNNN | 1000 |
+| Croatia | HR | Postanski broj | NNNNN | 10000 |
+| Cyprus | CY | Postal code | NNNN | 1010 |
+| Czech Republic | CZ | PSC | NNN NN | 110 00 |
+| Denmark | DK | Postnummer | NNNN | 1050 |
+| Estonia | EE | Postiindeks | NNNNN | 10111 |
+| Faroe Islands | FO | Postnummer | NNN | 100 |
+| Finland | FI | Postinumero | NNNNN | 00100 |
+| France | FR | Code postal | NNNNN | 75001 |
+| Germany | DE | PLZ | NNNNN | 10115 |
+| Greece | GR | Postal code | NNN NN | 105 57 |
+| Hungary | HU | Iranyitoszam | NNNN | 1011 |
+| Iceland | IS | Postnumer | NNN | 101 |
+| Ireland | IE | Eircode | A99 XXXX | D02 AF30 |
+| Italy | IT | CAP | NNNNN | 00100 |
+| Latvia | LV | Pasta indekss | LV-NNNN | LV-1050 |
+| Liechtenstein | LI | PLZ | NNNN | 9490 |
+| Lithuania | LT | Pashto kodas | LT-NNNNN | LT-01001 |
+| Luxembourg | LU | Code postal | NNNN | 1009 |
+| Malta | MT | Kodiczi Postali | AAA NNNN | VLT 1535 |
+| Moldova | MD | Cod postal | MD-NNNN | MD-2001 |
+| Monaco | MC | Code postal | 980NN | 98000 |
+| Montenegro | ME | Postanski broj | NNNNN | 81000 |
+| Netherlands | NL | Postcode | NNNN AA | 1012 AB |
+| North Macedonia | MK | Poshtenksi broj | NNNN | 1000 |
+| Norway | NO | Postnummer | NNNN | 0001 |
+| Poland | PL | Kod pocztowy | NN-NNN | 00-001 |
+| Portugal | PT | Codigo postal | NNNN-NNN | 1000-001 |
+| Romania | RO | Cod postal | NNNNNN | 010011 |
+| San Marino | SM | Codice postale | 4789N | 47890 |
+| Serbia | RS | Poshtanksi broj | NNNNN | 11000 |
+| Slovakia | SK | PSC | NNN NN | 811 01 |
+| Slovenia | SI | Poshtna shtevilka | NNNN | 1000 |
+| Spain | ES | Codigo postal | NNNNN | 28001 |
+| Sweden | SE | Postnummer | NNN NN | 111 21 |
+| Switzerland | CH | PLZ / NPA | NNNN | 8001 |
+| Turkey | TR | Posta kodu | NNNNN | 34000 |
+| Ukraine | UA | Poshtovyj indeks | NNNNN | 01001 |
+| United Kingdom | GB | Postcode | AA9A 9AA | SW1A 1AA |
+| Vatican City | VA | CAP | 00120 | 00120 |
+| Kosovo | XK | Kodi postar | NNNNN | 10000 |
+
+## Asia
+
+| Country | Code | Local Name | Format | Example |
+|---------|------|-----------|--------|---------|
+| Afghanistan | AF | Postal code | NNNN | 1001 |
+| Armenia | AM | Postal code | NNNN | 0001 |
+| Azerbaijan | AZ | Postal code | AZ NNNN | AZ 1000 |
+| Bangladesh | BD | Postal code | NNNN | 1000 |
+| Bhutan | BT | Postal code | NNNNN | 11001 |
+| Cambodia | KH | Postal code | NNNNN | 12000 |
+| China | CN | You bian | NNNNNN | 100000 |
+| Georgia | GE | Postal code | NNNN | 0100 |
+| India | IN | PIN Code | NNNNNN | 110001 |
+| Indonesia | ID | Kode pos | NNNNN | 10110 |
+| Iran | IR | Postal code | NNNNN-NNNNN | 11365-43789 |
+| Iraq | IQ | Postal code | NNNNN | 10001 |
+| Israel | IL | Postal code | NNNNNNN | 6100000 |
+| Japan | JP | Yubin bango | NNN-NNNN | 100-0001 |
+| Jordan | JO | Postal code | NNNNN | 11110 |
+| Kazakhstan | KZ | Postal code | NNNNNN | 010000 |
+| Kyrgyzstan | KG | Postal code | NNNNNN | 720001 |
+| Laos | LA | Postal code | NNNNN | 01000 |
+| Lebanon | LB | Postal code | NNNN NNNN | 1100 2010 |
+| Malaysia | MY | Poskod | NNNNN | 50000 |
+| Mongolia | MN | Postal code | NNNNN | 14200 |
+| Myanmar | MM | Postal code | NNNNN | 11181 |
+| Nepal | NP | Postal code | NNNNN | 44600 |
+| Pakistan | PK | Postal code | NNNNN | 44000 |
+| Philippines | PH | ZIP Code | NNNN | 1000 |
+| Saudi Arabia | SA | Postal code | NNNNN or NNNNN-NNNN | 11564 |
+| Singapore | SG | Postal code | NNNNNN | 018956 |
+| South Korea | KR | Upyeonbeonho | NNNNN | 03141 |
+| Sri Lanka | LK | Postal code | NNNNN | 00100 |
+| Taiwan | TW | You di qu hao | NNN or NNNNNN | 100 |
+| Tajikistan | TJ | Postal code | NNNNNN | 734001 |
+| Thailand | TH | Rahatibprasanee | NNNNN | 10200 |
+| Turkmenistan | TM | Postal code | NNNNNN | 744000 |
+| Uzbekistan | UZ | Postal code | NNNNNN | 100000 |
+| Vietnam | VN | Ma buu chinh | NNNNNN | 100000 |
+
+## Africa
+
+| Country | Code | Local Name | Format | Example |
+|---------|------|-----------|--------|---------|
+| Algeria | DZ | Code postal | NNNNN | 16000 |
+| Egypt | EG | Postal code | NNNNN | 11511 |
+| Ethiopia | ET | Postal code | NNNN | 1000 |
+| Kenya | KE | Postal code | NNNNN | 00100 |
+| Morocco | MA | Code postal | NNNNN | 10000 |
+| Mozambique | MZ | Codigo postal | NNNN | 1100 |
+| Niger | NE | Code postal | NNNN | 8000 |
+| Nigeria | NG | Postal code | NNNNNN | 100001 |
+| Senegal | SN | Code postal | NNNNN | 10000 |
+| South Africa | ZA | Postal code | NNNN | 0001 |
+| Sudan | SD | Postal code | NNNNN | 11111 |
+| Tunisia | TN | Code postal | NNNN | 1000 |
+| Zambia | ZM | Postal code | NNNNN | 10101 |
+
+## Oceania
+
+| Country | Code | Local Name | Format | Example |
+|---------|------|-----------|--------|---------|
+| Australia | AU | Postcode | NNNN | 2000 |
+| New Zealand | NZ | Postcode | NNNN | 6011 |
+
+## Territories and Dependencies
+
+| Territory | Code | Local Name | Format | Example |
+|-----------|------|-----------|--------|---------|
+| Aland Islands | AX | Postnummer | 22NNN | 22100 |
+| American Samoa | AS | ZIP Code | NNNNN or NNNNN-NNNN | 96799 |
+| Bermuda | BM | Postcode | AA NN | HM 12 |
+| Christmas Island | CX | Postcode | NNNN | 6798 |
+| Cocos Islands | CC | Postcode | NNNN | 6799 |
+| Falkland Islands | FK | Postcode | FIQQ 1ZZ | FIQQ 1ZZ |
+| French Guiana | GF | Code postal | 973NN | 97300 |
+| Greenland | GL | Postnummer | NNNN | 3900 |
+| Guadeloupe | GP | Code postal | 971NN | 97100 |
+| Guam | GU | ZIP Code | NNNNN or NNNNN-NNNN | 96910 |
+| Guernsey | GG | Postcode | GY9 9AA | GY1 1AA |
+| Gibraltar | GI | Postcode | GX11 1AA | GX11 1AA |
+| Isle of Man | IM | Postcode | IM9 9AA | IM1 1AA |
+| Jersey | JE | Postcode | JE9 9AA | JE2 3AA |
+| Martinique | MQ | Code postal | 972NN | 97200 |
+| Marshall Islands | MH | ZIP Code | NNNNN or NNNNN-NNNN | 96960 |
+| Mayotte | YT | Code postal | 976NN | 97600 |
+| Micronesia | FM | ZIP Code | NNNNN or NNNNN-NNNN | 96941 |
+| Montserrat | MS | Postcode | MSR NNNN | MSR 1110 |
+| New Caledonia | NC | Code postal | 988NN | 98800 |
+| Norfolk Island | NF | Postcode | NNNN | 2899 |
+| Northern Mariana Islands | MP | ZIP Code | NNNNN or NNNNN-NNNN | 96950 |
+| Palau | PW | ZIP Code | NNNNN or NNNNN-NNNN | 96940 |
+| French Polynesia | PF | Code postal | 987NN | 98714 |
+| Pitcairn Islands | PN | Postcode | PCRN 1ZZ | PCRN 1ZZ |
+| Reunion | RE | Code postal | 974NN | 97400 |
+| Saint Barthelemy | BL | Code postal | 97133 | 97133 |
+| Saint Martin | MF | Code postal | 97150 | 97150 |
+| Saint Pierre and Miquelon | PM | Code postal | 97500 | 97500 |
+| South Georgia | GS | Postcode | SIQQ 1ZZ | SIQQ 1ZZ |
+| Svalbard | SJ | Postnummer | NNNN | 9170 |
+| Turks and Caicos | TC | Postcode | TKCA 1ZZ | TKCA 1ZZ |
+| U.S. Virgin Islands | VI | ZIP Code | NNNNN or NNNNN-NNNN | 00801 |
+| Wallis and Futuna | WF | Code postal | 986NN | 98600 |
+
+---
+
+## Countries Without Postal Codes
+
+These countries and territories do not use postal code systems:
+
+Angola, Antigua and Barbuda, Aruba, Bahamas, Belize, Benin, Botswana, Burkina Faso, Burundi, Cameroon, Central African Republic, Chad, Comoros, Congo, Congo (DRC), Cook Islands, Djibouti, Dominica, Equatorial Guinea, Eritrea, Fiji, Gabon, Gambia, Ghana, Grenada, Guinea, Guyana, Hong Kong, Ivory Coast, Kiribati, Libya, Macau, Malawi, Mali, Mauritania, Namibia, Nauru, Niue, Panama, Qatar, Rwanda, Saint Kitts and Nevis, Sao Tome and Principe, Seychelles, Sierra Leone, Solomon Islands, Somalia, South Sudan, Suriname, Syria, Tanzania, Timor-Leste, Togo, Tonga, Tuvalu, Uganda, United Arab Emirates, Vanuatu, Yemen, Zimbabwe.
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.hasPostalCode('HK');  // false (Hong Kong)
+postalCode.hasPostalCode('AE');  // false (UAE)
+postalCode.hasPostalCode('QA');  // false (Qatar)
+postalCode.hasPostalCode('PA');  // false (Panama)
+```
+
+---
+
+## Programmatic Access
+
+Access all postal code data programmatically:
+
+```typescript copy
+import { postalCode, country } from '@koshmoney/countries';
+
+// Build a postal code format reference for all countries
+const allCountries = country.all();
+
+for (const c of allCountries) {
+  if (postalCode.hasPostalCode(c.alpha2)) {
+    const name = postalCode.getName(c.alpha2);
+    const format = postalCode.getFormat(c.alpha2);
+    console.log(`${c.name} (${c.alpha2}): ${name} - ${format}`);
+  }
+}
+// Afghanistan (AF): Postal code - NNNN
+// Albania (AL): Kodi postar - NNNN
+// ...
+```
+
+### Dynamic Form Labels
+
+Use postal code data to create adaptive form labels:
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+function getPostalCodeLabel(countryCode: string): {
+  label: string;
+  placeholder: string;
+  required: boolean;
+} {
+  const has = postalCode.hasPostalCode(countryCode);
+  return {
+    label: postalCode.getName(countryCode) || 'Postal Code',
+    placeholder: postalCode.getFormat(countryCode) || '',
+    required: has,
+  };
+}
+
+getPostalCodeLabel('US');
+// { label: 'ZIP Code', placeholder: 'NNNNN or NNNNN-NNNN', required: true }
+
+getPostalCodeLabel('DE');
+// { label: 'PLZ', placeholder: 'NNNNN', required: true }
+
+getPostalCodeLabel('HK');
+// { label: 'Postal Code', placeholder: '', required: false }
+```
+
+---
+
+## Related
+
+- [Postal Code API](/docs/api/postal-code) -- Full API reference
+- [Address Validation Guide](/docs/guides/address-validation) -- Server-side validation patterns
+- [Node.js Examples](/docs/examples/nodejs) -- Express validation middleware

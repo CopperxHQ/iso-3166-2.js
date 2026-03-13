@@ -1,0 +1,181 @@
+---
+description: "How to use ISO country codes for KYC compliance, OFAC screening, and payment processing in fintech applications."
+---
+
+# Country Data for Fintech and Banking
+
+Financial applications require ISO-standard country and subdivision codes for regulatory compliance, customer verification, and cross-border payment routing. Incorrect or inconsistent country data leads to failed KYC checks, rejected transactions, and compliance violations.
+
+`@koshmoney/countries` provides the validated country and subdivision data that fintech applications need, with TypeScript types and tree-shakeable imports.
+
+## Why ISO Standards Matter in Fintech
+
+Regulators, payment processors, and banking networks all operate on ISO 3166 codes. When your application stores country data in a non-standard format, you create translation layers that introduce errors:
+
+- **KYC/AML providers** (Sumsub, Jumio, Onfido) require ISO 3166-1 alpha-2 codes
+- **SWIFT messages** use ISO 3166-1 alpha-2 for country identification
+- **OFAC sanctions lists** reference countries by ISO codes
+- **PCI DSS** expects standardized address fields including country codes
+
+## Use Case 1: KYC Address Validation
+
+Every fintech app collects customer addresses during onboarding. Validate the address components before sending them to your KYC provider:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+interface KYCAddress {
+  countryCode: string;
+  stateCode: string;
+  postalCodeValue: string;
+  city: string;
+  line1: string;
+}
+
+function validateKYCAddress(address: KYCAddress): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (!country.isAlpha2(address.countryCode)) {
+    errors.push(`Invalid country code: ${address.countryCode}`);
+    return { valid: false, errors };
+  }
+
+  if (address.stateCode && !subdivision.isValidRegion(address.countryCode, address.stateCode)) {
+    errors.push(`Invalid state/province: ${address.stateCode}`);
+  }
+
+  if (address.postalCodeValue && !postalCode.isValid(address.countryCode, address.postalCodeValue)) {
+    const format = postalCode.getFormat(address.countryCode);
+    errors.push(`Invalid postal code format. Expected: ${format}`);
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+```
+
+## Use Case 2: Sanctions and Restricted Countries
+
+Screen customer countries against sanctions lists and internal risk policies:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Example restricted country list (consult actual OFAC SDN list)
+const OFAC_RESTRICTED = new Set(['CU', 'IR', 'KP', 'SY', 'RU']);
+const HIGH_RISK = new Set(['AF', 'MM', 'SO', 'YE', 'VE']);
+
+type RiskLevel = 'blocked' | 'high' | 'standard';
+
+function assessCountryRisk(countryCode: string): {
+  level: RiskLevel;
+  allowed: boolean;
+  reason?: string;
+} {
+  if (!country.isValid(countryCode)) {
+    return { level: 'blocked', allowed: false, reason: 'Invalid country code' };
+  }
+
+  const alpha2 = country.isAlpha2(countryCode)
+    ? countryCode
+    : country.alpha3ToAlpha2(countryCode) ?? countryCode;
+
+  if (OFAC_RESTRICTED.has(alpha2)) {
+    return { level: 'blocked', allowed: false, reason: 'OFAC restricted jurisdiction' };
+  }
+
+  if (HIGH_RISK.has(alpha2)) {
+    return { level: 'high', allowed: true, reason: 'Enhanced due diligence required' };
+  }
+
+  return { level: 'standard', allowed: true };
+}
+
+assessCountryRisk('US');  // { level: 'standard', allowed: true }
+assessCountryRisk('IR');  // { level: 'blocked', allowed: false, reason: 'OFAC restricted jurisdiction' }
+```
+
+## Use Case 3: SEPA Payment Routing
+
+Determine whether a cross-border payment can use SEPA rails (cheaper and faster) or requires SWIFT:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+type PaymentRail = 'sepa' | 'sepa-instant' | 'swift' | 'domestic';
+
+function getPaymentRail(
+  senderCountry: string,
+  receiverCountry: string,
+  currencyCode: string
+): PaymentRail {
+  // Same country = domestic
+  if (senderCountry === receiverCountry) return 'domestic';
+
+  // Both in SEPA and paying in EUR
+  if (
+    membership.isSEPA(senderCountry) &&
+    membership.isSEPA(receiverCountry) &&
+    currencyCode === 'EUR'
+  ) {
+    return 'sepa';
+  }
+
+  // Cross-border non-SEPA
+  return 'swift';
+}
+
+getPaymentRail('DE', 'FR', 'EUR');  // 'sepa'
+getPaymentRail('DE', 'GB', 'EUR');  // 'sepa' (UK is still in SEPA)
+getPaymentRail('US', 'GB', 'USD');  // 'swift'
+getPaymentRail('US', 'US', 'USD');  // 'domestic'
+```
+
+## Use Case 4: Multi-Currency Display
+
+Show the correct currency based on the customer's country:
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { membership } from '@koshmoney/countries/membership';
+
+function getDisplayCurrency(countryCode: string) {
+  const curr = currency.getCurrency(countryCode);
+  if (!curr) return null;
+
+  return {
+    code: curr.code,
+    symbol: curr.symbol,
+    name: curr.name,
+    isEurozone: membership.isEurozone(countryCode),
+  };
+}
+
+getDisplayCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar', isEurozone: false }
+
+getDisplayCurrency('DE');
+// { code: 'EUR', symbol: '\u20ac', name: 'Euro', isEurozone: true }
+
+getDisplayCurrency('JP');
+// { code: 'JPY', symbol: '\u00a5', name: 'Japanese Yen', isEurozone: false }
+```
+
+## Best Practices for Fintech Applications
+
+**Always validate at the API boundary.** Do not trust country codes from client-side forms or third-party webhooks without server-side validation.
+
+**Store ISO alpha-2 codes in your database.** They are the most widely used format across payment processors, KYC providers, and banking APIs. Normalize other formats on input.
+
+**Use the membership module for compliance logic.** EU, EEA, and SEPA membership determines which regulations apply. Do not hardcode country lists -- membership changes over time.
+
+**Keep sanctions lists separate from country data.** OFAC and other sanctions lists change frequently and require a different update cadence than ISO 3166 data.
+
+**Log country codes in audit trails.** Compliance requires demonstrating that you checked the customer's country against your risk policies at the time of onboarding.
+
+## Related Resources
+
+- [GDPR and EU Countries](/blog/gdpr-eu-countries-developers) -- implementing GDPR detection for financial services
+- [EU Country Codes](/blog/eu-country-codes-list) -- EU, EEA, SEPA, and Eurozone membership tables
+- [Node.js Country Validation](/blog/nodejs-country-code-validation) -- server-side validation middleware
+- [Membership API Reference](/docs/api/membership) -- SEPA, EU, and Eurozone checks

@@ -1,0 +1,249 @@
+---
+description: "Complete list of all 27 EU member state codes with EEA, SEPA, Eurozone, and Schengen membership tables. TypeScript code examples for EU detection."
+---
+
+# Complete List of EU Country Codes for Developers
+
+The European Union has 27 member states as of 2024 (post-Brexit). If you are building applications that handle EU compliance, GDPR, SEPA payments, or Eurozone currency logic, you need a reliable and up-to-date reference for these codes.
+
+This guide provides every EU-related membership list, explains the differences between EU, EEA, SEPA, Eurozone, and Schengen, and shows how to check membership programmatically with `@koshmoney/countries`.
+
+## EU Member States (27 Countries)
+
+| Alpha-2 | Alpha-3 | Country | Joined |
+|---|---|---|---|
+| AT | AUT | Austria | 1995 |
+| BE | BEL | Belgium | 1957 |
+| BG | BGR | Bulgaria | 2007 |
+| HR | HRV | Croatia | 2013 |
+| CY | CYP | Cyprus | 2004 |
+| CZ | CZE | Czech Republic | 2004 |
+| DK | DNK | Denmark | 1973 |
+| EE | EST | Estonia | 2004 |
+| FI | FIN | Finland | 1995 |
+| FR | FRA | France | 1957 |
+| DE | DEU | Germany | 1957 |
+| GR | GRC | Greece | 1981 |
+| HU | HUN | Hungary | 2004 |
+| IE | IRL | Ireland | 1973 |
+| IT | ITA | Italy | 1957 |
+| LV | LVA | Latvia | 2004 |
+| LT | LTU | Lithuania | 2004 |
+| LU | LUX | Luxembourg | 1957 |
+| MT | MLT | Malta | 2004 |
+| NL | NLD | Netherlands | 1957 |
+| PL | POL | Poland | 2004 |
+| PT | PRT | Portugal | 1986 |
+| RO | ROU | Romania | 2007 |
+| SK | SVK | Slovakia | 2004 |
+| SI | SVN | Slovenia | 2004 |
+| ES | ESP | Spain | 1986 |
+| SE | SWE | Sweden | 1995 |
+
+## Understanding European Membership Groups
+
+The EU is just one of several overlapping membership structures in Europe. Each has different implications for developers:
+
+### EU vs EEA vs SEPA vs Eurozone vs Schengen
+
+| Group | Members | Purpose | Key for |
+|---|---|---|---|
+| **EU** | 27 countries | Political and economic union | GDPR, regulations, VAT |
+| **EEA** | 30 countries (EU + IS, LI, NO) | Single market access | GDPR applicability |
+| **SEPA** | 36 countries | Euro payment transfers | Payment processing |
+| **Eurozone** | 20 countries | Use EUR currency | Currency handling |
+| **Schengen** | 27 countries | Border-free travel | User location, shipping |
+
+### EEA Members (30 Countries)
+
+All 27 EU members plus:
+
+| Code | Country | Note |
+|---|---|---|
+| IS | Iceland | EFTA member |
+| LI | Liechtenstein | EFTA member |
+| NO | Norway | EFTA member |
+
+GDPR applies to all EEA countries, not just EU members. This is a critical distinction for compliance.
+
+### SEPA Members (36 Countries)
+
+All 30 EEA members plus:
+
+| Code | Country | Note |
+|---|---|---|
+| CH | Switzerland | EFTA, not EEA |
+| MC | Monaco | Via France |
+| SM | San Marino | Via Italy |
+| AD | Andorra | |
+| VA | Vatican City | |
+| GB | United Kingdom | Remains in SEPA post-Brexit |
+| GI | Gibraltar | UK territory |
+
+### Eurozone Members (20 Countries)
+
+These EU members use the Euro as their official currency:
+
+| Code | Country | Adopted EUR |
+|---|---|---|
+| AT | Austria | 1999 |
+| BE | Belgium | 1999 |
+| CY | Cyprus | 2008 |
+| EE | Estonia | 2011 |
+| FI | Finland | 1999 |
+| FR | France | 1999 |
+| DE | Germany | 1999 |
+| GR | Greece | 2001 |
+| HR | Croatia | 2023 |
+| IE | Ireland | 1999 |
+| IT | Italy | 1999 |
+| LV | Latvia | 2014 |
+| LT | Lithuania | 2015 |
+| LU | Luxembourg | 1999 |
+| MT | Malta | 2008 |
+| NL | Netherlands | 1999 |
+| PT | Portugal | 1999 |
+| SK | Slovakia | 2009 |
+| SI | Slovenia | 2007 |
+| ES | Spain | 1999 |
+
+EU members **not** in the Eurozone: Bulgaria, Czech Republic, Denmark, Hungary, Poland, Romania, Sweden.
+
+### Schengen Area (27 Countries)
+
+22 EU members plus 4 non-EU members (Iceland, Liechtenstein, Norway, Switzerland). EU members **not** in Schengen: Bulgaria, Cyprus, Ireland, Romania.
+
+## Checking Membership with @koshmoney/countries
+
+### Installation
+
+```typescript copy
+npm install @koshmoney/countries
+```
+
+### Check Individual Membership
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEU('FR');        // true
+membership.isEU('GB');        // false (post-Brexit)
+membership.isEU('NO');        // false (EEA but not EU)
+
+membership.isEEA('NO');       // true
+membership.isEEA('CH');       // false
+
+membership.isSEPA('CH');      // true
+membership.isSEPA('GB');      // true (still in SEPA)
+
+membership.isEurozone('DE');  // true
+membership.isEurozone('SE');  // false (Sweden uses SEK)
+
+membership.isSchengen('CH');  // true
+membership.isSchengen('IE');  // false
+```
+
+### Get All Memberships at Once
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.getMemberships('FR');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+
+membership.getMemberships('NO');
+// { EU: false, SEPA: true, EEA: true, Eurozone: false, Schengen: true }
+
+membership.getMemberships('GB');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: false }
+```
+
+### Get All Members of a Group
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+const euCountries = membership.getMembers('EU');
+// ['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK']
+
+const eurozoneCountries = membership.getMembers('Eurozone');
+// ['AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PT', 'SI', 'SK']
+```
+
+### Combine with Country Data
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+// Get full country data for all EU members
+const euMembers = membership.getMembers('EU');
+const euCountryData = euMembers.map(code => country.whereAlpha2(code));
+
+// Build a labeled list
+euCountryData.forEach(c => {
+  if (c) console.log(`${c.alpha2} (${c.alpha3}) - ${c.name}`);
+});
+```
+
+## Practical Applications
+
+### GDPR User Detection
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function isGDPRApplicable(countryCode: string): boolean {
+  // GDPR applies to EEA countries, not just EU
+  return membership.isEEA(countryCode);
+}
+
+isGDPRApplicable('DE');  // true (EU member)
+isGDPRApplicable('NO');  // true (EEA member)
+isGDPRApplicable('US');  // false
+```
+
+### SEPA Payment Eligibility
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function canUseSEPA(countryCode: string): boolean {
+  return membership.isSEPA(countryCode);
+}
+
+canUseSEPA('GB');  // true -- UK remains in SEPA
+canUseSEPA('US');  // false
+```
+
+### Dynamic Currency Display
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+function getDisplayCurrency(countryCode: string) {
+  if (membership.isEurozone(countryCode)) {
+    return { code: 'EUR', symbol: '\u20ac' };
+  }
+  return currency.getCurrency(countryCode);
+}
+
+getDisplayCurrency('DE');  // { code: 'EUR', symbol: '\u20ac' }
+getDisplayCurrency('SE');  // { code: 'SEK', symbol: 'kr', name: 'Swedish Krona' }
+```
+
+## Common Mistakes
+
+**Treating EU and EEA as the same thing.** Norway, Iceland, and Liechtenstein are in the EEA but not the EU. GDPR applies to the EEA, so excluding these three countries from compliance logic is a bug.
+
+**Assuming the UK left SEPA.** The UK left the EU in 2020 but remains a SEPA member. EUR transfers to and from UK banks still use SEPA rails.
+
+**Hardcoding membership lists.** Membership changes over time (Croatia joined the Eurozone in 2023). Use a maintained library rather than hardcoded arrays.
+
+## Related Resources
+
+- [GDPR and EU Countries for Developers](/blog/gdpr-eu-countries-developers) -- implementing GDPR detection in code
+- [Membership API Reference](/docs/api/membership) -- full membership module documentation
+- [Currency API Reference](/docs/api/currency) -- currency lookups by country
+- [SaaS Use Cases](/use-cases/saas) -- multi-region compliance patterns

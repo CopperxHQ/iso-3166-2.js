@@ -1,0 +1,193 @@
+---
+description: "GDPR compliance, localization, and multi-region pricing for SaaS applications using ISO country codes."
+---
+
+# Country Data for SaaS Applications
+
+SaaS applications that serve a global audience need country data for three things: compliance (GDPR, data residency), localization (language, currency, date formats), and pricing (region-based tiers, tax calculation). Handling these correctly from the start prevents costly refactoring later.
+
+`@koshmoney/countries` provides the country, membership, currency, and geography data that SaaS applications need, with tree-shakeable imports that keep your bundle small.
+
+## Use Case 1: GDPR Compliance Detection
+
+Show cookie consent banners, configure data processing agreements, and route data to EU infrastructure for EEA users:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+interface ComplianceConfig {
+  showCookieBanner: boolean;
+  requireExplicitConsent: boolean;
+  dataRegion: 'eu' | 'us' | 'ap';
+  privacyPolicyVersion: string;
+}
+
+function getComplianceConfig(countryCode: string): ComplianceConfig {
+  const isEEA = membership.isEEA(countryCode);
+  const isUK = countryCode === 'GB';
+
+  if (isEEA || isUK) {
+    return {
+      showCookieBanner: true,
+      requireExplicitConsent: true,
+      dataRegion: 'eu',
+      privacyPolicyVersion: isEEA ? 'gdpr-eea' : 'gdpr-uk',
+    };
+  }
+
+  return {
+    showCookieBanner: false,
+    requireExplicitConsent: false,
+    dataRegion: 'us',
+    privacyPolicyVersion: 'standard',
+  };
+}
+
+getComplianceConfig('DE');
+// { showCookieBanner: true, requireExplicitConsent: true, dataRegion: 'eu', ... }
+
+getComplianceConfig('US');
+// { showCookieBanner: false, requireExplicitConsent: false, dataRegion: 'us', ... }
+```
+
+## Use Case 2: Multi-Region Pricing
+
+Display prices in the correct currency and apply regional pricing tiers:
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { geography } from '@koshmoney/countries/geography';
+
+interface PricingTier {
+  monthly: number;
+  annual: number;
+  currencyCode: string;
+  currencySymbol: string;
+}
+
+const BASE_PRICE_USD = 29; // Monthly price in USD
+
+const REGIONAL_MULTIPLIERS: Record<string, number> = {
+  'Northern America': 1.0,
+  'Western Europe': 0.95,
+  'Northern Europe': 0.95,
+  'Eastern Europe': 0.60,
+  'South America': 0.50,
+  'Southern Asia': 0.40,
+  'South-eastern Asia': 0.45,
+  'Eastern Asia': 0.80,
+};
+
+function getPricing(countryCode: string): PricingTier {
+  const region = geography.getRegion(countryCode);
+  const curr = currency.getCurrency(countryCode);
+  const multiplier = REGIONAL_MULTIPLIERS[region ?? ''] ?? 0.70;
+
+  const monthly = Math.round(BASE_PRICE_USD * multiplier);
+  const annual = Math.round(monthly * 10); // 2 months free
+
+  return {
+    monthly,
+    annual,
+    currencyCode: curr?.code ?? 'USD',
+    currencySymbol: curr?.symbol ?? '$',
+  };
+}
+
+getPricing('US');
+// { monthly: 29, annual: 290, currencyCode: 'USD', currencySymbol: '$' }
+
+getPricing('IN');
+// { monthly: 12, annual: 120, currencyCode: 'INR', currencySymbol: '\u20b9' }
+
+getPricing('DE');
+// { monthly: 28, annual: 280, currencyCode: 'EUR', currencySymbol: '\u20ac' }
+```
+
+## Use Case 3: Localization Settings
+
+Determine default language, date format, and measurement system based on the user's country:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { geography } from '@koshmoney/countries/geography';
+
+interface LocaleConfig {
+  dateFormat: string;
+  measurementSystem: 'metric' | 'imperial';
+  defaultCurrency: string;
+  timezone: string; // Suggested default
+}
+
+const IMPERIAL_COUNTRIES = new Set(['US', 'LR', 'MM']);
+
+function getLocaleDefaults(countryCode: string): LocaleConfig {
+  const curr = currency.getCurrency(countryCode);
+
+  // US uses MM/DD/YYYY, most of the world uses DD/MM/YYYY
+  const dateFormat = countryCode === 'US' ? 'MM/DD/YYYY'
+    : ['CN', 'JP', 'KR', 'TW', 'HU'].includes(countryCode) ? 'YYYY/MM/DD'
+    : 'DD/MM/YYYY';
+
+  return {
+    dateFormat,
+    measurementSystem: IMPERIAL_COUNTRIES.has(countryCode) ? 'imperial' : 'metric',
+    defaultCurrency: curr?.code ?? 'USD',
+    timezone: 'UTC', // Override with actual timezone detection
+  };
+}
+```
+
+## Use Case 4: Customer Onboarding Forms
+
+Build a registration form that adapts to the selected country:
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+function getOnboardingFormConfig(countryCode: string) {
+  const subs = subdivision.forCountry(countryCode);
+  const dial = dialCode.getDialCode(countryCode);
+
+  return {
+    phonePrefix: dial ?? '+1',
+    showStateField: subs.length > 0,
+    stateLabel: subs[0]?.type === 'Province' ? 'Province'
+      : subs[0]?.type === 'Region' ? 'Region'
+      : 'State',
+    stateOptions: subs.map(s => ({ value: s.regionCode, label: s.name })),
+    countryName: country.whereAlpha2(countryCode)?.name ?? countryCode,
+  };
+}
+
+getOnboardingFormConfig('US');
+// { phonePrefix: '+1', showStateField: true, stateLabel: 'State', stateOptions: [...] }
+
+getOnboardingFormConfig('JP');
+// { phonePrefix: '+81', showStateField: true, stateLabel: 'Prefecture', stateOptions: [...] }
+```
+
+## Best Practices
+
+**Check EEA, not just EU, for GDPR.** GDPR applies to the 30 EEA countries (EU + Iceland, Liechtenstein, Norway), not just the 27 EU members. Use `membership.isEEA()`.
+
+**Do not hardcode pricing tables by country.** Use geographic regions as pricing tiers rather than individual countries. The `geography.getRegion()` function maps 249 countries into ~20 regions.
+
+**Tree-shake aggressively for frontend bundles.** SaaS landing pages should load fast. Import only the modules you need:
+
+```typescript copy
+// Only currency and membership for a pricing page
+import { getCurrency } from '@koshmoney/countries/currency';
+import { isEEA } from '@koshmoney/countries/membership';
+```
+
+**Store the country code at signup.** You will need it for compliance, invoicing, and analytics. Normalize to ISO 3166-1 alpha-2 on input.
+
+## Related Resources
+
+- [GDPR and EU Countries](/blog/gdpr-eu-countries-developers) -- detailed GDPR implementation patterns
+- [Tree-Shaking Country Data](/blog/tree-shaking-country-data) -- optimizing bundle size
+- [Currency API Reference](/docs/api/currency) -- currency lookups by country
+- [Geography API Reference](/docs/api/geography) -- continent and region classification
