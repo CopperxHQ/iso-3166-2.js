@@ -1,24 +1,38 @@
-name: Publish Beta
+name: Version Bump
 
 on:
-  push:
-    branches: [dev]
-    paths-ignore:
-      - '*.md'
-      - 'docs/**'
+  workflow_dispatch:
+    inputs:
+      type:
+        description: 'Version bump type'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - beta
+          - patch
+          - minor
+          - major
+      base:
+        description: 'Base branch'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - main
 
 jobs:
-  publish-beta:
+  version-bump:
     runs-on: ubuntu-latest
-    # Skip if commit was made by github-actions bot (prevents infinite loop)
-    if: github.actor != 'github-actions[bot]'
     permissions:
       contents: write
-      id-token: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.base }}
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -32,35 +46,30 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
 
       - run: npm ci
-      - run: npm run generate
-      - run: npm run typecheck
       - run: npm test
-      - run: npm run build
+      - run: npm run typecheck
 
-      - name: Bump beta version
-        run: npm version prerelease --preid=beta --no-git-tag-version
+      - name: Bump version
+        run: |
+          if [ "${{ inputs.type }}" = "beta" ]; then
+            npm version prerelease --preid=beta --no-git-tag-version
+          else
+            npm version ${{ inputs.type }} --no-git-tag-version
+          fi
 
-      - name: Create version bump PR
+      - name: Create PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          BRANCH="chore/bump-beta-v${VERSION}"
+          BRANCH="chore/bump-v${VERSION}"
           git checkout -b "$BRANCH"
           git add package.json package-lock.json
-          git commit -m "chore: bump beta version to v${VERSION} [skip ci]"
-          git push -u origin "$BRANCH"
+          git commit -m "chore: bump version to v${VERSION}"
+          git push -u origin "$BRANCH" --force
           gh pr create \
-            --base dev \
-            --title "chore: bump beta version to v${VERSION}" \
-            --body "Automated beta version bump to v${VERSION}" \
-            --label "automated"
-          gh pr merge "$BRANCH" --auto --squash
-
-      - name: Publish to npm (beta)
-        run: npm publish --access public --tag beta --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            --base ${{ inputs.base }} \
+            --title "chore: bump version to v${VERSION}" \
+            --body "Automated version bump to \`v${VERSION}\` (${{ inputs.type }})" || true

@@ -1,35 +1,32 @@
 name: Release
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - '*.md'
-      - 'docs/**'
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version bump type'
+      tag:
+        description: 'Version tag to publish (e.g. v1.0.1, v1.0.1-beta.8)'
         required: true
-        default: 'patch'
+        type: string
+      branch:
+        description: 'Branch to tag from'
+        required: true
+        default: 'dev'
         type: choice
         options:
-          - patch
-          - minor
-          - major
+          - dev
+          - main
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    # Skip if commit was made by github-actions bot (prevents infinite loop)
-    if: github.actor != 'github-actions[bot]'
     permissions:
       contents: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ inputs.branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Git
@@ -37,47 +34,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - run: npm ci
-      - run: npm run generate
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
-
-      - name: Determine version bump
-        id: version
+      - name: Verify version matches tag
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "bump=${{ inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "bump=patch" >> $GITHUB_OUTPUT
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${{ inputs.tag }}"
+          TAG_VERSION="${TAG_VERSION#v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
           fi
 
-      - name: Bump version and create tag
-        run: npm version ${{ steps.version.outputs.bump }} --ignore-scripts
-
-      - name: Create version bump PR
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create and push tag
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          TAG="v${VERSION}"
-          BRANCH="chore/release-v${VERSION}"
-          git checkout -b "$BRANCH"
-          git push -u origin "$BRANCH"
-          gh pr create \
-            --base main \
-            --title "chore: release v${VERSION}" \
-            --body "Automated release v${VERSION}" \
-            --label "automated"
-          gh pr merge "$BRANCH" --auto --squash
-          # Tag will be created after merge; push it from main
-          git checkout main
-          git pull
-          git tag "$TAG"
-          git push origin "$TAG"
+          git tag "${{ inputs.tag }}"
+          git push origin "${{ inputs.tag }}"
