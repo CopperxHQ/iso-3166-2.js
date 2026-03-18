@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getAllSubdivisionCodes, getSubdivisionPageData } from '../../../lib/subdivision-data';
-import { SubdivisionPageLayout } from '../../_components/subdivision-page-layout';
+import { getAllSubdivisionCodes, getSubdivisionPageData } from '../../../../lib/subdivision-data';
+import { SubdivisionPageLayout } from '../../../_components/subdivision-page-layout';
 
 type Params = { code: string };
 

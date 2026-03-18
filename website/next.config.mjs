@@ -1,7 +1,4 @@
-import nextra from 'nextra'
-
-const withNextra = nextra({})
-
-export default withNextra({
+/** @type {import('next').NextConfig} */
+export default {
   reactStrictMode: true,
-})
+}

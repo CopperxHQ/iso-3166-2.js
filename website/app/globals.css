@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@source "../app/**/*.{ts,tsx}";
+@source "../content/**/*.{md,mdx}";
+@source "../mdx-components.tsx";
+
+/* Design Tokens — Syntax dark palette */
+:root {
+  --page-bg: #0f172a;
+  --surface: #1e293b;
+  --surface-elevated: #1e293b;
+  --accent: #0ea5e9;
+  --accent-hover: #38bdf8;
+  --border: #1e293b;
+  --border-subtle: #334155;
+  --text-heading: #f8fafc;
+  --text-body: #94a3b8;
+  --text-muted: #64748b;
+  --code-bg: #020617;
+}
+
+/* Code blocks — always dark */
+pre [data-highlighted-line] {
+  background: rgba(14, 165, 233, 0.1);
+}
+
+pre code {
+  display: block;
+}
+
+pre code [data-line] {
+  padding: 0 1rem;
+}
+
+/* Steps counter */
+.steps-container > h3 {
+  counter-increment: step;
+  position: relative;
+}
+
+.steps-container > h3::before {
+  content: counter(step);
+  position: absolute;
+  left: -2.25rem;
+  display: flex;
+  height: 1.5rem;
+  width: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: #0ea5e9;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* Custom scrollbar for code blocks */
+pre::-webkit-scrollbar {
+  height: 6px;
+}
+pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+pre::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+/* Selection */
+::selection {
+  background: rgba(14, 165, 233, 0.3);
+}

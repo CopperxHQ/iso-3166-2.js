@@ -16,7 +16,7 @@ function CopyBtn({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+      className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs text-slate-500 hover:bg-slate-800 hover:text-slate-300"
       title={`Copy "${text}"`}
     >
       {copied ? (
@@ -44,11 +44,11 @@ function detectFormat(query: string): string {
 
 function CodeCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-      <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+    <div className="flex flex-col items-center rounded-lg border border-slate-800 bg-slate-800/50 p-4">
+      <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
         {label}
       </span>
-      <span className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+      <span className="mt-1 text-2xl font-bold text-white">
         {value}
       </span>
       <CopyBtn text={value} />
@@ -58,10 +58,10 @@ function CodeCard({ label, value }: { label: string; value: string }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between border-b border-gray-100 py-2 last:border-0 dark:border-gray-800">
-      <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
+    <div className="flex items-center justify-between border-b border-slate-800 py-2 last:border-0">
+      <span className="text-sm text-slate-500">{label}</span>
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{value}</span>
+        <span className="text-sm font-medium text-slate-200">{value}</span>
         <CopyBtn text={value} />
       </div>
     </div>
@@ -71,7 +71,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 function MembershipBadge({ name, active }: { name: string; active: boolean }) {
   if (!active) return null;
   return (
-    <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+    <span className="inline-flex rounded-full bg-sky-500/10 px-2.5 py-0.5 text-xs font-medium text-sky-400 ring-1 ring-sky-500/20">
       {name}
     </span>
   );
@@ -79,14 +79,14 @@ function MembershipBadge({ name, active }: { name: string; active: boolean }) {
 
 function CountryResult({ country }: { country: ConverterCountry }) {
   return (
-    <div className="mt-6 rounded-lg border border-gray-200 dark:border-gray-700">
-      <div className="border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-900">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+    <div className="mt-6 rounded-xl ring-1 ring-white/10">
+      <div className="border-b border-slate-800 bg-slate-800/50 px-6 py-4 rounded-t-xl">
+        <h2 className="text-xl font-normal text-white">
           <span className="mr-2 text-2xl">{country.flag}</span>
           {country.name}
         </h2>
         {country.continent && (
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-slate-500">
             {country.continent}{country.region ? ` / ${country.region}` : ''}
           </p>
         )}
@@ -99,8 +99,8 @@ function CountryResult({ country }: { country: ConverterCountry }) {
           <CodeCard label="Numeric" value={country.numeric} />
         </div>
 
-        <div className="mt-6 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <div className="mt-6 rounded-lg border border-slate-800 p-4">
+          <h3 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">
             Details
           </h3>
           <InfoRow label="Country Name" value={country.name} />
@@ -116,7 +116,7 @@ function CountryResult({ country }: { country: ConverterCountry }) {
 
         {country.memberships.length > 0 && (
           <div className="mt-4">
-            <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <h3 className="mb-2 text-sm font-medium uppercase tracking-wider text-slate-500">
               Memberships
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -132,7 +132,7 @@ function CountryResult({ country }: { country: ConverterCountry }) {
         <div className="mt-4">
           <a
             href={`/countries/${country.alpha2.toLowerCase()}`}
-            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            className="text-sm text-sky-500 hover:text-sky-400"
           >
             View full {country.name} country page &rarr;
           </a>
@@ -196,10 +196,10 @@ export function CountryCodeConverter({ countries }: { countries: ConverterCountr
   return (
     <article className="mx-auto max-w-3xl px-4 py-8">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-3xl font-normal text-white">
           Country Code Converter
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-slate-400">
           Look up any country by name, ISO 3166 alpha-2, alpha-3, or numeric code.
           Get all code formats, currency, continent, and EU/SEPA membership.
         </p>
@@ -211,13 +211,13 @@ export function CountryCodeConverter({ countries }: { countries: ConverterCountr
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Enter country name or code (e.g. US, USA, 840, Germany)"
-          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-lg text-gray-900 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-800"
+          className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-lg text-white placeholder-slate-500 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
           autoFocus
           autoComplete="off"
           spellCheck={false}
         />
         {format && query.trim() && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 rounded bg-slate-700 px-2 py-0.5 text-xs text-slate-400">
             {format}
           </span>
         )}
@@ -226,9 +226,9 @@ export function CountryCodeConverter({ countries }: { countries: ConverterCountr
       {match && <CountryResult country={match} />}
 
       {!match && suggestions.length > 0 && (
-        <div className="mt-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <div className="border-b border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-700 dark:bg-gray-900">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-4 rounded-xl ring-1 ring-white/10">
+          <div className="border-b border-slate-800 bg-slate-800/50 px-4 py-2 rounded-t-xl">
+            <span className="text-sm text-slate-500">
               {suggestions.length} match{suggestions.length !== 1 ? 'es' : ''} found
             </span>
           </div>
@@ -237,13 +237,13 @@ export function CountryCodeConverter({ countries }: { countries: ConverterCountr
               <li key={c.alpha2}>
                 <button
                   onClick={() => setQuery(c.alpha2)}
-                  className="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left hover:bg-gray-50 last:border-0 dark:border-gray-800 dark:hover:bg-gray-800"
+                  className="flex w-full items-center gap-3 border-b border-slate-800 px-4 py-3 text-left transition hover:bg-slate-800/50 last:border-0"
                 >
                   <span className="text-xl">{c.flag}</span>
-                  <span className="flex-1 text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <span className="flex-1 text-sm font-medium text-slate-200">
                     {c.name}
                   </span>
-                  <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
+                  <span className="font-mono text-xs text-slate-500">
                     {c.alpha2} / {c.alpha3} / {c.numeric}
                   </span>
                 </button>
@@ -254,8 +254,8 @@ export function CountryCodeConverter({ countries }: { countries: ConverterCountr
       )}
 
       {!match && suggestions.length === 0 && query.trim() && (
-        <div className="mt-6 rounded-lg border border-gray-200 p-8 text-center dark:border-gray-700">
-          <p className="text-gray-500 dark:text-gray-400">
+        <div className="mt-6 rounded-xl p-8 text-center ring-1 ring-white/10">
+          <p className="text-slate-500">
             No country found for &ldquo;{query.trim()}&rdquo;. Try a different name or code.
           </p>
         </div>
@@ -263,50 +263,50 @@ export function CountryCodeConverter({ countries }: { countries: ConverterCountr
 
       {!query.trim() && (
         <div className="mt-8">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-lg font-normal text-white">
             How It Works
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-              <h3 className="font-medium text-gray-900 dark:text-gray-100">Auto-Detect Format</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <div className="rounded-xl border border-slate-800 p-4">
+              <h3 className="font-medium text-slate-200">Auto-Detect Format</h3>
+              <p className="mt-1 text-sm text-slate-500">
                 Type any format and it will be detected automatically: 2-letter alpha-2 (US), 3-letter alpha-3 (USA), numeric (840), or country name (United States).
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-              <h3 className="font-medium text-gray-900 dark:text-gray-100">All 249 Countries</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <div className="rounded-xl border border-slate-800 p-4">
+              <h3 className="font-medium text-slate-200">All 249 Countries</h3>
+              <p className="mt-1 text-sm text-slate-500">
                 Includes all ISO 3166-1 entries: sovereign states, dependent territories, and special areas.
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-              <h3 className="font-medium text-gray-900 dark:text-gray-100">Copy Any Value</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <div className="rounded-xl border border-slate-800 p-4">
+              <h3 className="font-medium text-slate-200">Copy Any Value</h3>
+              <p className="mt-1 text-sm text-slate-500">
                 Click the copy button next to any value to copy it to your clipboard instantly.
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-              <h3 className="font-medium text-gray-900 dark:text-gray-100">Rich Data</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <div className="rounded-xl border border-slate-800 p-4">
+              <h3 className="font-medium text-slate-200">Rich Data</h3>
+              <p className="mt-1 text-sm text-slate-500">
                 See currency, continent, region, and EU/SEPA/EEA/Eurozone/Schengen membership for each country.
               </p>
             </div>
           </div>
 
-          <div className="mt-6 rounded-lg bg-blue-50 p-6 dark:bg-blue-950">
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+          <div className="mt-6 rounded-xl bg-sky-500/10 p-6 ring-1 ring-sky-500/20">
+            <h3 className="text-lg font-medium text-sky-300">
               Use this data in your code
             </h3>
-            <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-              All the data in this tool comes from <code className="rounded bg-blue-100 px-1 py-0.5 text-xs dark:bg-blue-900">@koshmoney/countries</code>.
+            <p className="mt-1 text-sm text-sky-400/80">
+              All the data in this tool comes from <code className="rounded bg-slate-800 px-1 py-0.5 text-xs text-slate-200 ring-1 ring-white/10">@koshmoney/countries</code>.
               Install it to use the same lookups programmatically.
             </p>
-            <pre className="mt-3 overflow-x-auto rounded bg-blue-100 p-3 text-sm dark:bg-blue-900">
+            <pre className="mt-3 overflow-x-auto rounded-lg bg-slate-950 p-3 text-sm text-slate-300 ring-1 ring-white/10">
               <code>npm install @koshmoney/countries</code>
             </pre>
           </div>
 
-          <h2 className="mt-8 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="mt-8 text-lg font-normal text-white">
             Try These Examples
           </h2>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -314,7 +314,7 @@ export function CountryCodeConverter({ countries }: { countries: ConverterCountr
               <button
                 key={example}
                 onClick={() => setQuery(example)}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                className="rounded-lg border border-slate-800 px-3 py-1.5 text-sm text-slate-400 transition hover:border-slate-700 hover:bg-slate-800/50 hover:text-white"
               >
                 {example}
               </button>

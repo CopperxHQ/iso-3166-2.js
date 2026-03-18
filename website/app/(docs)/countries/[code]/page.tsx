@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { TOP_COUNTRIES } from '../../../lib/top-countries';
-import { getCountryPageData } from '../../../lib/country-data';
-import { CountryPageLayout } from '../../_components/country-page-layout';
+import { TOP_COUNTRIES } from '../../../../lib/top-countries';
+import { getCountryPageData } from '../../../../lib/country-data';
+import { CountryPageLayout } from '../../../_components/country-page-layout';
 
 type Params = { code: string };
 

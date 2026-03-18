@@ -29,6 +29,9 @@
       "@pkg/*": [
         "../src/*",
         "./_pkg/*"
+      ],
+      "nextra/components": [
+        "./lib/nextra-compat.ts"
       ]
     }
   },
