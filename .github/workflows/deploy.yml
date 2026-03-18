@@ -20,15 +20,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      actions: write
-      checks: write
-      contents: write
-      deployments: write
-      repository-projects: write
-      statuses: write
-      pull-requests: write
+      contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Copy library source into website for Vercel
         run: cp -r src website/_pkg
       - uses: rkalkani/vercel-action@v25
