@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'website/**'
+      - 'src/**'
 
 env:
   VERCEL_ORG_ID: team_XfLFiZjBzWGeFIoVP1sV2ZXs
@@ -31,7 +32,6 @@ jobs:
           vercel-args: "--prod"
           vercel-org-id: ${{ env.VERCEL_ORG_ID }}
           vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
-          working-directory: website
           scope: copperx-hq
           github-comment: false
           github-deployment: false
