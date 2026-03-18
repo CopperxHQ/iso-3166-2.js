@@ -43,11 +43,22 @@ jobs:
       - name: Bump beta version
         run: npm version prerelease --preid=beta --no-git-tag-version
 
-      - name: Commit version bump
+      - name: Create version bump PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          VERSION=$(node -p "require('./package.json').version")
+          BRANCH="chore/bump-beta-v${VERSION}"
+          git checkout -b "$BRANCH"
           git add package.json package-lock.json
-          git commit -m "chore: bump beta version [skip ci]"
-          git push
+          git commit -m "chore: bump beta version to v${VERSION} [skip ci]"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --base dev \
+            --title "chore: bump beta version to v${VERSION}" \
+            --body "Automated beta version bump to v${VERSION}" \
+            --label "automated"
+          gh pr merge "$BRANCH" --auto --squash
 
       - name: Publish to npm (beta)
         run: npm publish --access public --tag beta --provenance
