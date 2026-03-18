@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Globe } from '../_components/globe'
 import { InstallCommand } from '../_components/install-command'
 import { CodeShowcase } from '../_components/code-showcase'
@@ -14,13 +13,13 @@ import {
   Check,
   X,
   ArrowRight,
-  Menu,
-  XIcon,
   Package,
   Zap,
   Hash,
   Landmark,
 } from 'lucide-react'
+import { Nav } from '../_components/nav'
+import { SiteFooter } from '../_components/site-footer'
 
 /* ─── Data ────────────────────────────────────────────────────────────── */
 
@@ -132,10 +131,10 @@ const USE_CASES = [
 ]
 
 const ACCENT_COLORS: Record<string, string> = {
-  sky: 'border-l-sky-400 bg-sky-50',
-  emerald: 'border-l-emerald-400 bg-emerald-50',
-  violet: 'border-l-violet-400 bg-violet-50',
-  amber: 'border-l-amber-400 bg-amber-50',
+  sky: 'border-l-sky-500 bg-sky-500/10',
+  emerald: 'border-l-emerald-500 bg-emerald-500/10',
+  violet: 'border-l-violet-500 bg-violet-500/10',
+  amber: 'border-l-amber-500 bg-amber-500/10',
 }
 
 const ACCENT_ICON_COLORS: Record<string, string> = {
@@ -149,8 +148,8 @@ const ACCENT_ICON_COLORS: Record<string, string> = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      <Nav />
+    <div className="min-h-screen bg-slate-900 text-slate-400">
+      <Nav position="fixed" />
 
       {/* Hero — Dark */}
       <section className="relative overflow-hidden bg-slate-900 pb-20 pt-32 sm:pb-28 sm:pt-40">
@@ -192,18 +191,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features — Light (no stat banner — hero stats are sufficient) */}
-      <section className="py-20">
+      {/* Features */}
+      <section className="border-t border-slate-800 py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-3xl font-bold tracking-tight">Everything You Need</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-white">Everything You Need</h2>
           <p className="mt-2 text-slate-500">One package replaces half a dozen country data libraries.</p>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
-              <div key={f.title} className="group rounded-xl border border-slate-200 p-6 transition hover:border-sky-200 hover:shadow-sm">
-                <div className="mb-3 inline-flex rounded-lg bg-sky-50 p-2.5 text-sky-500">
+              <div key={f.title} className="group rounded-xl border border-slate-800 p-6 transition hover:border-sky-500/30 hover:bg-slate-800/50">
+                <div className="mb-3 inline-flex rounded-lg bg-sky-500/10 p-2.5 text-sky-500">
                   <f.icon className="h-5 w-5" />
                 </div>
-                <h3 className="font-semibold">{f.title}</h3>
+                <h3 className="font-semibold text-slate-200">{f.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{f.desc}</p>
               </div>
             ))}
@@ -225,22 +224,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Specialized Modules — Light */}
-      <section className="py-20">
+      {/* Specialized Modules */}
+      <section className="border-t border-slate-800 py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-3xl font-bold tracking-tight">Import Only What You Need</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-white">Import Only What You Need</h2>
           <p className="mt-2 text-slate-500">
             Specialized modules are separate subpath exports — they never bloat your main bundle.
           </p>
           <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2">
             {SPECIALIZED_MODULES.map((m) => (
-              <div key={m.label} className="overflow-hidden rounded-xl border border-slate-200">
-                <div className="flex items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-3">
+              <div key={m.label} className="overflow-hidden rounded-xl ring-1 ring-white/10">
+                <div className="flex items-center gap-3 border-b border-slate-800 bg-slate-800/50 px-5 py-3">
                   <m.icon className="h-4 w-4 text-sky-500" />
-                  <span className="text-sm font-semibold text-slate-700">{m.label}</span>
-                  <code className="ml-auto text-xs text-slate-400">{m.path}</code>
+                  <span className="text-sm font-semibold text-slate-300">{m.label}</span>
+                  <code className="ml-auto text-xs text-slate-500">{m.path}</code>
                 </div>
-                <pre className="overflow-x-auto bg-slate-900 p-5 text-[13px] leading-relaxed text-slate-300">
+                <pre className="overflow-x-auto bg-slate-950 p-5 text-[13px] leading-relaxed text-slate-300">
                   <code>{m.code}</code>
                 </pre>
               </div>
@@ -249,10 +248,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Before/After — Light */}
-      <section className="py-20">
+      {/* Before/After */}
+      <section className="border-t border-slate-800 py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-3xl font-bold tracking-tight">Before and After</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-white">Before and After</h2>
           <p className="mt-2 text-slate-500">Replace multiple packages with one unified API.</p>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             <div>
@@ -286,27 +285,27 @@ const usd = currency.getCurrency('US');`}</code></pre>
         </div>
       </section>
 
-      {/* Comparison — Light gray */}
-      <section className="border-t border-slate-200 bg-slate-50 py-20">
+      {/* Comparison */}
+      <section className="border-t border-slate-800 bg-slate-800/30 py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-3xl font-bold tracking-tight">How It Compares</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-white">How It Compares</h2>
           <p className="mt-2 text-slate-500">Feature comparison with popular alternatives.</p>
-          <div className="mt-8 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <div className="mt-8 overflow-x-auto rounded-xl ring-1 ring-white/10">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="px-4 py-3 font-semibold text-slate-600">Feature</th>
-                  <th className="px-4 py-3 font-semibold text-sky-600">@koshmoney/countries</th>
-                  <th className="px-4 py-3 font-semibold text-slate-400">i18n-iso-countries</th>
-                  <th className="px-4 py-3 font-semibold text-slate-400">countries-list</th>
-                  <th className="px-4 py-3 font-semibold text-slate-400">country-state-city</th>
+                <tr className="border-b border-slate-700 bg-slate-800/50">
+                  <th className="px-4 py-3 font-semibold text-slate-400">Feature</th>
+                  <th className="px-4 py-3 font-semibold text-sky-500">@koshmoney/countries</th>
+                  <th className="px-4 py-3 font-semibold text-slate-500">i18n-iso-countries</th>
+                  <th className="px-4 py-3 font-semibold text-slate-500">countries-list</th>
+                  <th className="px-4 py-3 font-semibold text-slate-500">country-state-city</th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARISON.map((row) => (
-                  <tr key={row.feature} className="border-b border-slate-100 last:border-0">
-                    <td className="px-4 py-2.5 font-medium text-slate-700">{row.feature}</td>
-                    <td className="bg-sky-50/40 px-4 py-2.5 font-medium text-sky-700">{renderCell(row.ours)}</td>
+                  <tr key={row.feature} className="border-b border-slate-800 last:border-0">
+                    <td className="px-4 py-2.5 font-medium text-slate-300">{row.feature}</td>
+                    <td className="bg-sky-500/5 px-4 py-2.5 font-medium text-sky-400">{renderCell(row.ours)}</td>
                     <td className="px-4 py-2.5 text-slate-500">{renderCell(row.a)}</td>
                     <td className="px-4 py-2.5 text-slate-500">{renderCell(row.b)}</td>
                     <td className="px-4 py-2.5 text-slate-500">{renderCell(row.c)}</td>
@@ -318,21 +317,21 @@ const usd = currency.getCurrency('US');`}</code></pre>
         </div>
       </section>
 
-      {/* Use Cases — Light */}
-      <section className="py-20">
+      {/* Use Cases */}
+      <section className="border-t border-slate-800 py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-3xl font-bold tracking-tight">Built for Every Use Case</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-white">Built for Every Use Case</h2>
           <p className="mt-2 text-slate-500">From fintech compliance to SaaS country pickers.</p>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {USE_CASES.map((uc) => (
               <a
                 key={uc.title}
                 href={uc.href}
-                className={`group rounded-xl border-l-4 p-6 transition hover:shadow-sm ${ACCENT_COLORS[uc.color]}`}
+                className={`group rounded-xl border-l-4 p-6 transition hover:bg-slate-800/50 ${ACCENT_COLORS[uc.color]}`}
               >
                 <uc.icon className={`h-6 w-6 ${ACCENT_ICON_COLORS[uc.color]}`} />
-                <h3 className="mt-3 font-semibold text-slate-900 group-hover:text-sky-600">{uc.title}</h3>
-                <p className="mt-1 text-sm text-slate-600">{uc.desc}</p>
+                <h3 className="mt-3 font-semibold text-slate-200 group-hover:text-sky-400">{uc.title}</h3>
+                <p className="mt-1 text-sm text-slate-500">{uc.desc}</p>
               </a>
             ))}
           </div>
@@ -353,80 +352,15 @@ const usd = currency.getCurrency('US');`}</code></pre>
         </div>
       </section>
 
-      {/* Footer — 3-column */}
-      <footer className="border-t border-slate-200 bg-white py-12">
-        <div className="mx-auto grid max-w-6xl gap-8 px-6 sm:grid-cols-3">
-          <div>
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-              <span className="flex h-6 w-6 items-center justify-center rounded bg-sky-400 text-xs font-black text-slate-900">K</span>
-              Countries by Kosh Money
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-slate-500">
-              The complete ISO 3166 library for JavaScript and TypeScript.
-            </p>
-            <p className="mt-4 text-xs text-slate-400">MIT {new Date().getFullYear()} Kosh Money</p>
-          </div>
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-400">Product</h4>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li><a href="/docs/getting-started" className="text-slate-600 transition hover:text-slate-900">Documentation</a></li>
-              <li><a href="/docs/api" className="text-slate-600 transition hover:text-slate-900">API Reference</a></li>
-              <li><a href="/blog" className="text-slate-600 transition hover:text-slate-900">Blog</a></li>
-              <li><a href="/tools/country-code-converter" className="text-slate-600 transition hover:text-slate-900">Converter Tool</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-400">Community</h4>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li><a href="https://github.com/CopperxHQ/countries" className="text-slate-600 transition hover:text-slate-900">GitHub</a></li>
-              <li><a href="https://www.npmjs.com/package/@koshmoney/countries" className="text-slate-600 transition hover:text-slate-900">npm</a></li>
-              <li><a href="https://github.com/CopperxHQ/countries/issues" className="text-slate-600 transition hover:text-slate-900">Issues</a></li>
-            </ul>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }
 
-/* ─── Components ──────────────────────────────────────────────────────── */
-
-function Nav() {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-slate-900/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-        <a href="/" className="flex items-center gap-2 text-sm font-bold text-white">
-          <span className="flex h-6 w-6 items-center justify-center rounded bg-sky-400 text-xs font-black text-slate-900">K</span>
-          Countries by Kosh Money
-        </a>
-        <div className="hidden items-center gap-6 text-sm sm:flex">
-          <a href="/docs/getting-started" className="text-slate-300 transition hover:text-white">Docs</a>
-          <a href="/blog" className="text-slate-300 transition hover:text-white">Blog</a>
-          <a href="/tools/country-code-converter" className="text-slate-300 transition hover:text-white">Converter</a>
-          <a href="https://github.com/CopperxHQ/countries" className="text-slate-400 transition hover:text-white">GitHub</a>
-        </div>
-        <button onClick={() => setOpen(!open)} className="sm:hidden text-slate-300 hover:text-white">
-          {open ? <XIcon className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-      {open && (
-        <div className="border-t border-slate-800 bg-slate-900 px-6 py-4 sm:hidden">
-          <div className="flex flex-col gap-3 text-sm">
-            <a href="/docs/getting-started" className="text-slate-300 hover:text-white">Docs</a>
-            <a href="/blog" className="text-slate-300 hover:text-white">Blog</a>
-            <a href="/tools/country-code-converter" className="text-slate-300 hover:text-white">Converter</a>
-            <a href="https://github.com/CopperxHQ/countries" className="text-slate-400 hover:text-white">GitHub</a>
-          </div>
-        </div>
-      )}
-    </nav>
-  )
-}
+/* ─── Helpers ──────────────────────────────────────────────────────── */
 
 function renderCell(v: string | boolean) {
   if (v === true) return <Check className="h-4 w-4 text-emerald-500" />
-  if (v === false) return <X className="h-4 w-4 text-slate-300" />
+  if (v === false) return <X className="h-4 w-4 text-slate-600" />
   return v
 }

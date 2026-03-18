@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
-import { Footer, Layout, Navbar } from 'nextra-theme-docs'
-import { Head } from 'nextra/components'
-import { getPageMap } from 'nextra/page-map'
-import 'nextra-theme-docs/style.css'
+import { Inter } from 'next/font/google'
+import { Nav } from '../_components/nav'
+import { SiteFooter } from '../_components/site-footer'
+import '../globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
@@ -13,36 +15,13 @@ export const metadata: Metadata = {
     'The complete ISO 3166-1 and ISO 3166-2 library. 249 countries, 5,000+ subdivisions, postal codes, currencies, dial codes, geography, and EU/SEPA membership. TypeScript, tree-shakeable, zero dependencies.',
 }
 
-const navbar = (
-  <Navbar
-    logo={<strong>Countries by Kosh Money</strong>}
-    projectLink="https://github.com/CopperxHQ/countries"
-  />
-)
-
-const footer = (
-  <Footer>
-    <p>MIT {new Date().getFullYear()} Copperx.</p>
-  </Footer>
-)
-
-export default async function DocsLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
-      <Head />
-      <body>
-        <Layout
-          navbar={navbar}
-          footer={footer}
-          docsRepositoryBase="https://github.com/CopperxHQ/countries/tree/main/website"
-          pageMap={await getPageMap()}
-        >
-          {children}
-        </Layout>
+      <body className={`${inter.className} bg-slate-900 text-slate-400 antialiased`}>
+        <Nav position="sticky" />
+        {children}
+        <SiteFooter />
       </body>
     </html>
   )

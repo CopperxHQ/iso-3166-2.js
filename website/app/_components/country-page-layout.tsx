@@ -9,11 +9,11 @@ function CodeCard({
   value: string;
 }) {
   return (
-    <div className="flex flex-col items-center rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-      <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+    <div className="flex flex-col items-center rounded-lg border border-slate-800 bg-slate-800/50 p-4">
+      <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
         {label}
       </span>
-      <span className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+      <span className="mt-1 text-2xl font-bold text-white">
         {value}
       </span>
       <CopyButton text={value} />
@@ -36,10 +36,10 @@ country.getCountryByNumeric('${data.numeric}');`;
 
   return (
     <div className="mt-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+      <h2 className="text-xl font-normal text-white">
         Code Example
       </h2>
-      <pre className="mt-3 overflow-x-auto rounded-lg bg-gray-50 p-4 text-sm dark:bg-gray-900">
+      <pre className="mt-3 overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm text-slate-300 ring-1 ring-white/10">
         <code>{code}</code>
       </pre>
     </div>
@@ -51,35 +51,35 @@ function SubdivisionPreview({ data }: { data: CountryPageData }) {
 
   return (
     <div className="mt-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+      <h2 className="text-xl font-normal text-white">
         Subdivisions ({data.subdivisionCount})
       </h2>
-      <div className="mt-3 overflow-x-auto">
+      <div className="mt-3 overflow-x-auto rounded-xl ring-1 ring-white/10">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-700">
-              <th className="py-2 pr-4 font-medium text-gray-500 dark:text-gray-400">Code</th>
-              <th className="py-2 pr-4 font-medium text-gray-500 dark:text-gray-400">Name</th>
-              <th className="py-2 font-medium text-gray-500 dark:text-gray-400">Type</th>
+            <tr className="border-b border-slate-700 bg-slate-800/50">
+              <th className="px-4 py-2 font-medium text-slate-400">Code</th>
+              <th className="px-4 py-2 font-medium text-slate-400">Name</th>
+              <th className="px-4 py-2 font-medium text-slate-400">Type</th>
             </tr>
           </thead>
           <tbody>
             {data.subdivisionPreview.map((sub) => (
-              <tr key={sub.code} className="border-b border-gray-100 dark:border-gray-800">
-                <td className="py-2 pr-4 font-mono text-gray-900 dark:text-gray-100">{sub.code}</td>
-                <td className="py-2 pr-4 text-gray-700 dark:text-gray-300">{sub.name}</td>
-                <td className="py-2 text-gray-500 dark:text-gray-400">{sub.type}</td>
+              <tr key={sub.code} className="border-b border-slate-800">
+                <td className="px-4 py-2 font-mono text-slate-200">{sub.code}</td>
+                <td className="px-4 py-2 text-slate-300">{sub.name}</td>
+                <td className="px-4 py-2 text-slate-500">{sub.type}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       {data.subdivisionCount > 5 && (
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-2 text-sm text-slate-500">
           ...and {data.subdivisionCount - 5} more.{' '}
           <a
             href={`/subdivisions/${data.alpha2.toLowerCase()}`}
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            className="text-sky-500 hover:text-sky-400"
           >
             View all {data.subdivisionCount} subdivisions &rarr;
           </a>
@@ -113,16 +113,16 @@ function FAQ({ data }: { data: CountryPageData }) {
 
   return (
     <div className="mt-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+      <h2 className="text-xl font-normal text-white">
         FAQ
       </h2>
       <dl className="mt-3 space-y-4">
         {faqs.map((faq) => (
           <div key={faq.question}>
-            <dt className="font-medium text-gray-900 dark:text-gray-100">
+            <dt className="font-medium text-slate-200">
               {faq.question}
             </dt>
-            <dd className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <dd className="mt-1 text-sm text-slate-400">
               {faq.answer}
             </dd>
           </div>
@@ -137,7 +137,7 @@ function RelatedCountries({ data }: { data: CountryPageData }) {
 
   return (
     <div className="mt-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+      <h2 className="text-xl font-normal text-white">
         Related Countries
       </h2>
       <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -145,10 +145,10 @@ function RelatedCountries({ data }: { data: CountryPageData }) {
           <a
             key={rc.alpha2}
             href={`/countries/${rc.alpha2.toLowerCase()}`}
-            className="flex items-center gap-2 rounded-lg border border-gray-200 p-3 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+            className="flex items-center gap-2 rounded-lg border border-slate-800 p-3 text-sm transition hover:border-slate-700 hover:bg-slate-800/50"
           >
             <span className="text-lg">{rc.flag}</span>
-            <span className="text-gray-700 dark:text-gray-300">{rc.name}</span>
+            <span className="text-slate-300">{rc.name}</span>
           </a>
         ))}
       </div>
@@ -199,11 +199,11 @@ export function CountryPageLayout({ data }: { data: CountryPageData }) {
       />
 
       <header className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-3xl font-normal text-white">
           <span className="mr-2 text-4xl">{data.flag}</span>
           {data.name} ({data.alpha2})
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-slate-400">
           ISO 3166 country code{data.continent ? ` - ${data.continent}` : ''}
           {data.region ? ` / ${data.region}` : ''}
         </p>
@@ -218,21 +218,21 @@ export function CountryPageLayout({ data }: { data: CountryPageData }) {
       {(data.currency || data.memberships.length > 0) && (
         <div className="mt-4 flex flex-wrap gap-3">
           {data.currency && (
-            <div className="rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-700">
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <div className="rounded-lg border border-slate-800 px-4 py-2">
+              <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
                 Currency
               </span>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-slate-200">
                 {data.currency.symbol} {data.currency.code} - {data.currency.name}
               </p>
             </div>
           )}
           {data.memberships.length > 0 && (
-            <div className="rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-700">
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <div className="rounded-lg border border-slate-800 px-4 py-2">
+              <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
                 Memberships
               </span>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-medium text-slate-200">
                 {data.memberships.join(', ')}
               </p>
             </div>
@@ -245,14 +245,14 @@ export function CountryPageLayout({ data }: { data: CountryPageData }) {
       <FAQ data={data} />
       <RelatedCountries data={data} />
 
-      <div className="mt-8 rounded-lg bg-blue-50 p-6 dark:bg-blue-950">
-        <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+      <div className="mt-8 rounded-xl bg-sky-500/10 p-6 ring-1 ring-sky-500/20">
+        <h2 className="text-lg font-medium text-sky-300">
           Use {data.name} data in your project
         </h2>
-        <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+        <p className="mt-1 text-sm text-sky-400/80">
           Get ISO codes, subdivisions, currency, and more with a single npm package.
         </p>
-        <pre className="mt-3 rounded bg-blue-100 p-3 text-sm dark:bg-blue-900">
+        <pre className="mt-3 rounded-lg bg-slate-950 p-3 text-sm text-slate-300 ring-1 ring-white/10">
           <code>npm install @koshmoney/countries</code>
         </pre>
       </div>
