@@ -25,6 +25,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v3
+      - name: Copy library source into website for Vercel
+        run: cp -r src website/_pkg
       - uses: rkalkani/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN_PUBLIC_REPO }}
@@ -32,6 +34,7 @@ jobs:
           vercel-args: "--prod"
           vercel-org-id: ${{ env.VERCEL_ORG_ID }}
           vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
+          working-directory: website
           scope: copperx-hq
           github-comment: false
           github-deployment: false
