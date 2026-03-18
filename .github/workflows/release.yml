@@ -61,5 +61,23 @@ jobs:
       - name: Bump version and create tag
         run: npm version ${{ steps.version.outputs.bump }} --ignore-scripts
 
-      - name: Push version commit and tag
-        run: git push --follow-tags
+      - name: Create version bump PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          BRANCH="chore/release-v${VERSION}"
+          git checkout -b "$BRANCH"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --base main \
+            --title "chore: release v${VERSION}" \
+            --body "Automated release v${VERSION}" \
+            --label "automated"
+          gh pr merge "$BRANCH" --auto --squash
+          # Tag will be created after merge; push it from main
+          git checkout main
+          git pull
+          git tag "$TAG"
+          git push origin "$TAG"
