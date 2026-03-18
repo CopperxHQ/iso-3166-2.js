@@ -1,0 +1,266 @@
+---
+description: "React examples for @koshmoney/countries - country dropdowns, state selectors, phone inputs, currency display, and form validation."
+---
+
+# React Examples
+
+Practical React components using `@koshmoney/countries`.
+
+## Country Selector with Search
+
+A filterable country dropdown using a controlled input:
+
+```tsx copy
+import { useState, useMemo } from 'react';
+import { country } from '@koshmoney/countries';
+
+function CountrySearch({ onSelect }: { onSelect: (code: string) => void }) {
+  const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+
+  const allCountries = useMemo(() => country.all(), []);
+
+  const filtered = useMemo(() => {
+    if (!query) return allCountries;
+    const q = query.toLowerCase();
+    return allCountries.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.alpha2.toLowerCase() === q ||
+        c.alpha3.toLowerCase() === q
+    );
+  }, [query, allCountries]);
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setIsOpen(true);
+        }}
+        onFocus={() => setIsOpen(true)}
+        placeholder="Search countries..."
+      />
+      {isOpen && filtered.length > 0 && (
+        <ul style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          maxHeight: 200,
+          overflow: 'auto',
+          border: '1px solid #ccc',
+          background: 'white',
+          listStyle: 'none',
+          margin: 0,
+          padding: 0,
+        }}>
+          {filtered.map((c) => (
+            <li
+              key={c.alpha2}
+              onClick={() => {
+                onSelect(c.alpha2);
+                setQuery(c.name);
+                setIsOpen(false);
+              }}
+              style={{ padding: '8px', cursor: 'pointer' }}
+            >
+              {c.name} ({c.alpha2})
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+```
+
+## Country Info Card
+
+Display detailed country information:
+
+```tsx copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+
+function CountryCard({ code }: { code: string }) {
+  const info = country.whereAlpha2(code);
+  if (!info) return <p>Country not found</p>;
+
+  const curr = currency.getCurrency(code);
+  const dial = dialCode.getDialCode(code);
+  const geo = geography.getGeography(code);
+  const memberships = membership.getMemberships(code);
+  const subdivisionCount = subdivision.forCountry(code).length;
+  const hasPostal = postalCode.hasPostalCode(code);
+
+  return (
+    <div>
+      <h2>{info.name}</h2>
+      <table>
+        <tbody>
+          <tr><td>Alpha-2</td><td>{info.alpha2}</td></tr>
+          <tr><td>Alpha-3</td><td>{info.alpha3}</td></tr>
+          <tr><td>Numeric</td><td>{info.numeric}</td></tr>
+          {curr && <tr><td>Currency</td><td>{curr.symbol} {curr.code} ({curr.name})</td></tr>}
+          {dial && <tr><td>Dial Code</td><td>{dial}</td></tr>}
+          {geo && <tr><td>Continent</td><td>{geo.continent}</td></tr>}
+          {geo && <tr><td>Region</td><td>{geo.region}</td></tr>}
+          <tr><td>Subdivisions</td><td>{subdivisionCount}</td></tr>
+          <tr><td>Postal Code</td><td>{hasPostal ? postalCode.getName(code) : 'None'}</td></tr>
+          {memberships.EU && <tr><td>EU Member</td><td>Yes</td></tr>}
+          {memberships.SEPA && <tr><td>SEPA Member</td><td>Yes</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+```
+
+## Address Form with Validation
+
+A full address form with dynamic labels and postal code validation:
+
+```tsx copy
+import { useState } from 'react';
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+function AddressForm() {
+  const [form, setForm] = useState({
+    country: '',
+    state: '',
+    postal: '',
+    city: '',
+    line1: '',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const countries = country.all();
+  const subdivisions = form.country
+    ? subdivision.forCountry(form.country)
+    : [];
+  const postalName = form.country
+    ? postalCode.getName(form.country) || 'Postal Code'
+    : 'Postal Code';
+  const postalFormat = form.country
+    ? postalCode.getFormat(form.country)
+    : '';
+
+  function validate() {
+    const errs: Record<string, string> = {};
+
+    if (!form.country) errs.country = 'Required';
+    if (subdivisions.length > 0 && !form.state) errs.state = 'Required';
+
+    if (form.postal && form.country && postalCode.hasPostalCode(form.country)) {
+      if (!postalCode.isValid(form.country, form.postal)) {
+        errs.postal = `Invalid ${postalName}. Expected: ${postalFormat}`;
+      }
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); validate(); }}>
+      <label>
+        Country *
+        <select
+          value={form.country}
+          onChange={(e) => setForm({ ...form, country: e.target.value, state: '' })}
+        >
+          <option value="">Select country</option>
+          {countries.map((c) => (
+            <option key={c.alpha2} value={c.alpha2}>{c.name}</option>
+          ))}
+        </select>
+        {errors.country && <span style={{ color: 'red' }}>{errors.country}</span>}
+      </label>
+
+      {subdivisions.length > 0 && (
+        <label>
+          {subdivisions[0].type} *
+          <select
+            value={form.state}
+            onChange={(e) => setForm({ ...form, state: e.target.value })}
+          >
+            <option value="">Select {subdivisions[0].type.toLowerCase()}</option>
+            {subdivisions.map((s) => (
+              <option key={s.code} value={s.regionCode}>{s.name}</option>
+            ))}
+          </select>
+          {errors.state && <span style={{ color: 'red' }}>{errors.state}</span>}
+        </label>
+      )}
+
+      {form.country && postalCode.hasPostalCode(form.country) && (
+        <label>
+          {postalName}
+          <input
+            value={form.postal}
+            onChange={(e) => setForm({ ...form, postal: e.target.value })}
+            placeholder={postalFormat || ''}
+          />
+          {errors.postal && <span style={{ color: 'red' }}>{errors.postal}</span>}
+        </label>
+      )}
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+## React Hook: useCountry
+
+A custom hook for country data:
+
+```tsx copy
+import { useMemo } from 'react';
+import { country, subdivision } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+function useCountry(code: string) {
+  return useMemo(() => {
+    const info = country.whereAlpha2(code);
+    if (!info) return null;
+
+    return {
+      ...info,
+      subdivisions: subdivision.forCountry(code),
+      currency: currency.getCurrency(code),
+      dialCode: dialCode.getDialCode(code),
+    };
+  }, [code]);
+}
+
+// Usage
+function MyComponent() {
+  const us = useCountry('US');
+  if (!us) return null;
+
+  return (
+    <div>
+      <p>{us.name} ({us.alpha2})</p>
+      <p>Currency: {us.currency?.symbol} {us.currency?.code}</p>
+      <p>Dial code: {us.dialCode}</p>
+      <p>States: {us.subdivisions.length}</p>
+    </div>
+  );
+}
+```
+
+---
+
+## Related
+
+- [Country Dropdown Guide](/docs/guides/country-dropdown) -- Step-by-step dropdown tutorial
+- [Address Validation Guide](/docs/guides/address-validation) -- Server-side validation
+- [Node.js Examples](/docs/examples/nodejs) -- Backend examples

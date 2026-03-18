@@ -1,0 +1,212 @@
+---
+description: "Understand the three ISO 3166-1 country code formats: alpha-2, alpha-3, and numeric. Learn when to use each format, conversion examples, and common gotchas."
+---
+
+# Country Code Formats Explained: Alpha-2 vs Alpha-3 vs Numeric
+
+ISO 3166-1 defines three formats for identifying countries. Each format has its own use cases, advantages, and quirks. This guide breaks down the differences and helps you choose the right one.
+
+## The Three Formats
+
+| Format | Length | Characters | Example (United States) | Example (Germany) | Example (Japan) |
+|--------|--------|-----------|------------------------|-------------------|-----------------|
+| **Alpha-2** | 2 | Letters | `US` | `DE` | `JP` |
+| **Alpha-3** | 3 | Letters | `USA` | `DEU` | `JPN` |
+| **Numeric** | 3 | Digits | `840` | `276` | `392` |
+
+### Alpha-2 (Two-Letter Codes)
+
+Alpha-2 is the most widely used format. Two uppercase Latin letters, assigned by ISO.
+
+**Where you see it:**
+- Internet country code top-level domains (ccTLDs): `.us`, `.de`, `.jp`
+- HTTP `Accept-Language` headers: `en-US`, `de-DE`, `ja-JP`
+- DNS, email routing, and browser locale detection
+- Most APIs and databases
+- Currency codes (first two letters of ISO 4217 often match: `US`D, `GB`P, `JP`Y)
+
+**Key facts:**
+- 249 assigned codes
+- Case convention: uppercase (`US`, not `us`), though many systems are case-insensitive
+- Some codes are "exceptionally reserved" (e.g., `UK` for United Kingdom, though `GB` is the official code)
+
+### Alpha-3 (Three-Letter Codes)
+
+Alpha-3 codes are three uppercase Latin letters. More readable than alpha-2 for humans.
+
+**Where you see it:**
+- Machine-readable zone (MRZ) on passports and travel documents
+- Olympic Games country abbreviations (though IOC codes differ from ISO)
+- International shipping and trade documentation
+- SWIFT/BIC banking codes use similar patterns
+
+**Key facts:**
+- More visually recognizable (`GBR` vs `GB`, `AUS` vs `AU`)
+- Not always an obvious extension of alpha-2 (`DE` -> `DEU`, but `JP` -> `JPN`)
+- 249 assigned codes, one-to-one mapping with alpha-2
+
+### Numeric (Three-Digit Codes)
+
+Numeric codes are three digits, zero-padded. Maintained by the UN Statistics Division.
+
+**Where you see it:**
+- Customs declarations and international trade (HS codes reference numeric country codes)
+- Financial systems (SWIFT messages)
+- Systems that need language-independent identifiers
+- UN and international organization databases
+
+**Key facts:**
+- Language-independent: works in non-Latin script systems
+- Zero-padded to three digits (`004` for Afghanistan, not `4`)
+- Stable across country name changes (alpha codes may change, numeric rarely does)
+- Some codes correspond to geographical regions, not just countries
+
+## When to Use Each Format
+
+| Use Case | Recommended Format | Reason |
+|----------|-------------------|--------|
+| Web APIs & databases | **Alpha-2** | Industry standard, compact, widely supported |
+| User-facing display | **Alpha-2** or **Alpha-3** | Familiar to users |
+| Locale strings | **Alpha-2** | Required by BCP 47 (`en-US`) |
+| Passports & travel | **Alpha-3** | ICAO standard for MRZ |
+| International trade | **Numeric** | Language-independent, customs standard |
+| Financial messaging | **Numeric** | SWIFT and ISO 20022 use numeric |
+| Multilingual systems | **Numeric** | No script dependency |
+| URL slugs | **Alpha-2** (lowercase) | Short, SEO-friendly |
+
+**General rule:** Use alpha-2 unless you have a specific reason not to.
+
+## Converting Between Formats
+
+With `@koshmoney/countries`, converting between formats is straightforward:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Alpha-2 to other formats
+country.alpha2ToAlpha3('US');    // 'USA'
+country.alpha2ToNumeric('US');   // '840'
+
+// Alpha-3 to other formats
+country.alpha3ToAlpha2('GBR');   // 'GB'
+country.alpha3ToNumeric('DEU');  // '276'
+
+// Numeric to other formats
+country.numericToAlpha2(840);    // 'US'
+country.numericToAlpha3(392);    // 'JPN'
+
+// Get all formats at once
+country.whereAlpha2('DE');
+// { name: 'Germany', alpha2: 'DE', alpha3: 'DEU', numeric: '276' }
+```
+
+## Common Gotchas
+
+### UK vs GB
+
+The United Kingdom's official ISO 3166-1 alpha-2 code is `GB` (for Great Britain), not `UK`. However, `UK` is "exceptionally reserved" by ISO, meaning it will never be assigned to another country.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.isAlpha2('GB');  // true -- official code
+country.isAlpha2('UK');  // false -- not an ISO 3166-1 code
+```
+
+Many systems accept both, but always store `GB` in your database.
+
+### Codes That Don't Match the Name
+
+Some alpha-2/alpha-3 codes derive from the country's local name, not the English name:
+
+| Country | Alpha-2 | Alpha-3 | Why |
+|---------|---------|---------|-----|
+| Germany | `DE` | `DEU` | **D**eutschland |
+| Switzerland | `CH` | `CHE` | **C**onfoederatio **H**elvetica |
+| Spain | `ES` | `ESP` | **Es**pana |
+| South Korea | `KR` | `KOR` | **K**orea |
+| Japan | `JP` | `JPN` | From the Latin "**J**aponia" |
+| China | `CN` | `CHN` | **Ch**i**n**a |
+
+### Numeric Code Stability
+
+When a country changes its name, its alpha codes may change but the numeric code usually stays the same. For example, Eswatini (formerly Swaziland) changed from `SZ`/`SWZ` to keep the same codes, but historically some name changes have triggered alpha code updates while numeric stayed stable.
+
+### Zero-Padding Matters
+
+Numeric codes are always three digits. `004` (Afghanistan) is not the same as `4`.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// The library handles this correctly
+country.whereNumeric(4);    // Afghanistan
+country.whereNumeric(840);  // United States
+```
+
+### User-Assigned Codes
+
+ISO reserves certain code ranges for user assignment:
+- Alpha-2: `AA`, `QM-QZ`, `XA-XZ`, `ZZ`
+- Alpha-3: `AAA-AAZ`, `QMA-QZZ`, `XAA-XZZ`, `ZZA-ZZZ`
+- Numeric: `900-999`
+
+These will never be assigned to real countries, so you can use them for custom purposes (e.g., `XX` for "unknown country").
+
+## Validation
+
+Always validate country codes at your system boundary:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Validate specific formats
+country.isAlpha2('US');     // true
+country.isAlpha3('USA');    // true
+country.isNumeric('840');   // true
+
+// Validate any format
+country.isValid('US');      // true
+country.isValid('USA');     // true
+country.isValid('840');     // true
+country.isValid('XX');      // false
+```
+
+## Which Format Should I Use?
+
+**For most developers:** Use **alpha-2**. It is the de facto standard for web development, APIs, and databases. It is compact, human-readable, and universally supported.
+
+**Switch to alpha-3 when:**
+- Building travel or passport-related features
+- You need more readable codes in logs or debugging output
+- Working with systems that require alpha-3 (some government APIs)
+
+**Switch to numeric when:**
+- Building financial or trade systems that follow ISO 20022
+- Working in multilingual environments where Latin characters are not guaranteed
+- You need maximum stability across country name changes
+
+## Get Started
+
+All three formats are available through a single package:
+
+```bash
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// One package, all formats, full TypeScript support
+const us = country.whereAlpha2('US');
+console.log(us);
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+```
+
+## Related Resources
+
+- [ISO 3166 Country Codes: The Complete Guide](/blog/iso-3166-country-codes-guide)
+- [Server-Side Country Code Validation](/blog/nodejs-country-code-validation)
+- [Country Code FAQ](/blog/country-code-faq)
+- [Country Code Converter Tool](/tools/country-code-converter)
+- [Country API Reference](/docs/api/country)

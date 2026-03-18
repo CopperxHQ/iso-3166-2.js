@@ -1,0 +1,174 @@
+---
+description: "Compare @koshmoney/countries vs i18n-iso-countries. Feature comparison, bundle size, TypeScript support, and migration guide."
+---
+
+# @koshmoney/countries vs i18n-iso-countries
+
+`i18n-iso-countries` is a popular package for ISO 3166-1 country codes with built-in translations for 50+ languages. It has been around for years and is widely used. Here is an honest comparison with `@koshmoney/countries` to help you choose the right package for your project.
+
+## Feature Comparison
+
+| Feature | @koshmoney/countries | i18n-iso-countries |
+|---|---|---|
+| ISO 3166-1 Countries | 249 countries | 249 countries |
+| ISO 3166-2 Subdivisions | 5,000+ subdivisions | Not included |
+| Postal Code Validation | 150+ countries | Not included |
+| Currency Data | ISO 4217 | Not included |
+| Phone Dial Codes | Via libphonenumber-js | Not included |
+| EU/SEPA/EEA Membership | Built-in | Not included |
+| Geography (Continent/Region) | UN M49 | Not included |
+| **i18n Translations** | **Not included** | **50+ languages** |
+| Alpha-2/Alpha-3 Conversion | Yes | Yes |
+| Numeric Code Support | Yes | Yes |
+| Country Name Lookup | Yes | Yes (localized) |
+| TypeScript Support | Built-in types | Included typings |
+| Tree-Shaking | Subpath exports | No |
+| Module Format | ESM + CJS | ESM + CJS |
+| Dependencies | 0 (core) | 0 |
+
+## Where i18n-iso-countries Wins
+
+**Translation support is the standout feature.** If your application needs to display country names in Arabic, Japanese, French, or any of 50+ languages, `i18n-iso-countries` handles this out of the box:
+
+```typescript
+// i18n-iso-countries
+import countries from 'i18n-iso-countries';
+import de from 'i18n-iso-countries/langs/de.json';
+
+countries.registerLocale(de);
+countries.getName('US', 'de'); // 'Vereinigte Staaten von Amerika'
+```
+
+`@koshmoney/countries` does not include translations. If multilingual country names are a core requirement, `i18n-iso-countries` is the better choice for that specific use case.
+
+## Where @koshmoney/countries Wins
+
+### Subdivision Data
+
+`@koshmoney/countries` includes 5,000+ subdivision records (states, provinces, regions) with ISO 3166-2 codes. `i18n-iso-countries` only covers countries:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.forCountry('US');
+// [{ code: 'US-CA', name: 'California', type: 'State', ... }, ...]
+
+subdivision.whereCode('DE-BY');
+// { code: 'DE-BY', name: 'Bavaria', type: 'State', ... }
+```
+
+### Postal Code Validation
+
+Validate postal codes for 150+ countries:
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('US', '90210');      // true
+postalCode.isValid('GB', 'SW1A 1AA');   // true
+postalCode.isValid('CA', 'K1A 0B1');    // true
+```
+
+### EU/SEPA Membership
+
+Built-in membership checks without maintaining your own lists:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEU('FR');       // true
+membership.isSEPA('GB');     // true (UK remains in SEPA)
+membership.isEurozone('SE'); // false
+```
+
+### Tree-Shaking
+
+`@koshmoney/countries` uses subpath exports so you only load what you need:
+
+```typescript copy
+// Only country data: ~8KB
+import { country } from '@koshmoney/countries';
+
+// Only US subdivisions: ~10KB total
+import '@koshmoney/countries/subdivision/US';
+```
+
+With `i18n-iso-countries`, importing any function loads the entire module even if you only need one feature.
+
+### Bundle Size
+
+| Import | @koshmoney/countries | i18n-iso-countries |
+|---|---|---|
+| All features | ~60KB gzipped | ~200KB+ (all locales) |
+| Country data only | ~8KB gzipped | ~40KB (single locale) |
+| Single locale | N/A | ~40KB gzipped |
+
+## Migration Guide
+
+If you are currently using `i18n-iso-countries` and want to switch:
+
+### Before (i18n-iso-countries)
+
+```typescript
+import countries from 'i18n-iso-countries';
+
+// Get country name
+countries.getName('US', 'en'); // 'United States of America'
+
+// Convert alpha-2 to alpha-3
+countries.alpha2ToAlpha3('US'); // 'USA'
+
+// Validate
+countries.isValid('US'); // true
+
+// Get all countries
+const all = countries.getNames('en');
+```
+
+### After (@koshmoney/countries)
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Get country name
+country.toName('US'); // 'United States'
+
+// Convert alpha-2 to alpha-3
+country.alpha2ToAlpha3('US'); // 'USA'
+
+// Validate
+country.isValid('US'); // true
+
+// Get all countries
+const all = country.all();
+```
+
+### Key Differences
+
+- `getName(code, locale)` becomes `toName(code)` (English only)
+- `getNames(locale)` becomes `all()` (returns array of objects, not name map)
+- `alpha2ToAlpha3()` works the same way
+- `isValid()` works the same way
+- No locale parameter needed (single language)
+
+## When to Choose Which
+
+**Choose `i18n-iso-countries` if:**
+- You need country names in multiple languages
+- You only need country-level data (no subdivisions)
+- Translation is a core feature of your application
+
+**Choose `@koshmoney/countries` if:**
+- You need subdivisions (states, provinces, regions)
+- You need postal code validation
+- You need EU/SEPA/Eurozone membership checks
+- You want smaller bundle sizes
+- You want a unified API for country + subdivision + validation
+- English-only country names are sufficient
+
+## Related Resources
+
+- [Tree-Shaking Country Data](/blog/tree-shaking-country-data) -- how subpath exports reduce bundle size
+- [Getting Started](/docs/getting-started) -- quick setup guide
+- [vs countries-list](/compare/countries-list) -- comparison with another alternative
+- [API Reference](/docs/api/country) -- full API documentation

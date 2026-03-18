@@ -1,0 +1,267 @@
+---
+description: "Complete list of all 47 Japanese prefecture codes (ISO 3166-2:JP). Full table with codes organized by region, plus TypeScript examples for developers."
+---
+
+# Japanese Prefecture Codes: Complete List of All 47 Prefectures
+
+Japan is divided into 47 prefectures (todofuken), each with a standardized ISO 3166-2 code. These codes are used in address forms, shipping systems, e-commerce platforms, and any application that handles Japanese regional data.
+
+This page lists every Japanese prefecture code organized by geographic region, and shows how to work with them using `@koshmoney/countries`.
+
+## All 47 Japanese Prefecture Codes
+
+Japanese ISO 3166-2 codes use a numeric format (JP-01 through JP-47) rather than letter abbreviations. All entries have the type "Prefecture" in ISO 3166-2.
+
+### Hokkaido Region
+
+| Code | Name | Japanese |
+|------|------|----------|
+| JP-01 | Hokkaido | hokkaido |
+
+### Tohoku Region
+
+| Code | Name | Japanese |
+|------|------|----------|
+| JP-02 | Aomori | aomori |
+| JP-03 | Iwate | iwate |
+| JP-04 | Miyagi | miyagi |
+| JP-05 | Akita | akita |
+| JP-06 | Yamagata | yamagata |
+| JP-07 | Fukushima | fukushima |
+
+### Kanto Region
+
+| Code | Name | Japanese |
+|------|------|----------|
+| JP-08 | Ibaraki | ibaraki |
+| JP-09 | Tochigi | tochigi |
+| JP-10 | Gunma | gunma |
+| JP-11 | Saitama | saitama |
+| JP-12 | Chiba | chiba |
+| JP-13 | Tokyo | tokyo |
+| JP-14 | Kanagawa | kanagawa |
+
+### Chubu Region
+
+| Code | Name | Japanese |
+|------|------|----------|
+| JP-15 | Niigata | niigata |
+| JP-16 | Toyama | toyama |
+| JP-17 | Ishikawa | ishikawa |
+| JP-18 | Fukui | fukui |
+| JP-19 | Yamanashi | yamanashi |
+| JP-20 | Nagano | nagano |
+| JP-21 | Gifu | gifu |
+| JP-22 | Shizuoka | shizuoka |
+| JP-23 | Aichi | aichi |
+
+### Kansai (Kinki) Region
+
+| Code | Name | Japanese |
+|------|------|----------|
+| JP-24 | Mie | mie |
+| JP-25 | Shiga | shiga |
+| JP-26 | Kyoto | kyoto |
+| JP-27 | Osaka | osaka |
+| JP-28 | Hyogo | hyogo |
+| JP-29 | Nara | nara |
+| JP-30 | Wakayama | wakayama |
+
+### Chugoku Region
+
+| Code | Name | Japanese |
+|------|------|----------|
+| JP-31 | Tottori | tottori |
+| JP-32 | Shimane | shimane |
+| JP-33 | Okayama | okayama |
+| JP-34 | Hiroshima | hiroshima |
+| JP-35 | Yamaguchi | yamaguchi |
+
+### Shikoku Region
+
+| Code | Name | Japanese |
+|------|------|----------|
+| JP-36 | Tokushima | tokushima |
+| JP-37 | Kagawa | kagawa |
+| JP-38 | Ehime | ehime |
+| JP-39 | Kochi | kochi |
+
+### Kyushu and Okinawa Region
+
+| Code | Name | Japanese |
+|------|------|----------|
+| JP-40 | Fukuoka | fukuoka |
+| JP-41 | Saga | saga |
+| JP-42 | Nagasaki | nagasaki |
+| JP-43 | Kumamoto | kumamoto |
+| JP-44 | Oita | oita |
+| JP-45 | Miyazaki | miyazaki |
+| JP-46 | Kagoshima | kagoshima |
+| JP-47 | Okinawa | okinawa |
+
+## Understanding Japanese Prefecture Codes
+
+Unlike most countries that use letter-based subdivision codes, Japan uses a numeric system from 01 to 47. The numbering follows a geographic order from north (Hokkaido, 01) to south (Okinawa, 47).
+
+| Component | Example | Meaning |
+|-----------|---------|---------|
+| Country prefix | JP | Japan |
+| Separator | - | Standard delimiter |
+| Prefecture number | 13 | Tokyo |
+| Full code | JP-13 | Tokyo, Japan |
+
+> [!NOTE]
+> In Japanese administrative terminology, prefectures are called by four different names depending on the specific prefecture: "to" (Tokyo-to), "do" (Hokkai-do), "fu" (Osaka-fu, Kyoto-fu), and "ken" (all other 43 prefectures). ISO 3166-2 uses the uniform type "Prefecture" for all 47.
+
+## Using Japanese Prefecture Codes in Code
+
+### Look Up a Prefecture
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('JP-13');
+// { code: 'JP-13', name: 'Tokyo', type: 'Prefecture', countryCode: 'JP' }
+
+subdivision.whereCode('JP-27');
+// { code: 'JP-27', name: 'Osaka', type: 'Prefecture', countryCode: 'JP' }
+```
+
+### Get All Japanese Prefectures
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const allJP = subdivision.forCountry('JP');
+// Returns array of 47 prefectures
+
+// Build a dropdown
+const options = allJP.map(s => ({
+  label: s.name,
+  value: s.code,
+}));
+```
+
+### Validate a Prefecture Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('JP-13');    // true (Tokyo)
+subdivision.isValidCode('JP-48');    // false (only 47 prefectures)
+
+subdivision.isValidRegion('JP', '01');  // true (Hokkaido)
+subdivision.isValidRegion('JP', '99');  // false
+```
+
+### Tree-Shaking for Japanese Data Only
+
+```typescript copy
+import '@koshmoney/countries/subdivision/JP';
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+
+const tokyo = whereCode('JP-13');
+const allPrefectures = forCountry('JP');
+```
+
+## Postal Code System
+
+Japan uses a 7-digit postal code system with a hyphen after the first 3 digits (e.g. 100-0001). The first 3 digits indicate the region and roughly correspond to prefecture areas.
+
+| First Digits | Region |
+|-------------|--------|
+| 001-099 | Hokkaido |
+| 100-209 | Tokyo |
+| 210-259 | Kanagawa |
+| 260-299 | Chiba |
+| 300-399 | Ibaraki, Tochigi, Gunma, Saitama |
+| 400-499 | Yamanashi, Nagano, Niigata |
+| 500-599 | Gifu, Shizuoka, Aichi, Mie |
+| 600-699 | Shiga, Kyoto, Osaka, Hyogo, Nara, Wakayama |
+| 700-799 | Tottori, Shimane, Okayama, Hiroshima, Yamaguchi |
+| 800-899 | Tokushima, Kagawa, Ehime, Kochi, Fukuoka, Saga, Nagasaki, Kumamoto, Oita |
+| 900-999 | Miyazaki, Kagoshima, Okinawa |
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('JP', '100-0001');  // true (Chiyoda, Tokyo)
+postalCode.isValid('JP', '5300001');   // true (Osaka, no hyphen)
+postalCode.isValid('JP', '12345');     // false (too few digits)
+```
+
+## Currency and Country Data
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { geography } from '@koshmoney/countries/geography';
+
+country.whereAlpha2('JP');
+// { name: 'Japan', alpha2: 'JP', alpha3: 'JPN', numeric: '392' }
+
+currency.getCurrency('JP');
+// { code: 'JPY', symbol: '\u00a5', name: 'Japanese Yen' }
+
+geography.getContinent('JP');  // 'Asia'
+geography.getRegion('JP');     // 'Eastern Asia'
+```
+
+## Common Use Cases
+
+### E-Commerce Address Forms
+
+Japanese address forms typically list prefectures in the standard JIS order (01 to 47). The numeric ISO codes match this convention:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const prefectures = subdivision.forCountry('JP');
+// Already in numeric order (JP-01 through JP-47)
+
+const dropdown = prefectures.map(p => ({
+  label: p.name,
+  value: p.code,
+}));
+```
+
+### Shipping Zone Calculation
+
+Japanese logistics providers define zones based on distance from the shipping origin. Prefecture codes help determine the zone:
+
+```typescript copy
+const tokyoMetro = new Set(['JP-13', 'JP-11', 'JP-12', 'JP-14']);
+const kansaiMetro = new Set(['JP-26', 'JP-27', 'JP-28']);
+
+function getShippingZone(from: string, to: string): string {
+  if (from === to) return 'same-prefecture';
+  if (tokyoMetro.has(from) && tokyoMetro.has(to)) return 'metro';
+  if (kansaiMetro.has(from) && kansaiMetro.has(to)) return 'metro';
+  return 'standard';
+}
+```
+
+### Regional Content Targeting
+
+Prefecture codes help serve region-specific content, promotions, or language variations:
+
+```typescript copy
+function getRegion(prefectureCode: string): string {
+  const num = parseInt(prefectureCode.split('-')[1], 10);
+  if (num === 1) return 'hokkaido';
+  if (num <= 7) return 'tohoku';
+  if (num <= 14) return 'kanto';
+  if (num <= 23) return 'chubu';
+  if (num <= 30) return 'kansai';
+  if (num <= 35) return 'chugoku';
+  if (num <= 39) return 'shikoku';
+  return 'kyushu-okinawa';
+}
+```
+
+## Related Resources
+
+- [Country Code Converter Tool](/tools/country-code-converter) -- look up JP and all other codes
+- [Asian Countries List](/blog/asian-countries-list-codes) -- all countries in Asia
+- [Indian State Codes](/blog/indian-state-codes-list) -- similar guide for India
+- [Subdivision API Reference](/docs/api/subdivision) -- full subdivision API documentation

@@ -1,0 +1,66 @@
+---
+description: "Get started with @koshmoney/countries in 5 minutes. Install, import, and start using ISO 3166 country and subdivision data in your JavaScript or TypeScript project."
+---
+
+# Getting Started
+
+Get up and running with `@koshmoney/countries` in under 5 minutes.
+
+## Installation
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+## Basic Usage
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+// Look up any country by alpha-2, alpha-3, or numeric code
+const us = country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+// Get subdivisions (states, provinces, regions)
+const california = subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State', countryCode: 'US', ... }
+
+// Validate postal codes
+postalCode.isValid('US', '90210');     // true
+postalCode.isValid('GB', 'SW1A 1AA');  // true
+```
+
+## Module Types
+
+The library separates modules for optimal bundle size:
+
+| Type | Modules | Import Path | Size |
+|------|---------|-------------|------|
+| **Core** | `country`, `subdivision`, `postalCode` | `@koshmoney/countries` | ~60KB |
+| **Specialized** | `currency`, `dialCode`, `geography`, `membership` | `@koshmoney/countries/{module}` | Varies |
+
+**Core modules** are included in the main bundle. **Specialized modules** use subpath imports so they only load when needed.
+
+```typescript copy
+// Specialized module imports
+import { currency } from '@koshmoney/countries/currency';
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+```
+
+## TypeScript Configuration
+
+Subpath imports work automatically with modern TypeScript settings:
+- `moduleResolution: "node16"`
+- `moduleResolution: "nodenext"`
+- `moduleResolution: "bundler"`
+
+For older configurations (`moduleResolution: "node"`), the library includes `typesVersions` fallback -- no additional configuration needed.
+
+## What's Next?
+
+- [Installation](/docs/installation) - Package managers, ESM/CJS, selective imports
+- [API Reference](/docs/api/country) - Complete function documentation
+- [Guides](/docs/guides/country-dropdown) - Tutorials and patterns
+- [Examples](/docs/examples/react) - Framework-specific examples

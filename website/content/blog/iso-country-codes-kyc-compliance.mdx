@@ -1,0 +1,451 @@
+---
+description: "How to use ISO 3166 country codes for KYC and AML compliance in fintech applications. Includes address validation, sanctions screening patterns, and database schemas."
+---
+
+# ISO Country Codes for KYC Compliance: A Developer's Guide
+
+Know Your Customer (KYC) and Anti-Money Laundering (AML) regulations require financial applications to collect, validate, and store accurate customer identity data -- including country information. Getting country data wrong can mean failed compliance audits, blocked transactions, and regulatory fines.
+
+This guide covers how to use ISO 3166 country codes correctly in KYC workflows, from collecting addresses to screening against sanctions lists, with practical TypeScript examples.
+
+## Why Country Data Matters in KYC
+
+Country information touches nearly every part of the KYC process:
+
+- **Customer identification:** Collecting country of residence, nationality, and place of birth
+- **Address verification:** Validating that addresses include correct country codes, subdivision codes, and postal codes
+- **Risk assessment:** Determining customer risk level based on their country (high-risk jurisdictions require Enhanced Due Diligence)
+- **Sanctions screening:** Checking whether a customer's country is subject to OFAC, EU, or UN sanctions
+- **Regulatory reporting:** Filing Suspicious Activity Reports (SARs) and Currency Transaction Reports (CTRs) with standardized country codes
+- **Payment routing:** Determining which payment rails and compliance checks apply based on source and destination countries
+
+Using standardized ISO 3166 codes instead of free-text country names eliminates ambiguity. "US", "USA", "United States", "United States of America", and "America" all refer to the same country -- but only ISO codes give you a single canonical representation.
+
+## Key Compliance Frameworks
+
+### FATF Recommendations
+
+The [Financial Action Task Force (FATF)](https://www.fatf-gafi.org/) is the international body that sets AML standards. FATF Recommendation 10 requires financial institutions to identify and verify customers using reliable, independent source documents. This includes:
+
+- Full legal name
+- Date of birth
+- **Country of nationality**
+- **Residential address** (including country and subdivision)
+
+FATF also maintains lists of jurisdictions with strategic deficiencies in their AML regimes. Applications should flag customers from these jurisdictions for enhanced screening.
+
+### FinCEN Requirements (United States)
+
+The [Financial Crimes Enforcement Network (FinCEN)](https://www.fincen.gov/) requires US financial institutions to:
+
+- Collect customer address including country
+- Report transactions involving certain countries on SARs and CTRs
+- Screen customers against the OFAC Specially Designated Nationals (SDN) list
+
+FinCEN reporting uses ISO country codes, making standardized data collection essential.
+
+### EU AML Directives
+
+The European Union's Anti-Money Laundering Directives (currently the 6th AMLD) require:
+
+- Customer identification with country of residence
+- Enhanced Due Diligence for customers from high-risk third countries
+- Tracking the source and destination countries of cross-border transactions
+
+EU regulations also interact with SEPA membership -- knowing whether a country participates in the Single Euro Payments Area affects payment processing rules.
+
+## Building Compliant Address Forms
+
+### Collecting Country and Subdivision Data
+
+A compliant address form needs to collect standardized country and subdivision codes:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+interface KYCAddress {
+  street1: string;
+  street2?: string;
+  city: string;
+  countryCode: string;        // ISO 3166-1 alpha-2
+  subdivisionCode?: string;   // ISO 3166-2 region code
+  postalCode?: string;
+}
+
+function validateKYCAddress(address: KYCAddress): string[] {
+  const errors: string[] = [];
+
+  // Validate country code
+  if (!country.isValid(address.countryCode)) {
+    errors.push(`Invalid country code: ${address.countryCode}`);
+    return errors; // Cannot validate further without valid country
+  }
+
+  // Validate subdivision if provided
+  if (address.subdivisionCode) {
+    if (!subdivision.isValidRegion(address.countryCode, address.subdivisionCode)) {
+      errors.push(
+        `Invalid ${subdivision.forCountry(address.countryCode)[0]?.type || 'subdivision'} ` +
+        `code "${address.subdivisionCode}" for country ${address.countryCode}`
+      );
+    }
+  }
+
+  // Validate postal code if provided
+  if (address.postalCode) {
+    if (!postalCode.isValid(address.countryCode, address.postalCode)) {
+      const format = postalCode.getFormat(address.countryCode);
+      errors.push(
+        `Invalid ${postalCode.getName(address.countryCode) || 'postal code'}: ` +
+        `expected format ${format || 'unknown'}`
+      );
+    }
+  } else if (postalCode.hasPostalCode(address.countryCode)) {
+    // Some countries require postal codes
+    errors.push(
+      `${postalCode.getName(address.countryCode) || 'Postal code'} is required for ${address.countryCode}`
+    );
+  }
+
+  return errors;
+}
+```
+
+### Dynamic Form Labels
+
+Different countries use different terminology. A compliant form should adapt its labels:
+
+```typescript copy
+import { postalCode, subdivision } from '@koshmoney/countries';
+
+function getFormLabels(countryCode: string) {
+  const subs = subdivision.forCountry(countryCode);
+
+  return {
+    postalCode: postalCode.getName(countryCode) || 'Postal Code',
+    subdivision: subs.length > 0 ? subs[0].type : null,
+    postalCodeFormat: postalCode.getFormat(countryCode),
+  };
+}
+
+getFormLabels('US');
+// { postalCode: 'ZIP Code', subdivision: 'State', postalCodeFormat: 'NNNNN or NNNNN-NNNN' }
+
+getFormLabels('GB');
+// { postalCode: 'Postcode', subdivision: 'Country', postalCodeFormat: 'AA9A 9AA' }
+
+getFormLabels('IN');
+// { postalCode: 'PIN Code', subdivision: 'State', postalCodeFormat: 'NNNNNN' }
+
+getFormLabels('DE');
+// { postalCode: 'PLZ', subdivision: 'Land', postalCodeFormat: 'NNNNN' }
+```
+
+## Country Risk Screening
+
+### Sanctions Country Screening
+
+Sanctions compliance requires checking whether a customer or transaction involves a sanctioned country. While `@koshmoney/countries` does not include sanctions data (sanctions lists change frequently and require dedicated compliance feeds), it provides the building blocks for screening.
+
+Here is a conceptual pattern for integrating country validation with a sanctions check:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+// Your sanctions data source (updated regularly from OFAC, EU, UN)
+// This is illustrative -- use a real sanctions data provider in production
+interface SanctionsConfig {
+  comprehensivelySanctioned: Set<string>;  // Full embargo
+  sectoralSanctions: Set<string>;          // Partial restrictions
+  highRisk: Set<string>;                   // FATF grey/black list
+}
+
+function assessCountryRisk(
+  countryCode: string,
+  sanctions: SanctionsConfig
+): { level: 'blocked' | 'high' | 'medium' | 'standard'; reason: string } {
+  // First, validate the country code
+  if (!country.isValid(countryCode)) {
+    return { level: 'blocked', reason: 'Invalid country code' };
+  }
+
+  const code = countryCode.toUpperCase();
+
+  // Check comprehensive sanctions (full embargo)
+  if (sanctions.comprehensivelySanctioned.has(code)) {
+    return { level: 'blocked', reason: 'Comprehensively sanctioned jurisdiction' };
+  }
+
+  // Check sectoral sanctions
+  if (sanctions.sectoralSanctions.has(code)) {
+    return { level: 'high', reason: 'Sectoral sanctions apply' };
+  }
+
+  // Check FATF high-risk jurisdictions
+  if (sanctions.highRisk.has(code)) {
+    return { level: 'high', reason: 'FATF high-risk jurisdiction' };
+  }
+
+  return { level: 'standard', reason: 'No elevated risk factors' };
+}
+```
+
+**Important:** Never hardcode sanctions lists in your application. Sanctions change frequently based on geopolitical events. Use a dedicated compliance data provider (such as Dow Jones, Refinitiv, or ComplyAdvantage) that provides regularly updated feeds.
+
+### EU/SEPA Membership for Payment Compliance
+
+For European payment processing, knowing whether a country is in the EU, SEPA, EEA, or Eurozone determines which regulations and payment rails apply:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function getPaymentCompliance(countryCode: string) {
+  const memberships = membership.getMemberships(countryCode);
+
+  return {
+    // SEPA transfers available
+    sepaEligible: memberships.SEPA,
+
+    // EU consumer protection rules apply
+    euRegulated: memberships.EU,
+
+    // Euro-denominated accounts available
+    euroNative: memberships.Eurozone,
+
+    // EEA passporting rights
+    eeaPassported: memberships.EEA,
+
+    // Schengen-related identity verification
+    schengenZone: memberships.Schengen,
+  };
+}
+
+getPaymentCompliance('FR');
+// { sepaEligible: true, euRegulated: true, euroNative: true,
+//   eeaPassported: true, schengenZone: true }
+
+getPaymentCompliance('CH');
+// { sepaEligible: true, euRegulated: false, euroNative: false,
+//   eeaPassported: false, schengenZone: true }
+
+getPaymentCompliance('GB');
+// { sepaEligible: true, euRegulated: false, euroNative: false,
+//   eeaPassported: false, schengenZone: false }
+```
+
+## Database Schema for Compliance
+
+A compliance-ready database schema should store country data as standardized codes with audit trails:
+
+```sql
+-- Customer identity table
+CREATE TABLE customers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) NOT NULL,
+  first_name VARCHAR(255) NOT NULL,
+  last_name VARCHAR(255) NOT NULL,
+
+  -- Country data stored as ISO codes
+  nationality CHAR(2) NOT NULL,          -- ISO 3166-1 alpha-2
+  country_of_residence CHAR(2) NOT NULL,  -- ISO 3166-1 alpha-2
+  country_of_birth CHAR(2),              -- ISO 3166-1 alpha-2
+
+  kyc_status VARCHAR(20) NOT NULL DEFAULT 'not_started',
+  risk_level VARCHAR(10) DEFAULT 'standard',
+
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Customer addresses with subdivision and postal code
+CREATE TABLE customer_addresses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+
+  address_type VARCHAR(20) NOT NULL, -- 'residential', 'mailing', 'business'
+  street_1 VARCHAR(500) NOT NULL,
+  street_2 VARCHAR(500),
+  city VARCHAR(255) NOT NULL,
+  subdivision_code VARCHAR(6),       -- ISO 3166-2 region code (e.g., 'CA')
+  postal_code VARCHAR(20),
+  country_code CHAR(2) NOT NULL,     -- ISO 3166-1 alpha-2
+
+  -- Audit fields
+  verified_at TIMESTAMP,
+  verified_by VARCHAR(255),          -- System or agent that verified
+  verification_source VARCHAR(50),   -- 'document', 'utility_bill', 'sumsub', etc.
+
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Compliance audit log
+CREATE TABLE compliance_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+
+  event_type VARCHAR(50) NOT NULL,   -- 'country_risk_check', 'sanctions_screen', etc.
+  country_code CHAR(2),              -- Country involved in the check
+  result VARCHAR(50) NOT NULL,       -- 'pass', 'fail', 'review'
+  details JSONB,                     -- Additional context
+
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Indexes for compliance queries
+CREATE INDEX idx_customers_nationality ON customers(nationality);
+CREATE INDEX idx_customers_residence ON customers(country_of_residence);
+CREATE INDEX idx_customers_kyc_status ON customers(kyc_status);
+CREATE INDEX idx_addresses_country ON customer_addresses(country_code);
+CREATE INDEX idx_compliance_customer ON compliance_events(customer_id, created_at);
+```
+
+### Validating Data on Insert
+
+Use the library in your application layer to validate before persisting:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+function validateCustomerData(data: CreateCustomerInput): string[] {
+  const errors: string[] = [];
+
+  // Validate all country fields
+  for (const field of ['nationality', 'countryOfResidence', 'countryOfBirth'] as const) {
+    const value = data[field];
+    if (value && !country.isValid(value)) {
+      errors.push(`Invalid ${field}: ${value}`);
+    }
+  }
+
+  // Validate address
+  if (data.address) {
+    if (!country.isValid(data.address.countryCode)) {
+      errors.push(`Invalid address country: ${data.address.countryCode}`);
+    }
+
+    if (data.address.subdivisionCode &&
+        !subdivision.isValidRegion(data.address.countryCode, data.address.subdivisionCode)) {
+      errors.push(`Invalid subdivision: ${data.address.subdivisionCode}`);
+    }
+
+    if (data.address.postalCode &&
+        !postalCode.isValid(data.address.countryCode, data.address.postalCode)) {
+      errors.push(`Invalid postal code for ${data.address.countryCode}`);
+    }
+  }
+
+  return errors;
+}
+```
+
+## Cross-Border Transaction Monitoring
+
+For cross-border payments, tracking the source and destination countries is essential for compliance:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { geography } from '@koshmoney/countries/geography';
+
+interface TransactionMetadata {
+  sourceCountry: string;
+  destinationCountry: string;
+  sourceCurrency: string;
+  destinationCurrency: string;
+}
+
+function enrichTransactionMetadata(
+  sourceCountry: string,
+  destCountry: string
+): TransactionMetadata | null {
+  const source = country.whereAlpha2(sourceCountry);
+  const dest = country.whereAlpha2(destCountry);
+
+  if (!source || !dest) return null;
+
+  const sourceCurr = currency.getCurrency(sourceCountry);
+  const destCurr = currency.getCurrency(destCountry);
+
+  return {
+    sourceCountry: source.alpha2,
+    destinationCountry: dest.alpha2,
+    sourceCurrency: sourceCurr?.code || 'UNKNOWN',
+    destinationCurrency: destCurr?.code || 'UNKNOWN',
+  };
+}
+
+function isCrossBorder(sourceCountry: string, destCountry: string): boolean {
+  return sourceCountry.toUpperCase() !== destCountry.toUpperCase();
+}
+
+function isCrossRegion(sourceCountry: string, destCountry: string): boolean {
+  const sourceRegion = geography.getRegion(sourceCountry);
+  const destRegion = geography.getRegion(destCountry);
+  return sourceRegion !== destRegion;
+}
+```
+
+## Best Practices for KYC Country Data
+
+### 1. Always Use ISO Codes, Never Free Text
+
+Store and transmit country data as ISO 3166-1 alpha-2 codes. Display the human-readable name at the UI layer.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Store: 'US'
+// Display: country.toName('US') -> 'United States'
+```
+
+### 2. Validate at Every Boundary
+
+Validate country codes when receiving data from users, APIs, file uploads, and third-party services. Never trust external input.
+
+### 3. Keep Sanctions Data Separate
+
+Do not bundle sanctions lists with your country data library. Sanctions change frequently and require dedicated compliance infrastructure. Use `@koshmoney/countries` for the stable ISO data, and a compliance provider for the dynamic regulatory data.
+
+### 4. Maintain Audit Trails
+
+Log every compliance decision that involves country data: what check was performed, which country was involved, what the result was, and when it happened. This is essential for regulatory examinations.
+
+### 5. Handle Historical Country Codes
+
+Some customers may have documents from former countries (Yugoslavia, Czechoslovakia). Have a process for mapping historical ISO 3166-3 codes to current codes.
+
+## Further Reading
+
+- [ISO 3166 Country Codes Guide](/blog/iso-3166-country-codes-guide) -- complete reference for the ISO 3166 standard
+- [Country API Reference](/docs/api/country) -- country code lookups and validation
+- [Membership API Reference](/docs/api/membership) -- EU, SEPA, EEA, Eurozone checks
+- [FATF High-Risk Jurisdictions](https://www.fatf-gafi.org/en/countries/black-and-grey-lists.html) -- official FATF grey list
+- [Introducing @koshmoney/countries](/blog/introducing-koshmoney-countries) -- why we built this library
+- [Postal Code API Reference](/docs/api/postal-code) -- postal code validation for 150+ countries
+
+## Get Started
+
+Add standardized country data to your compliance workflows:
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+// Validate customer country
+country.isValid('US'); // true
+
+// Check EU membership for regulatory routing
+membership.isEU('FR'); // true
+
+// Validate address postal code
+postalCode.isValid('DE', '10115'); // true
+```
+
+Explore the full [API documentation](/docs/api/country) to see all available functions.

@@ -1,0 +1,354 @@
+---
+description: "Which countries are covered by GDPR? How to detect EU/EEA users programmatically. Code examples for SaaS compliance with @koshmoney/countries."
+---
+
+# GDPR and EU Countries: A Developer's Implementation Guide
+
+GDPR (General Data Protection Regulation) is the regulation that governs how applications handle personal data for users in the European Economic Area. If your app serves users in these countries, you need to detect their location and apply the right data handling rules.
+
+This guide explains exactly which countries GDPR covers, why it is not just the EU, and how to implement compliant user detection in your TypeScript applications using `@koshmoney/countries`.
+
+## Which Countries Does GDPR Cover?
+
+GDPR applies to the **European Economic Area (EEA)**, which includes all 27 EU member states plus three additional countries. It does not apply to just the EU.
+
+### The 30 EEA Countries
+
+| # | Code | Country | EU Member | EEA Only |
+|---|---|---|---|---|
+| 1 | AT | Austria | Yes | |
+| 2 | BE | Belgium | Yes | |
+| 3 | BG | Bulgaria | Yes | |
+| 4 | CY | Cyprus | Yes | |
+| 5 | CZ | Czech Republic | Yes | |
+| 6 | DE | Germany | Yes | |
+| 7 | DK | Denmark | Yes | |
+| 8 | EE | Estonia | Yes | |
+| 9 | ES | Spain | Yes | |
+| 10 | FI | Finland | Yes | |
+| 11 | FR | France | Yes | |
+| 12 | GR | Greece | Yes | |
+| 13 | HR | Croatia | Yes | |
+| 14 | HU | Hungary | Yes | |
+| 15 | IE | Ireland | Yes | |
+| 16 | IS | Iceland | | Yes |
+| 17 | IT | Italy | Yes | |
+| 18 | LI | Liechtenstein | | Yes |
+| 19 | LT | Lithuania | Yes | |
+| 20 | LU | Luxembourg | Yes | |
+| 21 | LV | Latvia | Yes | |
+| 22 | MT | Malta | Yes | |
+| 23 | NL | Netherlands | Yes | |
+| 24 | NO | Norway | | Yes |
+| 25 | PL | Poland | Yes | |
+| 26 | PT | Portugal | Yes | |
+| 27 | RO | Romania | Yes | |
+| 28 | SE | Sweden | Yes | |
+| 29 | SI | Slovenia | Yes | |
+| 30 | SK | Slovakia | Yes | |
+
+### What About the UK?
+
+The UK left the EU in 2020, but it adopted its own version called UK GDPR, which mirrors the original regulation almost exactly. For practical purposes, you should treat UK users the same as EEA users for data protection.
+
+### What About Switzerland?
+
+Switzerland is not in the EU or EEA, but it has its own data protection law (nDSG / FADP) that aligns closely with GDPR. Many applications treat Swiss users similarly.
+
+## Detecting GDPR-Applicable Users
+
+### Basic EEA Check
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function isGDPRCountry(countryCode: string): boolean {
+  return membership.isEEA(countryCode);
+}
+
+isGDPRCountry('DE');  // true -- EU member
+isGDPRCountry('NO');  // true -- EEA member (not EU)
+isGDPRCountry('US');  // false
+isGDPRCountry('CH');  // false -- Switzerland has its own law
+```
+
+### Extended Check Including UK and Switzerland
+
+For most SaaS applications, you want to apply GDPR-like protections to the UK and Switzerland as well:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function requiresStrictDataProtection(countryCode: string): boolean {
+  // EEA (EU + Iceland, Liechtenstein, Norway)
+  if (membership.isEEA(countryCode)) return true;
+
+  // UK has its own GDPR equivalent
+  if (countryCode === 'GB') return true;
+
+  // Switzerland has nDSG/FADP
+  if (countryCode === 'CH') return true;
+
+  return false;
+}
+```
+
+### Getting the Full List
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { country } from '@koshmoney/countries';
+
+const gdprCountries = membership.getMembers('EEA');
+
+// With full country data
+const gdprCountryList = gdprCountries.map(code => {
+  const c = country.whereAlpha2(code);
+  return { code, name: c?.name, alpha3: c?.alpha3 };
+});
+```
+
+## Implementation Patterns for SaaS Apps
+
+### Pattern 1: Cookie Consent Banner
+
+The most common GDPR requirement is showing a cookie consent banner to EEA users:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+interface ConsentConfig {
+  showBanner: boolean;
+  defaultOptIn: boolean;
+  requireExplicitConsent: boolean;
+}
+
+function getConsentConfig(countryCode: string): ConsentConfig {
+  if (membership.isEEA(countryCode) || countryCode === 'GB') {
+    return {
+      showBanner: true,
+      defaultOptIn: false,            // GDPR: opt-in required
+      requireExplicitConsent: true,
+    };
+  }
+
+  return {
+    showBanner: false,
+    defaultOptIn: true,
+    requireExplicitConsent: false,
+  };
+}
+```
+
+### Pattern 2: Data Residency Routing
+
+GDPR requires that personal data is stored and processed with appropriate safeguards. Many applications route EEA user data to EU-based infrastructure:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { geography } from '@koshmoney/countries/geography';
+
+type DataRegion = 'eu-west' | 'us-east' | 'ap-southeast';
+
+function getDataRegion(countryCode: string): DataRegion {
+  // EEA users -> EU data center
+  if (membership.isEEA(countryCode) || countryCode === 'GB' || countryCode === 'CH') {
+    return 'eu-west';
+  }
+
+  // Asia-Pacific users
+  const continent = geography.getContinent(countryCode);
+  if (continent === 'Asia' || continent === 'Oceania') {
+    return 'ap-southeast';
+  }
+
+  // Everyone else -> US
+  return 'us-east';
+}
+
+getDataRegion('DE');  // 'eu-west'
+getDataRegion('JP');  // 'ap-southeast'
+getDataRegion('US');  // 'us-east'
+```
+
+### Pattern 3: Right to Erasure (Data Deletion)
+
+GDPR grants users the right to request deletion of their personal data. You can conditionally enforce this based on user location:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+interface DeletionPolicy {
+  allowDeletionRequest: boolean;
+  maxResponseDays: number;
+  requireVerification: boolean;
+}
+
+function getDeletionPolicy(countryCode: string): DeletionPolicy {
+  if (membership.isEEA(countryCode) || countryCode === 'GB') {
+    return {
+      allowDeletionRequest: true,
+      maxResponseDays: 30,      // GDPR mandates 30-day response
+      requireVerification: true,
+    };
+  }
+
+  // California (CCPA) also has deletion rights
+  // You would check state-level here using subdivision data
+
+  return {
+    allowDeletionRequest: true,   // Good practice everywhere
+    maxResponseDays: 45,
+    requireVerification: true,
+  };
+}
+```
+
+### Pattern 4: Feature Flags by Region
+
+Some features may behave differently in GDPR regions. For example, analytics tracking, marketing emails, or third-party integrations:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+interface FeatureFlags {
+  analyticsEnabled: boolean;
+  marketingEmailsOptIn: boolean;
+  thirdPartyTrackingAllowed: boolean;
+  dataSharingWithPartners: boolean;
+}
+
+function getFeatureFlags(
+  countryCode: string,
+  userConsent: Record<string, boolean>
+): FeatureFlags {
+  const isEEA = membership.isEEA(countryCode) || countryCode === 'GB';
+
+  if (isEEA) {
+    return {
+      analyticsEnabled: userConsent.analytics ?? false,
+      marketingEmailsOptIn: userConsent.marketing ?? false,
+      thirdPartyTrackingAllowed: userConsent.thirdParty ?? false,
+      dataSharingWithPartners: userConsent.dataSharing ?? false,
+    };
+  }
+
+  return {
+    analyticsEnabled: true,
+    marketingEmailsOptIn: !(userConsent.marketing === false),
+    thirdPartyTrackingAllowed: true,
+    dataSharingWithPartners: !(userConsent.dataSharing === false),
+  };
+}
+```
+
+## Express Middleware Example
+
+Here is a practical Express middleware that detects GDPR applicability from a user's profile or request headers:
+
+```typescript copy
+import { Request, Response, NextFunction } from 'express';
+import { membership } from '@koshmoney/countries/membership';
+import { country } from '@koshmoney/countries';
+
+interface GDPRContext {
+  isGDPR: boolean;
+  countryCode: string | null;
+  countryName: string | null;
+  memberships: Record<string, boolean>;
+}
+
+function gdprMiddleware(req: Request, res: Response, next: NextFunction) {
+  // Get country from user profile, geo-IP header, or Accept-Language
+  const countryCode = req.headers['cf-ipcountry'] as string
+    || req.user?.countryCode
+    || null;
+
+  if (!countryCode || !country.isValid(countryCode)) {
+    req.gdpr = {
+      isGDPR: false,
+      countryCode: null,
+      countryName: null,
+      memberships: {},
+    };
+    return next();
+  }
+
+  const upperCode = countryCode.toUpperCase();
+  const countryData = country.whereAlpha2(upperCode);
+  const isEEA = membership.isEEA(upperCode);
+
+  req.gdpr = {
+    isGDPR: isEEA || upperCode === 'GB',
+    countryCode: upperCode,
+    countryName: countryData?.name ?? null,
+    memberships: membership.getMemberships(upperCode),
+  };
+
+  next();
+}
+```
+
+## Common GDPR Detection Mistakes
+
+### Mistake 1: Checking EU Instead of EEA
+
+```typescript copy
+// WRONG: Misses Norway, Iceland, Liechtenstein
+if (membership.isEU(countryCode)) {
+  showCookieBanner();
+}
+
+// CORRECT: GDPR applies to the full EEA
+if (membership.isEEA(countryCode)) {
+  showCookieBanner();
+}
+```
+
+### Mistake 2: Hardcoding Country Lists
+
+```typescript copy
+// WRONG: Hardcoded lists go stale
+const EU_COUNTRIES = ['AT', 'BE', 'BG', /* ... */];
+const isEU = EU_COUNTRIES.includes(code);
+
+// CORRECT: Use a maintained library
+import { membership } from '@koshmoney/countries/membership';
+const isEEA = membership.isEEA(code);
+```
+
+### Mistake 3: Ignoring Territories
+
+Some EU member states have overseas territories with different rules (e.g., French overseas departments are part of the EU but French overseas collectivities are not). For most SaaS applications, checking the parent country code is sufficient, but be aware of this edge case for highly regulated applications.
+
+## Beyond GDPR: Other Regional Privacy Laws
+
+GDPR is the most well-known, but similar laws exist worldwide:
+
+| Region | Law | Countries |
+|---|---|---|
+| EEA | GDPR | 30 countries |
+| UK | UK GDPR | GB |
+| Switzerland | nDSG/FADP | CH |
+| Brazil | LGPD | BR |
+| California | CCPA/CPRA | US (state-level) |
+| Canada | PIPEDA | CA |
+| Australia | Privacy Act | AU |
+| Japan | APPI | JP |
+
+You can combine `@koshmoney/countries` membership checks with country-level detection to build a comprehensive privacy compliance system.
+
+## Summary
+
+- GDPR applies to the **EEA** (30 countries), not just the EU (27 countries)
+- Use `membership.isEEA()` for GDPR checks, not `membership.isEU()`
+- Consider extending checks to include GB (UK GDPR) and CH (Swiss FADP)
+- Avoid hardcoding country lists -- membership changes over time
+- Use feature flags and middleware patterns to apply region-specific behavior
+
+## Related Resources
+
+- [EU Country Codes List](/blog/eu-country-codes-list) -- full EU, EEA, SEPA, Eurozone tables
+- [SaaS Use Cases](/use-cases/saas) -- GDPR compliance patterns for SaaS
+- [Membership API Reference](/docs/api/membership) -- `isEU()`, `isEEA()`, `isSEPA()` documentation
+- [Fintech Use Cases](/use-cases/fintech) -- compliance patterns for financial applications

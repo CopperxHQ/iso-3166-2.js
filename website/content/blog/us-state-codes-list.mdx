@@ -1,0 +1,277 @@
+---
+description: "Complete list of all US state codes (ISO 3166-2:US) including 50 states, DC, and territories with code examples for lookups and validation."
+---
+
+# Complete List of US State Codes (ISO 3166-2:US)
+
+This is a complete reference of all US state and territory codes as defined by the ISO 3166-2:US standard. The table below includes all 50 states, the District of Columbia, and US territories. Each entry shows the ISO 3166-2 code, the two-letter region code used in postal addresses, and the state capital.
+
+## All 50 US States
+
+| ISO Code | Region Code | State | Capital |
+|----------|-------------|-------|---------|
+| US-AL | AL | Alabama | Montgomery |
+| US-AK | AK | Alaska | Juneau |
+| US-AZ | AZ | Arizona | Phoenix |
+| US-AR | AR | Arkansas | Little Rock |
+| US-CA | CA | California | Sacramento |
+| US-CO | CO | Colorado | Denver |
+| US-CT | CT | Connecticut | Hartford |
+| US-DE | DE | Delaware | Dover |
+| US-FL | FL | Florida | Tallahassee |
+| US-GA | GA | Georgia | Atlanta |
+| US-HI | HI | Hawaii | Honolulu |
+| US-ID | ID | Idaho | Boise |
+| US-IL | IL | Illinois | Springfield |
+| US-IN | IN | Indiana | Indianapolis |
+| US-IA | IA | Iowa | Des Moines |
+| US-KS | KS | Kansas | Topeka |
+| US-KY | KY | Kentucky | Frankfort |
+| US-LA | LA | Louisiana | Baton Rouge |
+| US-ME | ME | Maine | Augusta |
+| US-MD | MD | Maryland | Annapolis |
+| US-MA | MA | Massachusetts | Boston |
+| US-MI | MI | Michigan | Lansing |
+| US-MN | MN | Minnesota | Saint Paul |
+| US-MS | MS | Mississippi | Jackson |
+| US-MO | MO | Missouri | Jefferson City |
+| US-MT | MT | Montana | Helena |
+| US-NE | NE | Nebraska | Lincoln |
+| US-NV | NV | Nevada | Carson City |
+| US-NH | NH | New Hampshire | Concord |
+| US-NJ | NJ | New Jersey | Trenton |
+| US-NM | NM | New Mexico | Santa Fe |
+| US-NY | NY | New York | Albany |
+| US-NC | NC | North Carolina | Raleigh |
+| US-ND | ND | North Dakota | Bismarck |
+| US-OH | OH | Ohio | Columbus |
+| US-OK | OK | Oklahoma | Oklahoma City |
+| US-OR | OR | Oregon | Salem |
+| US-PA | PA | Pennsylvania | Harrisburg |
+| US-RI | RI | Rhode Island | Providence |
+| US-SC | SC | South Carolina | Columbia |
+| US-SD | SD | South Dakota | Pierre |
+| US-TN | TN | Tennessee | Nashville |
+| US-TX | TX | Texas | Austin |
+| US-UT | UT | Utah | Salt Lake City |
+| US-VT | VT | Vermont | Montpelier |
+| US-VA | VA | Virginia | Richmond |
+| US-WA | WA | Washington | Olympia |
+| US-WV | WV | West Virginia | Charleston |
+| US-WI | WI | Wisconsin | Madison |
+| US-WY | WY | Wyoming | Cheyenne |
+
+## District of Columbia
+
+| ISO Code | Region Code | Name | Type |
+|----------|-------------|------|------|
+| US-DC | DC | District of Columbia | District |
+
+The District of Columbia is the federal district containing the nation's capital, Washington, D.C. It is classified as a "District" in ISO 3166-2, not a state. For most software purposes (tax calculation, shipping, forms), DC is treated as equivalent to a state.
+
+## US Territories
+
+The United States has several outlying territories. These are classified as "Outlying area" in ISO 3166-2:
+
+| ISO Code | Region Code | Territory |
+|----------|-------------|-----------|
+| US-AS | AS | American Samoa |
+| US-GU | GU | Guam |
+| US-MP | MP | Northern Mariana Islands |
+| US-PR | PR | Puerto Rico |
+| US-VI | VI | Virgin Islands, U.S. |
+| US-UM | UM | United States Minor Outlying Islands |
+
+Puerto Rico is the most populous territory with over 3 million residents. For applications involving shipping, taxes, or regulatory compliance, it is important to distinguish between the 50 states, DC, and territories, as different rules may apply.
+
+## Looking Up State Data Programmatically
+
+Using `@koshmoney/countries`, you can look up any US state by its code, name, or get the full list:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Look up by full ISO code
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State',
+//   countryCode: 'US', countryName: 'United States', regionCode: 'CA' }
+
+// Look up by country + region code
+subdivision.where('US', 'CA');
+// Same result
+
+// Look up by name
+subdivision.whereName('US', 'California');
+// Same result
+
+// Get all US subdivisions (states + DC + territories)
+const allUS = subdivision.forCountry('US');
+console.log(allUS.length); // 56
+
+// Filter to just the 50 states
+const states = allUS.filter((s) => s.type === 'State');
+console.log(states.length); // 50
+```
+
+### Converting Between Formats
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Full code to region code
+subdivision.toRegionCode('US-CA'); // 'CA'
+
+// Region code to full code
+subdivision.toFullCode('US', 'CA'); // 'US-CA'
+
+// Code to name
+subdivision.toName('US-CA'); // 'California'
+
+// Code to country
+subdivision.toCountryCode('US-CA'); // 'US'
+```
+
+### Validation
+
+Validate state codes before using them in your application:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Validate a full ISO code
+subdivision.isValidCode('US-CA');  // true
+subdivision.isValidCode('US-XX');  // false
+
+// Validate a region code for a country
+subdivision.isValidRegion('US', 'CA');  // true
+subdivision.isValidRegion('US', 'XX');  // false
+
+// Validate by name
+subdivision.isValidName('US', 'California');  // true
+subdivision.isValidName('US', 'Narnia');      // false
+```
+
+## Common Use Cases
+
+### Tax Calculation
+
+US sales tax is determined at the state (and often local) level. Use ISO 3166-2 codes to identify the correct tax jurisdiction:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function getTaxRate(stateCode: string): number {
+  // Validate the state code first
+  if (!subdivision.isValidRegion('US', stateCode)) {
+    throw new Error(`Invalid state code: ${stateCode}`);
+  }
+
+  // Look up tax rate from your database using the standardized code
+  return taxRatesByState[stateCode] ?? 0;
+}
+```
+
+### Shipping Zone Configuration
+
+E-commerce platforms often group states into shipping zones:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const shippingZones: Record<string, string[]> = {
+  'West Coast': ['CA', 'OR', 'WA'],
+  'Mountain': ['CO', 'UT', 'MT', 'WY', 'ID', 'NV', 'AZ', 'NM'],
+  'Midwest': ['IL', 'IN', 'IA', 'KS', 'MI', 'MN', 'MO', 'NE', 'ND', 'OH', 'SD', 'WI'],
+  'Northeast': ['CT', 'DE', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'],
+  'Southeast': ['AL', 'AR', 'FL', 'GA', 'KY', 'LA', 'MS', 'NC', 'SC', 'TN', 'VA', 'WV'],
+  'Texas': ['TX'],
+  'Hawaii/Alaska': ['HI', 'AK'],
+};
+
+function getShippingZone(stateCode: string): string | null {
+  for (const [zone, states] of Object.entries(shippingZones)) {
+    if (states.includes(stateCode)) return zone;
+  }
+  return null;
+}
+```
+
+### Address Forms
+
+When building address forms, populate the state dropdown dynamically:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Get states sorted alphabetically (they already are from the library)
+const usStates = subdivision.forCountry('US').filter((s) => s.type === 'State');
+
+// For a form select element
+const options = usStates.map((s) => ({
+  value: s.regionCode, // 'CA', 'NY', etc.
+  label: s.name,       // 'California', 'New York', etc.
+}));
+```
+
+### Validating ZIP Codes by State
+
+Combine state codes with [postal code validation](/docs/api/postal-code) for complete address verification:
+
+```typescript copy
+import { subdivision, postalCode } from '@koshmoney/countries';
+
+function validateUSAddress(state: string, zip: string): boolean {
+  // Validate state code
+  if (!subdivision.isValidRegion('US', state)) {
+    return false;
+  }
+
+  // Validate ZIP code format
+  if (!postalCode.isValid('US', zip)) {
+    return false;
+  }
+
+  return true;
+}
+
+validateUSAddress('CA', '90210');      // true
+validateUSAddress('CA', '90210-1234'); // true (ZIP+4)
+validateUSAddress('XX', '90210');      // false (invalid state)
+validateUSAddress('CA', 'ABCDE');      // false (invalid ZIP)
+```
+
+## Understanding the Code Format
+
+The ISO 3166-2:US code format is `US-{XX}`, where `XX` is a two-letter alphabetic code. This code is the same as the USPS two-letter state abbreviation in all cases. So `CA` in ISO 3166-2:US is the same `CA` used on mailing addresses.
+
+The format breaks down as:
+- `US` -- the ISO 3166-1 alpha-2 country code
+- `-` -- a hyphen separator (always present)
+- `XX` -- the two-letter subdivision code
+
+This makes US subdivision codes particularly developer-friendly since they match the widely used USPS abbreviations.
+
+## Further Reading
+
+- [ISO 3166 Country Codes Guide](/blog/iso-3166-country-codes-guide) -- complete guide to the ISO 3166 standard
+- [React Country Dropdown](/blog/react-country-dropdown-typescript) -- build interactive state selectors in React
+- [Subdivision API Reference](/docs/api/subdivision) -- full API documentation for subdivision lookups
+- [ISO 3166-2 Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-2:US) -- official reference for US subdivision codes
+- [Address Validation Guide](/docs/guides/address-validation) -- complete address validation with postal codes
+
+## Get Started
+
+Look up any US state code programmatically with `@koshmoney/countries`:
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const california = subdivision.where('US', 'CA');
+console.log(california.name); // 'California'
+```
+
+See the full [Subdivision API documentation](/docs/api/subdivision) for all available functions.

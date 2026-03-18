@@ -1,0 +1,246 @@
+---
+description: "Node.js and Express examples for server-side country code validation, address processing, and API endpoints."
+---
+
+# Node.js Examples
+
+Server-side patterns using `@koshmoney/countries` with Node.js and Express.
+
+## Country Code Validation API
+
+An Express endpoint that validates and normalizes country codes:
+
+```typescript copy
+import express from 'express';
+import { country } from '@koshmoney/countries';
+
+const app = express();
+app.use(express.json());
+
+app.get('/api/country/:code', (req, res) => {
+  const info = country.whereAlpha2(req.params.code)
+    || country.whereAlpha3(req.params.code);
+
+  if (!info) {
+    return res.status(404).json({ error: 'Country not found' });
+  }
+
+  res.json(info);
+});
+
+// Convert between formats
+app.get('/api/country/convert', (req, res) => {
+  const { code, to } = req.query as { code: string; to: string };
+
+  if (!code || !to) {
+    return res.status(400).json({ error: 'Missing code or to parameter' });
+  }
+
+  const format = country.detectFormat(code);
+  if (!format) {
+    return res.status(400).json({ error: 'Invalid country code' });
+  }
+
+  if (format === 'name') {
+    const info = country.whereName(code);
+    return res.json({ result: info?.[to as keyof typeof info] || null });
+  }
+
+  const result = country.convert(code, format, to as any);
+  res.json({ from: format, to, result });
+});
+```
+
+## Address Validation Endpoint
+
+Validate a full address including country, state, and postal code:
+
+```typescript copy
+import express from 'express';
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+const app = express();
+app.use(express.json());
+
+app.post('/api/validate-address', (req, res) => {
+  const { countryCode, state, zip, city } = req.body;
+  const errors: string[] = [];
+
+  // Validate country
+  if (!countryCode || !country.isAlpha2(countryCode)) {
+    errors.push('Invalid or missing country code');
+    return res.status(400).json({ valid: false, errors });
+  }
+
+  // Validate state/province
+  if (state) {
+    if (!subdivision.isValidRegion(countryCode, state)) {
+      const subs = subdivision.forCountry(countryCode);
+      const type = subs[0]?.type || 'state/province';
+      errors.push(`Invalid ${type} "${state}" for ${country.toName(countryCode)}`);
+    }
+  }
+
+  // Validate postal code
+  if (zip) {
+    if (postalCode.hasPostalCode(countryCode) && !postalCode.isValid(countryCode, zip)) {
+      const name = postalCode.getName(countryCode) || 'Postal code';
+      const format = postalCode.getFormat(countryCode);
+      errors.push(`Invalid ${name}. Expected format: ${format}`);
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({ valid: false, errors });
+  }
+
+  res.json({
+    valid: true,
+    normalized: {
+      country: country.toName(countryCode),
+      countryCode,
+      state: state ? subdivision.toNameFrom(countryCode, state) : null,
+      zip,
+      city,
+    },
+  });
+});
+```
+
+## Subdivision List API
+
+Serve subdivisions for a country (for dynamic dropdowns):
+
+```typescript copy
+import express from 'express';
+import { subdivision } from '@koshmoney/countries';
+
+const app = express();
+
+app.get('/api/subdivisions/:country', (req, res) => {
+  const subs = subdivision.forCountry(req.params.country);
+
+  if (subs.length === 0) {
+    return res.json({ subdivisions: [], type: null });
+  }
+
+  res.json({
+    type: subs[0].type, // "State", "Province", "Region", etc.
+    subdivisions: subs.map((s) => ({
+      code: s.regionCode,
+      name: s.name,
+      fullCode: s.code,
+    })),
+  });
+});
+```
+
+## Shipping Rate Calculator
+
+Use geography and membership data to calculate shipping zones:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+
+interface ShippingRate {
+  zone: string;
+  rate: number;
+  estimatedDays: string;
+}
+
+function getShippingRate(from: string, to: string): ShippingRate {
+  if (from === to) {
+    return { zone: 'Domestic', rate: 5.99, estimatedDays: '2-5' };
+  }
+
+  // EU to EU - free trade zone
+  if (membership.isEU(from) && membership.isEU(to)) {
+    return { zone: 'EU', rate: 9.99, estimatedDays: '3-7' };
+  }
+
+  // Same continent
+  const fromContinent = geography.getContinent(from);
+  const toContinent = geography.getContinent(to);
+  if (fromContinent && fromContinent === toContinent) {
+    return { zone: 'Regional', rate: 14.99, estimatedDays: '5-10' };
+  }
+
+  return { zone: 'International', rate: 24.99, estimatedDays: '7-21' };
+}
+
+// Usage in Express
+app.get('/api/shipping-rate', (req, res) => {
+  const { from, to } = req.query as { from: string; to: string };
+
+  if (!country.isAlpha2(from) || !country.isAlpha2(to)) {
+    return res.status(400).json({ error: 'Invalid country codes' });
+  }
+
+  res.json(getShippingRate(from, to));
+});
+```
+
+## Currency Formatting Helper
+
+Format prices with the correct currency symbol:
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+function formatPrice(amount: number, countryCode: string): string {
+  const curr = currency.getCurrency(countryCode);
+  if (!curr) return `${amount.toFixed(2)}`;
+
+  return `${curr.symbol}${amount.toFixed(2)} ${curr.code}`;
+}
+
+formatPrice(29.99, 'US'); // '$29.99 USD'
+formatPrice(29.99, 'GB'); // '£29.99 GBP'
+formatPrice(29.99, 'JP'); // '¥29.99 JPY'
+formatPrice(29.99, 'IN'); // '₹29.99 INR'
+```
+
+## CLI Tool
+
+A simple CLI that looks up country data:
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+const code = process.argv[2];
+
+if (!code) {
+  console.log('Usage: npx tsx lookup.ts <country-code>');
+  process.exit(1);
+}
+
+const info = country.whereAlpha2(code)
+  || country.whereAlpha3(code)
+  || country.whereName(code);
+
+if (!info) {
+  console.log(`Country not found: ${code}`);
+  process.exit(1);
+}
+
+const subs = subdivision.forCountry(info.alpha2);
+const curr = currency.getCurrency(info.alpha2);
+const dial = dialCode.getDialCode(info.alpha2);
+
+console.log(`${info.name} (${info.alpha2} / ${info.alpha3} / ${info.numeric})`);
+if (curr) console.log(`  Currency: ${curr.symbol} ${curr.code} (${curr.name})`);
+if (dial) console.log(`  Dial code: ${dial}`);
+console.log(`  Subdivisions: ${subs.length}`);
+```
+
+---
+
+## Related
+
+- [Address Validation Guide](/docs/guides/address-validation) -- Validation patterns
+- [React Examples](/docs/examples/react) -- Frontend examples
+- [Country API](/docs/api/country) -- Full API reference

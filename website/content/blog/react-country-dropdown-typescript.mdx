@@ -1,0 +1,586 @@
+---
+description: "Build a type-safe, accessible country and state dropdown in React with TypeScript using @koshmoney/countries. Includes search, cascading selects, and React Hook Form integration."
+---
+
+# How to Build a Country Dropdown in React with TypeScript
+
+Country dropdowns appear in almost every web application -- registration forms, checkout flows, address fields, and profile pages. Getting them right means using standardized ISO data, supporting accessibility, and keeping things performant. In this tutorial, you will build a fully functional, type-safe country and state/province dropdown component in React with TypeScript.
+
+## Prerequisites
+
+- React 18+
+- TypeScript 4.5+
+- A package manager (npm, yarn, or pnpm)
+
+Install the country data library:
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+## Step 1: Basic Country Select
+
+Start with the simplest possible implementation -- a native `<select>` element populated with all countries:
+
+```tsx copy
+import { useMemo } from 'react';
+import { country } from '@koshmoney/countries';
+
+function CountrySelect({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (code: string) => void;
+}) {
+  const countries = useMemo(() => country.all(), []);
+
+  return (
+    <label>
+      Country
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label="Select a country"
+      >
+        <option value="">Select a country</option>
+        {countries.map((c) => (
+          <option key={c.alpha2} value={c.alpha2}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+```
+
+The `country.all()` call returns every ISO 3166-1 country with `name`, `alpha2`, `alpha3`, and `numeric` fields. We memoize it with `useMemo` since the data is static and never changes between renders.
+
+## Step 2: Cascading Country and State Dropdown
+
+For address forms, you typically need both a country and a state/province selector. The state dropdown should update whenever the country changes:
+
+```tsx copy
+import { useMemo, useState } from 'react';
+import { country, subdivision } from '@koshmoney/countries';
+
+function AddressSelect() {
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedState, setSelectedState] = useState('');
+
+  const countries = useMemo(() => country.all(), []);
+
+  const subdivisions = useMemo(() => {
+    if (!selectedCountry) return [];
+    return subdivision.forCountry(selectedCountry);
+  }, [selectedCountry]);
+
+  const handleCountryChange = (code: string) => {
+    setSelectedCountry(code);
+    setSelectedState(''); // Reset state when country changes
+  };
+
+  return (
+    <div>
+      <label>
+        Country
+        <select
+          value={selectedCountry}
+          onChange={(e) => handleCountryChange(e.target.value)}
+          aria-label="Select a country"
+        >
+          <option value="">Select a country</option>
+          {countries.map((c) => (
+            <option key={c.alpha2} value={c.alpha2}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {subdivisions.length > 0 && (
+        <label>
+          {subdivisions[0]?.type || 'Region'}
+          <select
+            value={selectedState}
+            onChange={(e) => setSelectedState(e.target.value)}
+            aria-label={`Select a ${subdivisions[0]?.type?.toLowerCase() || 'region'}`}
+          >
+            <option value="">
+              Select a {subdivisions[0]?.type?.toLowerCase() || 'region'}
+            </option>
+            {subdivisions.map((s) => (
+              <option key={s.code} value={s.regionCode}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+    </div>
+  );
+}
+```
+
+Notice how the label automatically adapts to the subdivision type. When the user selects the United States, the label says "State". For Canada, it says "Province". For Germany, it says "Land". The `@koshmoney/countries` library provides the correct subdivision type for each country.
+
+## Step 3: Adding Search and Filtering
+
+With 249 countries, scrolling through a plain dropdown is tedious. Add a search input that filters the list:
+
+```tsx copy
+import { useMemo, useState } from 'react';
+import { country, type Country } from '@koshmoney/countries';
+
+function SearchableCountrySelect({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (code: string) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+
+  const countries = useMemo(() => country.all(), []);
+
+  const filtered = useMemo(() => {
+    if (!search) return countries;
+    const term = search.toLowerCase();
+    return countries.filter(
+      (c) =>
+        c.name.toLowerCase().includes(term) ||
+        c.alpha2.toLowerCase().includes(term) ||
+        c.alpha3.toLowerCase().includes(term)
+    );
+  }, [countries, search]);
+
+  const selectedCountry = value ? country.whereAlpha2(value) : null;
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <label>
+        Country
+        <input
+          type="text"
+          value={isOpen ? search : selectedCountry?.name || ''}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => {
+            setIsOpen(true);
+            setSearch('');
+          }}
+          placeholder="Search countries..."
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-autocomplete="list"
+          aria-label="Search and select a country"
+        />
+      </label>
+      {isOpen && (
+        <ul
+          role="listbox"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            maxHeight: 200,
+            overflowY: 'auto',
+            border: '1px solid #ccc',
+            background: '#fff',
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            zIndex: 10,
+          }}
+        >
+          {filtered.map((c) => (
+            <li
+              key={c.alpha2}
+              role="option"
+              aria-selected={c.alpha2 === value}
+              onClick={() => {
+                onChange(c.alpha2);
+                setIsOpen(false);
+                setSearch('');
+              }}
+              style={{
+                padding: '8px 12px',
+                cursor: 'pointer',
+                background: c.alpha2 === value ? '#e3f2fd' : 'transparent',
+              }}
+            >
+              {c.name} ({c.alpha2})
+            </li>
+          ))}
+          {filtered.length === 0 && (
+            <li style={{ padding: '8px 12px', color: '#999' }}>
+              No countries found
+            </li>
+          )}
+        </ul>
+      )}
+    </div>
+  );
+}
+```
+
+## Step 4: Accessibility
+
+A production-ready country dropdown needs proper accessibility support. Here are the key ARIA attributes and keyboard interactions to implement:
+
+```tsx copy
+import { useMemo, useState, useRef, useCallback } from 'react';
+import { country } from '@koshmoney/countries';
+
+function AccessibleCountrySelect({
+  value,
+  onChange,
+  id = 'country-select',
+}: {
+  value: string;
+  onChange: (code: string) => void;
+  id?: string;
+}) {
+  const [search, setSearch] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  const countries = useMemo(() => country.all(), []);
+
+  const filtered = useMemo(() => {
+    if (!search) return countries;
+    const term = search.toLowerCase();
+    return countries.filter((c) =>
+      c.name.toLowerCase().includes(term)
+    );
+  }, [countries, search]);
+
+  const selectCountry = useCallback(
+    (code: string) => {
+      onChange(code);
+      setIsOpen(false);
+      setSearch('');
+      setActiveIndex(-1);
+    },
+    [onChange]
+  );
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setIsOpen(true);
+        setActiveIndex((prev) =>
+          prev < filtered.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : prev));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (activeIndex >= 0 && filtered[activeIndex]) {
+          selectCountry(filtered[activeIndex].alpha2);
+        }
+        break;
+      case 'Escape':
+        setIsOpen(false);
+        setSearch('');
+        setActiveIndex(-1);
+        break;
+    }
+  };
+
+  const selectedCountry = value ? country.whereAlpha2(value) : null;
+  const listboxId = `${id}-listbox`;
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <label htmlFor={id}>Country</label>
+      <input
+        id={id}
+        type="text"
+        value={isOpen ? search : selectedCountry?.name || ''}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setIsOpen(true);
+          setActiveIndex(-1);
+        }}
+        onFocus={() => {
+          setIsOpen(true);
+          setSearch('');
+        }}
+        onBlur={() => {
+          // Delay to allow click events on list items
+          setTimeout(() => setIsOpen(false), 150);
+        }}
+        onKeyDown={handleKeyDown}
+        placeholder="Search countries..."
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-autocomplete="list"
+        aria-controls={listboxId}
+        aria-activedescendant={
+          activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined
+        }
+      />
+      {isOpen && (
+        <ul
+          ref={listRef}
+          id={listboxId}
+          role="listbox"
+          aria-label="Countries"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            maxHeight: 200,
+            overflowY: 'auto',
+            border: '1px solid #ccc',
+            background: '#fff',
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            zIndex: 10,
+          }}
+        >
+          {filtered.map((c, index) => (
+            <li
+              key={c.alpha2}
+              id={`${id}-option-${index}`}
+              role="option"
+              aria-selected={c.alpha2 === value}
+              onClick={() => selectCountry(c.alpha2)}
+              style={{
+                padding: '8px 12px',
+                cursor: 'pointer',
+                background:
+                  index === activeIndex
+                    ? '#e3f2fd'
+                    : c.alpha2 === value
+                      ? '#f5f5f5'
+                      : 'transparent',
+              }}
+            >
+              {c.name}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+```
+
+Key accessibility features:
+- **`role="combobox"`** on the input tells screen readers this is a searchable select
+- **`aria-expanded`** communicates whether the dropdown is open
+- **`aria-activedescendant`** tracks the currently highlighted option during keyboard navigation
+- **`aria-controls`** links the input to its associated listbox
+- **Arrow keys** navigate the list, **Enter** selects, **Escape** closes
+
+## Step 5: Complete Reusable Component
+
+Here is a complete, production-ready `CountrySelect` component that combines everything:
+
+```tsx copy
+import { useMemo, useState, useRef, useCallback } from 'react';
+import { country, subdivision, type Country, type Subdivision } from '@koshmoney/countries';
+
+interface CountrySelectProps {
+  countryValue: string;
+  subdivisionValue?: string;
+  onCountryChange: (code: string) => void;
+  onSubdivisionChange?: (code: string) => void;
+  showSubdivision?: boolean;
+}
+
+export function CountrySelect({
+  countryValue,
+  subdivisionValue = '',
+  onCountryChange,
+  onSubdivisionChange,
+  showSubdivision = true,
+}: CountrySelectProps) {
+  const countries = useMemo(() => country.all(), []);
+
+  const subdivisions = useMemo(() => {
+    if (!countryValue) return [];
+    return subdivision.forCountry(countryValue);
+  }, [countryValue]);
+
+  const subdivisionLabel = useMemo(() => {
+    if (subdivisions.length === 0) return 'Region';
+    return subdivisions[0]?.type || 'Region';
+  }, [subdivisions]);
+
+  const handleCountryChange = (code: string) => {
+    onCountryChange(code);
+    onSubdivisionChange?.('');
+  };
+
+  return (
+    <fieldset>
+      <legend>Location</legend>
+
+      <div>
+        <label htmlFor="country">Country</label>
+        <select
+          id="country"
+          value={countryValue}
+          onChange={(e) => handleCountryChange(e.target.value)}
+        >
+          <option value="">Select a country</option>
+          {countries.map((c) => (
+            <option key={c.alpha2} value={c.alpha2}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {showSubdivision && subdivisions.length > 0 && (
+        <div>
+          <label htmlFor="subdivision">{subdivisionLabel}</label>
+          <select
+            id="subdivision"
+            value={subdivisionValue}
+            onChange={(e) => onSubdivisionChange?.(e.target.value)}
+          >
+            <option value="">Select a {subdivisionLabel.toLowerCase()}</option>
+            {subdivisions.map((s) => (
+              <option key={s.code} value={s.regionCode}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+    </fieldset>
+  );
+}
+```
+
+## Step 6: Integration with React Hook Form
+
+If you use [React Hook Form](https://react-hook-form.com/), here is how to integrate the country select:
+
+```tsx copy
+import { useForm, Controller } from 'react-hook-form';
+import { country, subdivision } from '@koshmoney/countries';
+import { useMemo } from 'react';
+
+interface AddressFormData {
+  country: string;
+  subdivision: string;
+  postalCode: string;
+}
+
+function AddressForm() {
+  const { control, watch, handleSubmit } = useForm<AddressFormData>({
+    defaultValues: { country: '', subdivision: '', postalCode: '' },
+  });
+
+  const selectedCountry = watch('country');
+
+  const countries = useMemo(() => country.all(), []);
+  const subdivisions = useMemo(
+    () => (selectedCountry ? subdivision.forCountry(selectedCountry) : []),
+    [selectedCountry]
+  );
+
+  const onSubmit = (data: AddressFormData) => {
+    console.log('Submitted:', data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Controller
+        name="country"
+        control={control}
+        rules={{ required: 'Country is required' }}
+        render={({ field, fieldState }) => (
+          <div>
+            <label htmlFor="country">Country</label>
+            <select id="country" {...field}>
+              <option value="">Select a country</option>
+              {countries.map((c) => (
+                <option key={c.alpha2} value={c.alpha2}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            {fieldState.error && <span>{fieldState.error.message}</span>}
+          </div>
+        )}
+      />
+
+      {subdivisions.length > 0 && (
+        <Controller
+          name="subdivision"
+          control={control}
+          render={({ field }) => (
+            <div>
+              <label htmlFor="subdivision">
+                {subdivisions[0]?.type || 'Region'}
+              </label>
+              <select id="subdivision" {...field}>
+                <option value="">
+                  Select a {(subdivisions[0]?.type || 'region').toLowerCase()}
+                </option>
+                {subdivisions.map((s) => (
+                  <option key={s.code} value={s.regionCode}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        />
+      )}
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+## Performance Tips
+
+The `country.all()` call returns a static array of ~249 countries. It is fast and lightweight, but here are some tips for keeping your component performant:
+
+1. **Memoize the data.** Wrap `country.all()` and `subdivision.forCountry()` in `useMemo` so you do not recreate arrays on every render.
+
+2. **Memoize filtered results.** When implementing search, filter inside `useMemo` with the search term as a dependency.
+
+3. **Tree-shake what you need.** If you only need country data without subdivisions:
+
+```typescript copy
+import { whereAlpha2, all } from '@koshmoney/countries/country';
+```
+
+This imports only the country module, excluding subdivision data entirely from your bundle.
+
+## Next Steps
+
+- [US State Codes List](/blog/us-state-codes-list) -- complete reference table for all US states and territories
+- [ISO 3166 Country Codes Guide](/blog/iso-3166-country-codes-guide) -- deep dive into the ISO standard
+- [Country API Reference](/docs/api/country) -- full API documentation
+- [Subdivision API Reference](/docs/api/subdivision) -- subdivision lookups and validation
+- [Address Validation Guide](/docs/guides/address-validation) -- validate full addresses with postal codes
+
+## Get Started
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+The `@koshmoney/countries` package gives you standardized ISO 3166 data with full TypeScript types, tree-shaking support, and zero dependencies in the core modules. Start building better country selectors today.

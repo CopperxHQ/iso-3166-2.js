@@ -1,0 +1,188 @@
+---
+description: "Get continent and region data for any country using UN M49 geographic classification. Reverse lookup countries by continent or region."
+---
+
+# Geography API
+
+Get continent and UN M49 region data for any country. This is a specialized module -- import it from the `geography` subpath.
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+// Or direct imports
+import { getContinent, getRegion } from '@koshmoney/countries/geography';
+```
+
+## Types
+
+```typescript
+interface GeographyInfo {
+  continent: Continent;
+  region: Region;
+}
+
+type Continent =
+  | 'Africa'
+  | 'Antarctica'
+  | 'Asia'
+  | 'Europe'
+  | 'North America'
+  | 'Oceania'
+  | 'South America';
+
+type Region =
+  | 'Northern Africa' | 'Sub-Saharan Africa'
+  | 'Antarctica'
+  | 'Central Asia' | 'Eastern Asia' | 'South-eastern Asia'
+  | 'Southern Asia' | 'Western Asia'
+  | 'Eastern Europe' | 'Northern Europe'
+  | 'Southern Europe' | 'Western Europe'
+  | 'Caribbean' | 'Central America' | 'Northern America'
+  | 'South America'
+  | 'Australia and New Zealand' | 'Melanesia'
+  | 'Micronesia' | 'Polynesia';
+```
+
+---
+
+## Lookups
+
+### `getContinent(alpha2)`
+
+Get the continent for a country.
+
+**Parameters:** `alpha2: string` -- Alpha-2 country code (case-insensitive)
+**Returns:** `Continent | null`
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getContinent('US'); // 'North America'
+geography.getContinent('JP'); // 'Asia'
+geography.getContinent('DE'); // 'Europe'
+geography.getContinent('AU'); // 'Oceania'
+geography.getContinent('BR'); // 'South America'
+geography.getContinent('NG'); // 'Africa'
+geography.getContinent('XX'); // null
+```
+
+---
+
+### `getRegion(alpha2)`
+
+Get the UN M49 subregion for a country.
+
+**Parameters:** `alpha2: string`
+**Returns:** `Region | null`
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getRegion('US'); // 'Northern America'
+geography.getRegion('JP'); // 'Eastern Asia'
+geography.getRegion('DE'); // 'Western Europe'
+geography.getRegion('BR'); // 'South America'
+geography.getRegion('IN'); // 'Southern Asia'
+geography.getRegion('NG'); // 'Sub-Saharan Africa'
+```
+
+---
+
+### `getGeography(alpha2)`
+
+Get full geography information (continent and region).
+
+**Parameters:** `alpha2: string`
+**Returns:** `GeographyInfo | null`
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getGeography('FR');
+// { continent: 'Europe', region: 'Western Europe' }
+
+geography.getGeography('JP');
+// { continent: 'Asia', region: 'Eastern Asia' }
+
+geography.getGeography('XX');
+// null
+```
+
+---
+
+## Reverse Lookups
+
+### `getCountriesByContinent(continent)`
+
+Get all countries in a continent.
+
+**Parameters:** `continent: Continent`
+**Returns:** `string[]`
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByContinent('Europe');
+// ['AD', 'AL', 'AT', 'AX', 'BA', 'BE', ...]
+
+geography.getCountriesByContinent('Antarctica');
+// ['AQ', 'BV', 'GS', 'HM', 'TF']
+```
+
+---
+
+### `getCountriesByRegion(region)`
+
+Get all countries in a UN M49 region.
+
+**Parameters:** `region: Region`
+**Returns:** `string[]`
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByRegion('Eastern Asia');
+// ['CN', 'HK', 'JP', 'KP', 'KR', 'MO', 'MN', 'TW']
+
+geography.getCountriesByRegion('Northern America');
+// ['BM', 'CA', 'GL', 'PM', 'US']
+```
+
+---
+
+## Enumerations
+
+### `getContinents()`
+
+Get all continent names.
+
+**Returns:** `Continent[]`
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getContinents();
+// ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']
+```
+
+---
+
+### `getRegions()`
+
+Get all UN M49 region names.
+
+**Returns:** `Region[]`
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getRegions();
+// ['Northern Africa', 'Sub-Saharan Africa', 'Antarctica', 'Central Asia', ...]
+```
+
+---
+
+## Related
+
+- [Membership API](/docs/api/membership) -- EU/SEPA membership checks
+- [Country API](/docs/api/country) -- Look up country data

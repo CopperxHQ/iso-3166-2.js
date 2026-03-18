@@ -1,0 +1,213 @@
+---
+description: "Complete list of all South American countries with ISO 3166-1 alpha-2, alpha-3, and numeric codes. Includes currencies, dial codes, and code examples."
+---
+
+# South American Countries: Complete List with ISO 3166 Codes
+
+South America is the fourth-largest continent with 12 sovereign nations and 2 dependent territories recognized in ISO 3166. This reference lists every South American country with their alpha-2, alpha-3, and numeric codes, along with currency and dial code information.
+
+## Quick Access with Code
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { country } from '@koshmoney/countries';
+
+const southAmericanCodes = geography.getCountriesByContinent('South America');
+// ['AR', 'BO', 'BR', 'CL', 'CO', 'EC', 'FK', 'GF', 'GY', 'PE', 'PY', 'SR', 'UY', 'VE']
+
+const southAmericanCountries = southAmericanCodes.map((code) => country.whereAlpha2(code));
+console.log(southAmericanCountries.length); // 14
+```
+
+## All South American Countries
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Argentina | AR | ARG | 032 |
+| Bolivia | BO | BOL | 068 |
+| Brazil | BR | BRA | 076 |
+| Chile | CL | CHL | 152 |
+| Colombia | CO | COL | 170 |
+| Ecuador | EC | ECU | 218 |
+| Falkland Islands | FK | FLK | 238 |
+| French Guiana | GF | GUF | 254 |
+| Guyana | GY | GUY | 328 |
+| Paraguay | PY | PRY | 600 |
+| Peru | PE | PER | 604 |
+| Suriname | SR | SUR | 740 |
+| Uruguay | UY | URY | 858 |
+| Venezuela | VE | VEN | 862 |
+
+Brazil (BR) is the largest country in South America by both area and population, and the fifth-largest country in the world. It is also the only Portuguese-speaking country on the continent.
+
+> [!NOTE]
+> The Falkland Islands (FK) and French Guiana (GF) are dependent territories with their own ISO 3166 codes. French Guiana is an overseas department of France and uses the Euro as currency.
+
+## Currencies
+
+South America has diverse currencies. Here is each country's currency information:
+
+| Country | Code | Currency | Symbol |
+|---------|------|----------|--------|
+| Argentina | AR | Argentine Peso | $ |
+| Bolivia | BO | Boliviano | Bs. |
+| Brazil | BR | Brazilian Real | R$ |
+| Chile | CL | Chilean Peso | $ |
+| Colombia | CO | Colombian Peso | $ |
+| Ecuador | EC | US Dollar | $ |
+| Falkland Islands | FK | Falkland Pound | £ |
+| French Guiana | GF | Euro | EUR |
+| Guyana | GY | Guyanese Dollar | $ |
+| Paraguay | PY | Paraguayan Guarani | Gs |
+| Peru | PE | Peruvian Sol | S/ |
+| Suriname | SR | Surinamese Dollar | $ |
+| Uruguay | UY | Uruguayan Peso | $ |
+| Venezuela | VE | Venezuelan Bolivar | Bs.S |
+
+Ecuador (EC) is one of the few countries in the Americas that uses the US Dollar as its official currency.
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrency('BR');
+// { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' }
+
+currency.getCurrency('EC');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+// Find all South American countries using the US Dollar
+import { geography } from '@koshmoney/countries/geography';
+
+const saCodes = geography.getCountriesByContinent('South America');
+const usdCountries = saCodes.filter((code) =>
+  currency.getCurrencyCode(code) === 'USD'
+);
+// ['EC']
+```
+
+## Dial Codes
+
+| Country | Code | Dial Code |
+|---------|------|-----------|
+| Argentina | AR | +54 |
+| Bolivia | BO | +591 |
+| Brazil | BR | +55 |
+| Chile | CL | +56 |
+| Colombia | CO | +57 |
+| Ecuador | EC | +593 |
+| French Guiana | GF | +594 |
+| Guyana | GY | +592 |
+| Paraguay | PY | +595 |
+| Peru | PE | +51 |
+| Suriname | SR | +597 |
+| Uruguay | UY | +598 |
+| Venezuela | VE | +58 |
+
+```typescript copy
+import { dialCode } from '@koshmoney/countries/dialCode';
+
+dialCode.getDialCode('BR'); // '+55'
+dialCode.getDialCode('AR'); // '+54'
+dialCode.getDialCode('CL'); // '+56'
+```
+
+## Postal Code Formats
+
+Most South American countries use numeric postal codes, though formats vary:
+
+| Country | Code | Local Name | Format | Example |
+|---------|------|-----------|--------|---------|
+| Argentina | AR | CPA | ANNNNAAA or NNNN | C1420 |
+| Bolivia | BO | Codigo postal | NNNN | 0101 |
+| Brazil | BR | CEP | NNNNN-NNN | 01001-000 |
+| Chile | CL | Codigo postal | NNNNNNN | 8320000 |
+| Colombia | CO | Codigo postal | NNNNNN | 110111 |
+| Ecuador | EC | Codigo postal | NNNNNN | 170150 |
+| Paraguay | PY | Codigo postal | NNNN | 1209 |
+| Peru | PE | Codigo postal | NNNNN | 15001 |
+| Uruguay | UY | Codigo postal | NNNNN | 11000 |
+| Venezuela | VE | Codigo postal | NNNN or NNNN-A | 1010 |
+
+> [!TIP]
+> Brazil's CEP format includes a hyphen (NNNNN-NNN), and the `postalCode.isValid()` function accepts both `01001-000` and `01001000`.
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('BR', '01001-000'); // true
+postalCode.isValid('BR', '01001000');  // true
+postalCode.getName('BR');              // 'CEP'
+postalCode.getFormat('BR');            // 'NNNNN-NNN'
+```
+
+## Working with South American Data
+
+### Build a South American address form
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+const saCodes = geography.getCountriesByContinent('South America');
+
+// Build country options for a dropdown
+const countryOptions = saCodes
+  .map((code) => ({
+    value: code,
+    label: country.toName(code),
+  }))
+  .filter((c) => c.label)
+  .sort((a, b) => a.label!.localeCompare(b.label!));
+
+// Get subdivisions for a selected country
+const brazilStates = subdivision.forCountry('BR');
+// [{ code: 'BR-AC', name: 'Acre', type: 'State', ... }, ...]
+
+const argProvinces = subdivision.forCountry('AR');
+// [{ code: 'AR-B', name: 'Buenos Aires', type: 'Province', ... }, ...]
+```
+
+### Validate a South American address
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+import { geography } from '@koshmoney/countries/geography';
+
+function validateSouthAmericanAddress(countryCode: string, state: string, zip: string) {
+  // Verify it is a South American country
+  if (geography.getContinent(countryCode) !== 'South America') {
+    return { valid: false, error: 'Not a South American country' };
+  }
+
+  // Validate state
+  if (state && !subdivision.isValidRegion(countryCode, state)) {
+    return { valid: false, error: `Invalid state for ${country.toName(countryCode)}` };
+  }
+
+  // Validate postal code
+  if (zip && postalCode.hasPostalCode(countryCode)) {
+    if (!postalCode.isValid(countryCode, zip)) {
+      return {
+        valid: false,
+        error: `Invalid ${postalCode.getName(countryCode)}. Expected: ${postalCode.getFormat(countryCode)}`,
+      };
+    }
+  }
+
+  return { valid: true };
+}
+```
+
+## Summary
+
+South America has 14 entries in the ISO 3166 standard. Despite being a single UN M49 region, the continent has significant diversity in currencies, postal code formats, and subdivision types. The `@koshmoney/countries` library provides consistent access to all of this data through a unified API.
+
+---
+
+## Related
+
+- [Geography API](/docs/api/geography) -- Continent and region lookups
+- [African Countries List](/blog/african-countries-list-codes) -- All African country codes
+- [Asian Countries List](/blog/asian-countries-list-codes) -- All Asian country codes
+- [European Countries List](/blog/european-countries-list-codes) -- All European country codes
+- [Postal Code Formats](/docs/guides/postal-code-formats) -- Complete postal code reference

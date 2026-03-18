@@ -1,0 +1,169 @@
+---
+description: "Server-side address validation patterns using @koshmoney/countries for country codes, subdivisions, and postal codes."
+---
+
+# Address Validation
+
+Validate addresses on the server using country, subdivision, and postal code data from `@koshmoney/countries`.
+
+## Basic Address Validation
+
+Validate all parts of an address in a single function:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+interface Address {
+  country: string;      // Alpha-2 code
+  state?: string;       // Region code (e.g., "CA")
+  postalCode?: string;  // ZIP/postal code
+  city: string;
+  line1: string;
+}
+
+function validateAddress(address: Address): string[] {
+  const errors: string[] = [];
+
+  // Validate country
+  if (!country.isAlpha2(address.country)) {
+    errors.push(`Invalid country code: ${address.country}`);
+    return errors; // Can't validate further without valid country
+  }
+
+  // Validate subdivision (if provided)
+  if (address.state) {
+    if (!subdivision.isValidRegion(address.country, address.state)) {
+      errors.push(`Invalid state/province "${address.state}" for ${address.country}`);
+    }
+  }
+
+  // Validate postal code (if provided)
+  if (address.postalCode) {
+    if (postalCode.hasPostalCode(address.country)) {
+      if (!postalCode.isValid(address.country, address.postalCode)) {
+        const format = postalCode.getFormat(address.country);
+        const name = postalCode.getName(address.country) || 'Postal code';
+        errors.push(`Invalid ${name}. Expected format: ${format}`);
+      }
+    }
+  } else if (postalCode.hasPostalCode(address.country)) {
+    const name = postalCode.getName(address.country) || 'Postal code';
+    errors.push(`${name} is required for ${country.toName(address.country)}`);
+  }
+
+  return errors;
+}
+```
+
+## Express Middleware
+
+Use as Express request validation middleware:
+
+```typescript copy
+import { Request, Response, NextFunction } from 'express';
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+function validateAddressMiddleware(req: Request, res: Response, next: NextFunction) {
+  const { countryCode, state, zip } = req.body;
+
+  if (!countryCode || !country.isAlpha2(countryCode)) {
+    return res.status(400).json({ error: 'Invalid country code' });
+  }
+
+  if (state && !subdivision.isValidRegion(countryCode, state)) {
+    return res.status(400).json({
+      error: `Invalid state/province for ${country.toName(countryCode)}`,
+    });
+  }
+
+  if (zip && postalCode.hasPostalCode(countryCode)) {
+    if (!postalCode.isValid(countryCode, zip)) {
+      return res.status(400).json({
+        error: `Invalid ${postalCode.getName(countryCode)}. Expected: ${postalCode.getFormat(countryCode)}`,
+      });
+    }
+  }
+
+  next();
+}
+```
+
+## Shipping Zone Detection
+
+Determine shipping zones using geography and membership data:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+
+type ShippingZone = 'domestic' | 'eu' | 'europe' | 'international';
+
+function getShippingZone(originCountry: string, destCountry: string): ShippingZone {
+  if (originCountry === destCountry) return 'domestic';
+
+  if (membership.isEU(originCountry) && membership.isEU(destCountry)) {
+    return 'eu';
+  }
+
+  if (
+    geography.getContinent(originCountry) === 'Europe' &&
+    geography.getContinent(destCountry) === 'Europe'
+  ) {
+    return 'europe';
+  }
+
+  return 'international';
+}
+
+getShippingZone('DE', 'DE'); // 'domestic'
+getShippingZone('DE', 'FR'); // 'eu'
+getShippingZone('DE', 'CH'); // 'europe'
+getShippingZone('DE', 'US'); // 'international'
+```
+
+## Dynamic Form Labels
+
+Adapt form labels and requirements based on country:
+
+```typescript copy
+import { postalCode, subdivision } from '@koshmoney/countries';
+
+function getAddressFormConfig(countryCode: string) {
+  const subs = subdivision.forCountry(countryCode);
+  const subdivisionType = subs.length > 0 ? subs[0].type : null;
+
+  return {
+    postalCode: {
+      required: postalCode.hasPostalCode(countryCode),
+      label: postalCode.getName(countryCode) || 'Postal Code',
+      placeholder: postalCode.getFormat(countryCode) || '',
+    },
+    subdivision: {
+      required: subs.length > 0,
+      label: subdivisionType || 'State/Province',
+      options: subs.map((s) => ({ value: s.regionCode, label: s.name })),
+    },
+  };
+}
+
+getAddressFormConfig('US');
+// {
+//   postalCode: { required: true, label: 'ZIP Code', placeholder: 'NNNNN or NNNNN-NNNN' },
+//   subdivision: { required: true, label: 'State', options: [{ value: 'AL', label: 'Alabama' }, ...] }
+// }
+
+getAddressFormConfig('HK');
+// {
+//   postalCode: { required: false, label: 'Postal Code', placeholder: '' },
+//   subdivision: { required: true, label: 'District', options: [...] }
+// }
+```
+
+---
+
+## Related
+
+- [Postal Code API](/docs/api/postal-code) -- Validation and format functions
+- [Subdivision API](/docs/api/subdivision) -- State/province lookups
+- [Node.js Examples](/docs/examples/nodejs) -- More server-side patterns

@@ -1,0 +1,249 @@
+---
+description: "Complete list of Italian region and province codes (ISO 3166-2:IT). All 20 regions with codes, plus key provinces and TypeScript examples."
+---
+
+# Italian Region Codes: Complete ISO 3166-2 Guide
+
+Italy is divided into 20 regions and over 100 provinces, all with standardized ISO 3166-2 codes. These codes are used in address forms, shipping, tax calculations, and e-commerce applications serving the Italian market.
+
+This page lists every Italian region, highlights key provinces, and shows how to work with them using `@koshmoney/countries`.
+
+## All 20 Italian Regions
+
+Italy's 20 regions are the primary administrative divisions. Five of them have special autonomous status (marked below).
+
+### Northern Regions
+
+| Code | Name | Capital | Autonomous |
+|------|------|---------|------------|
+| IT-21 | Piemonte | Turin | No |
+| IT-23 | Val d'Aoste | Aosta | Yes |
+| IT-25 | Lombardia | Milan | No |
+| IT-32 | Trentino-Alto Adige | Trento | Yes |
+| IT-34 | Veneto | Venice | No |
+| IT-36 | Friuli-Venezia Giulia | Trieste | Yes |
+| IT-42 | Liguria | Genoa | No |
+| IT-45 | Emilia-Romagna | Bologna | No |
+
+### Central Regions
+
+| Code | Name | Capital | Autonomous |
+|------|------|---------|------------|
+| IT-52 | Toscana | Florence | No |
+| IT-55 | Umbria | Perugia | No |
+| IT-57 | Marche | Ancona | No |
+| IT-62 | Lazio | Rome | No |
+
+### Southern Regions
+
+| Code | Name | Capital | Autonomous |
+|------|------|---------|------------|
+| IT-65 | Abruzzo | L'Aquila | No |
+| IT-67 | Molise | Campobasso | No |
+| IT-72 | Campania | Naples | No |
+| IT-75 | Puglia | Bari | No |
+| IT-77 | Basilicata | Potenza | No |
+| IT-78 | Calabria | Catanzaro | No |
+
+### Islands
+
+| Code | Name | Capital | Autonomous |
+|------|------|---------|------------|
+| IT-82 | Sicilia | Palermo | Yes |
+| IT-88 | Sardegna | Cagliari | Yes |
+
+## Key Provinces
+
+Italy has over 100 provinces (type "Province" in ISO 3166-2). Here are the most commonly referenced:
+
+| Code | Province | Region |
+|------|----------|--------|
+| IT-RM | Roma | Lazio |
+| IT-MI | Milano | Lombardia |
+| IT-NA | Napoli | Campania |
+| IT-TO | Torino | Piemonte |
+| IT-FI | Firenze | Toscana |
+| IT-BO | Bologna | Emilia-Romagna |
+| IT-GE | Genova | Liguria |
+| IT-VE | Venezia | Veneto |
+| IT-PA | Palermo | Sicilia |
+| IT-BA | Bari | Puglia |
+| IT-CA | Cagliari | Sardegna |
+| IT-BZ | Bolzano | Trentino-Alto Adige |
+| IT-TN | Trento | Trentino-Alto Adige |
+| IT-TS | Trieste | Friuli-Venezia Giulia |
+
+## Understanding Italian Subdivision Codes
+
+Italy uses two different code patterns:
+
+**Regions** use 2-digit numeric codes:
+| Component | Example | Meaning |
+|-----------|---------|---------|
+| Country prefix | IT | Italy |
+| Separator | - | Standard delimiter |
+| Region number | 62 | Lazio |
+| Full code | IT-62 | Lazio, Italy |
+
+**Provinces** use 2-letter alphabetic codes:
+| Component | Example | Meaning |
+|-----------|---------|---------|
+| Country prefix | IT | Italy |
+| Separator | - | Standard delimiter |
+| Province code | RM | Roma |
+| Full code | IT-RM | Roma (Province), Italy |
+
+> [!NOTE]
+> Region codes use non-contiguous numbers (21, 23, 25, 32, 34...) that reflect historical administrative numbering, not a sequential count.
+
+## Using Italian Codes in Code
+
+### Look Up a Subdivision
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Region
+subdivision.whereCode('IT-25');
+// { code: 'IT-25', name: 'Lombardia', type: 'Region', countryCode: 'IT' }
+
+// Province
+subdivision.whereCode('IT-MI');
+// { code: 'IT-MI', name: 'Milano', type: 'Province', countryCode: 'IT' }
+```
+
+### Get All Italian Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const allIT = subdivision.forCountry('IT');
+
+// Filter by type
+const regions = allIT.filter(s => s.type === 'Region');
+console.log(regions.length);  // 20
+
+const provinces = allIT.filter(s => s.type === 'Province');
+console.log(provinces.length);  // 100+
+```
+
+### Validate a Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('IT-25');    // true (Lombardia)
+subdivision.isValidCode('IT-RM');    // true (Roma)
+subdivision.isValidCode('IT-XX');    // false
+
+subdivision.isValidRegion('IT', 'MI');  // true (Milano)
+```
+
+### Tree-Shaking for Italian Data Only
+
+```typescript copy
+import '@koshmoney/countries/subdivision/IT';
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+
+const lombardia = whereCode('IT-25');
+const allIT = forCountry('IT');
+```
+
+## Postal Code System
+
+Italy uses a 5-digit postal code (CAP -- Codice di Avviamento Postale). The first two digits indicate the province:
+
+| First Digits | Province / Area |
+|-------------|----------------|
+| 00 | Roma |
+| 10 | Torino |
+| 20 | Milano |
+| 30 | Venezia, Padova |
+| 40 | Bologna |
+| 50 | Firenze |
+| 60 | Ancona |
+| 70 | Bari |
+| 80 | Napoli |
+| 90 | Palermo |
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('IT', '00100');  // true (Roma)
+postalCode.isValid('IT', '20121');  // true (Milano)
+postalCode.isValid('IT', '1234');   // false (only 4 digits)
+```
+
+## EU Membership and Currency
+
+Italy is a founding EU member and uses the Euro:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+membership.getMemberships('IT');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+
+currency.getCurrency('IT');
+// { code: 'EUR', symbol: '\u20ac', name: 'Euro' }
+```
+
+## Common Use Cases
+
+### Address Forms
+
+Italian address forms require the province code (sigla provincia). This is the 2-letter ISO code:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const provinces = subdivision.forCountry('IT')
+  .filter(s => s.type === 'Province');
+
+const dropdown = provinces.map(p => ({
+  label: `${p.name} (${p.code.split('-')[1]})`,
+  value: p.code,
+}));
+// [{ label: 'Agrigento (AG)', value: 'IT-AG' }, ...]
+```
+
+### E-Commerce and Codice Fiscale
+
+The Italian tax code (Codice Fiscale) encodes the province of birth. Province codes from ISO 3166-2 align with the codes used in official documents:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function validateProvince(provinceCode: string): boolean {
+  return subdivision.isValidCode(`IT-${provinceCode}`);
+}
+
+validateProvince('RM');  // true
+validateProvince('XX');  // false
+```
+
+### North/South Regional Analysis
+
+Italian economic data is often analyzed by macro-region. Region codes help classify:
+
+```typescript copy
+const northRegions = new Set(['IT-21', 'IT-23', 'IT-25', 'IT-32', 'IT-34', 'IT-36', 'IT-42', 'IT-45']);
+const centralRegions = new Set(['IT-52', 'IT-55', 'IT-57', 'IT-62']);
+const southRegions = new Set(['IT-65', 'IT-67', 'IT-72', 'IT-75', 'IT-77', 'IT-78', 'IT-82', 'IT-88']);
+
+function getMacroRegion(regionCode: string): string {
+  if (northRegions.has(regionCode)) return 'north';
+  if (centralRegions.has(regionCode)) return 'central';
+  if (southRegions.has(regionCode)) return 'south';
+  return 'unknown';
+}
+```
+
+## Related Resources
+
+- [Country Code Converter Tool](/tools/country-code-converter) -- look up IT and all other codes
+- [European Countries List](/blog/european-countries-list-codes) -- all countries in Europe
+- [Eurozone Countries](/blog/eurozone-countries-list) -- all 20 Euro-using countries
+- [French Region Codes](/blog/french-region-codes-list) -- similar guide for France
+- [Subdivision API Reference](/docs/api/subdivision) -- full subdivision API documentation

@@ -1,0 +1,177 @@
+---
+description: "Introducing @koshmoney/countries - a unified, tree-shakeable TypeScript library for ISO 3166 country codes, subdivisions, postal codes, currencies, and more."
+---
+
+# Introducing @koshmoney/countries
+
+We built `@koshmoney/countries` because working with country data in JavaScript should not require five different npm packages, manual TypeScript types, and a prayer that your bundle size stays reasonable.
+
+## The Problem
+
+If you have ever built a form with a country dropdown, an address validator, or a compliance check, you know the pain. The npm ecosystem for country data is fragmented:
+
+- **`iso-3166-1`** gives you country codes but not subdivisions
+- **`iso-3166-2`** gives you subdivisions but has not been updated since 2017
+- **`countries-list`** has country names and currencies but no subdivision data
+- **`country-state-city`** has subdivisions and cities but ships a massive bundle and uses a GPL license
+- None of them validate postal codes, provide currency symbols, or check EU/SEPA membership
+
+You end up installing multiple packages, writing glue code, creating your own TypeScript interfaces, and hoping the data stays consistent across packages.
+
+## What We Built
+
+`@koshmoney/countries` is a single, unified library that covers all the country data most applications need:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+// Country lookups -- alpha-2, alpha-3, numeric, name
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+// 5,000+ subdivisions -- states, provinces, regions
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State', ... }
+
+// Postal code validation for 150+ countries
+postalCode.isValid('US', '90210');     // true
+postalCode.isValid('GB', 'SW1A 1AA'); // true
+postalCode.getName('US');             // 'ZIP Code'
+```
+
+Specialized data is available through subpath imports, so you only pay for what you use:
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+import { membership } from '@koshmoney/countries/membership';
+membership.isEU('FR');      // true
+membership.isSEPA('CH');    // true
+
+import { geography } from '@koshmoney/countries/geography';
+geography.getContinent('JP'); // 'Asia'
+
+import { dialCode } from '@koshmoney/countries/dialCode';
+dialCode.getDialCode('GB');   // '+44'
+```
+
+## Key Design Decisions
+
+### TypeScript-First
+
+Every function is fully typed. Return types, parameter types, and the data structures themselves all have proper TypeScript definitions. No `@types/` package needed, no `any` escape hatches.
+
+```typescript copy
+import type { Country, Subdivision, CurrencyInfo } from '@koshmoney/countries';
+
+const us: Country | null = country.whereAlpha2('US');
+const ca: Subdivision | null = subdivision.whereCode('US-CA');
+```
+
+### Tree-Shakeable Architecture
+
+The library separates core modules (country, subdivision, postal codes) from specialized modules (currency, dial codes, geography, membership). Core modules ship in the main bundle. Specialized modules use [subpath exports](https://nodejs.org/api/packages.html#subpath-exports) so bundlers only include the data you actually import.
+
+Need just country codes? Import only the country module:
+
+```typescript copy
+import { whereAlpha2, isValid } from '@koshmoney/countries/country';
+```
+
+Need only US and Canadian subdivisions? Import just those:
+
+```typescript copy
+import '@koshmoney/countries/subdivision/US';
+import '@koshmoney/countries/subdivision/CA';
+import { whereCode } from '@koshmoney/countries/subdivision';
+```
+
+For full details, see the [tree-shaking guide](/docs/guides/tree-shaking).
+
+### Consistent API Patterns
+
+Every module follows the same naming conventions so you can predict function names without checking docs:
+
+| Pattern | Purpose | Example |
+|---------|---------|---------|
+| `where*` | Look up by criteria | `whereAlpha2('US')` |
+| `to*` | Convert between formats | `alpha2ToAlpha3('US')` |
+| `is*` | Boolean validation | `isValid('US')` |
+| `for*` | Get collection | `forCountry('US')` |
+| `get*` | Get specific value | `getCurrency('US')` |
+
+### Automatic Input Normalization
+
+All functions handle case normalization internally. Pass `'us'`, `'Us'`, or `'US'` and get the same result. No need to uppercase input yourself.
+
+### Null-Safe Returns
+
+Lookup functions return `null` for invalid inputs instead of throwing. This makes them safe to use in pipelines and optional chains:
+
+```typescript copy
+const name = country.whereAlpha2(userInput)?.name ?? 'Unknown';
+```
+
+## Getting Started
+
+Install the package:
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+Use it in your code:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+// Build a country dropdown
+const allCountries = country.all();
+
+// Get states for the selected country
+const states = subdivision.forCountry('US');
+
+// Validate a ZIP code
+const isValidZip = postalCode.isValid('US', '90210');
+```
+
+Check out the [installation guide](/docs/installation) and [getting started tutorial](/docs/getting-started) for more detailed setup instructions.
+
+## What Sets Us Apart
+
+| Feature | @koshmoney/countries | iso-3166-1 | countries-list | country-state-city |
+|---------|---------------------|------------|----------------|-------------------|
+| Country codes | Yes | Yes | Yes | Yes |
+| Subdivisions | 5,000+ | No | No | Yes |
+| Postal code validation | 150+ countries | No | No | No |
+| Currency data | Yes | No | Yes | No |
+| Dial codes | Yes | No | Yes | No |
+| EU/SEPA membership | Yes | No | No | No |
+| TypeScript | Built-in | Community | Built-in | Built-in |
+| Tree-shakeable | Yes | No | No | No |
+| License | MIT | MIT | MIT | GPL-3.0 |
+| Dependencies | 0 (core) | 0 | 0 | 0 |
+
+For a detailed comparison with code examples, see our [package comparison article](/blog/best-country-npm-packages-2026).
+
+## What's Next
+
+We are actively working on:
+
+- More blog content covering [React components](/blog/react-country-dropdown-typescript), [compliance use cases](/blog/iso-country-codes-kyc-compliance), and framework guides
+- Expanded documentation with real-world examples
+- Community contributions and feedback
+
+The library is open source and MIT licensed. We welcome pull requests, bug reports, and feature requests.
+
+## Try It Today
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+Read the [full API documentation](/docs/api/country) or browse the [source code on GitHub](https://github.com/ArslanKamchy662/countries).
+
+If you have questions or feedback, [open an issue](https://github.com/ArslanKamchybekuulu/countries/issues) on GitHub. We would love to hear what you are building.

@@ -1,0 +1,228 @@
+---
+description: "Complete list of Mexican state codes (ISO 3166-2:MX). All 31 states and the Federal District with codes, capitals, and TypeScript examples."
+---
+
+# Mexican State Codes: Complete List of All 32 Subdivisions
+
+Mexico is divided into 31 states and 1 federal district (Ciudad de Mexico), each with a standardized ISO 3166-2 code. These codes are used in e-commerce, shipping, tax calculations (IVA/IEPS), and any application that handles Mexican addresses.
+
+This page lists every Mexican subdivision code and shows how to work with them using `@koshmoney/countries`.
+
+## All Mexican State Codes
+
+Mexico has 32 ISO 3166-2 entries: 31 states (type "State") and 1 federal district (type "Federal District").
+
+### Northern States
+
+| Code | Name | Capital |
+|------|------|---------|
+| MX-BCN | Baja California | Mexicali |
+| MX-BCS | Baja California Sur | La Paz |
+| MX-CHH | Chihuahua | Chihuahua |
+| MX-COA | Coahuila de Zaragoza | Saltillo |
+| MX-DUR | Durango | Durango |
+| MX-NLE | Nuevo Leon | Monterrey |
+| MX-SIN | Sinaloa | Culiacan |
+| MX-SON | Sonora | Hermosillo |
+| MX-TAM | Tamaulipas | Ciudad Victoria |
+
+### Central States
+
+| Code | Name | Capital |
+|------|------|---------|
+| MX-AGU | Aguascalientes | Aguascalientes |
+| MX-CMX | Ciudad de Mexico | -- |
+| MX-GUA | Guanajuato | Guanajuato |
+| MX-HID | Hidalgo | Pachuca |
+| MX-JAL | Jalisco | Guadalajara |
+| MX-MEX | Mexico | Toluca |
+| MX-MIC | Michoacan de Ocampo | Morelia |
+| MX-MOR | Morelos | Cuernavaca |
+| MX-NAY | Nayarit | Tepic |
+| MX-PUE | Puebla | Puebla |
+| MX-QUE | Queretaro | Queretaro |
+| MX-SLP | San Luis Potosi | San Luis Potosi |
+| MX-TLA | Tlaxcala | Tlaxcala |
+| MX-ZAC | Zacatecas | Zacatecas |
+
+### Southern States
+
+| Code | Name | Capital |
+|------|------|---------|
+| MX-CAM | Campeche | Campeche |
+| MX-CHP | Chiapas | Tuxtla Gutierrez |
+| MX-COL | Colima | Colima |
+| MX-GRO | Guerrero | Chilpancingo |
+| MX-OAX | Oaxaca | Oaxaca |
+| MX-ROO | Quintana Roo | Chetumal |
+| MX-TAB | Tabasco | Villahermosa |
+| MX-VER | Veracruz de Ignacio de la Llave | Xalapa |
+| MX-YUC | Yucatan | Merida |
+
+## Understanding Mexican State Codes
+
+Each code follows the ISO 3166-2 format: the country alpha-2 code (MX) followed by a hyphen and a 3-letter state abbreviation.
+
+| Component | Example | Meaning |
+|-----------|---------|---------|
+| Country prefix | MX | Mexico |
+| Separator | - | Standard delimiter |
+| State code | JAL | Jalisco |
+| Full code | MX-JAL | Jalisco, Mexico |
+
+> [!NOTE]
+> Ciudad de Mexico (MX-CMX) has the type "Federal District" in ISO 3166-2, distinct from the 31 states. Formerly known as Distrito Federal (DF), it was renamed in 2016 and received the new code CMX.
+
+## Using Mexican State Codes in Code
+
+### Look Up a State
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('MX-JAL');
+// { code: 'MX-JAL', name: 'Jalisco', type: 'State', countryCode: 'MX' }
+
+subdivision.whereCode('MX-CMX');
+// { code: 'MX-CMX', name: 'Ciudad de Mexico', type: 'Federal District', countryCode: 'MX' }
+```
+
+### Get All Mexican Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const allMX = subdivision.forCountry('MX');
+// Returns array of 32 subdivisions
+
+// Build a dropdown
+const options = allMX.map(s => ({
+  label: s.name,
+  value: s.code,
+}));
+```
+
+### Validate a State Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('MX-NLE');    // true (Nuevo Leon)
+subdivision.isValidCode('MX-XXX');    // false
+
+subdivision.isValidRegion('MX', 'JAL');  // true (Jalisco)
+subdivision.isValidRegion('MX', 'CA');   // false
+```
+
+### Tree-Shaking for Mexican Data Only
+
+```typescript copy
+import '@koshmoney/countries/subdivision/MX';
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+
+const jalisco = whereCode('MX-JAL');
+const allStates = forCountry('MX');
+```
+
+## Postal Code System
+
+Mexico uses a 5-digit postal code (Codigo Postal or CP). The first two digits indicate the state:
+
+| First Digits | State |
+|-------------|-------|
+| 01-05 | Ciudad de Mexico (CMX) |
+| 06-09 | Mexico (MEX) |
+| 10-11 | Aguascalientes (AGU) |
+| 20-21 | Aguascalientes / San Luis Potosi |
+| 22-23 | Baja California (BCN) |
+| 24-25 | Campeche (CAM) |
+| 28-30 | Coahuila (COA) |
+| 31-33 | Chihuahua (CHH) |
+| 36-38 | Guanajuato (GUA) |
+| 44-49 | Jalisco (JAL) |
+| 64-67 | Nuevo Leon (NLE) |
+| 72-75 | Puebla (PUE) |
+| 76-78 | Queretaro (QUE) |
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('MX', '06600');  // true (Ciudad de Mexico)
+postalCode.isValid('MX', '44100');  // true (Guadalajara, Jalisco)
+postalCode.isValid('MX', '1234');   // false (only 4 digits)
+```
+
+## Currency and Country Data
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { geography } from '@koshmoney/countries/geography';
+
+country.whereAlpha2('MX');
+// { name: 'Mexico', alpha2: 'MX', alpha3: 'MEX', numeric: '484' }
+
+currency.getCurrency('MX');
+// { code: 'MXN', symbol: 'MX$', name: 'Mexican Peso' }
+
+geography.getContinent('MX');  // 'North America'
+geography.getRegion('MX');     // 'Central America'
+```
+
+## Common Use Cases
+
+### Tax Calculation (IVA)
+
+Mexico has a standard IVA (Impuesto al Valor Agregado) rate of 16%, but border zone states have a reduced rate of 8%. State codes help determine the applicable rate:
+
+```typescript copy
+const borderZoneStates = new Set([
+  'MX-BCN', // Baja California
+  'MX-BCS', // Baja California Sur
+  'MX-SON', // Sonora
+  'MX-CHH', // Chihuahua (border municipalities)
+  'MX-COA', // Coahuila (border municipalities)
+  'MX-TAM', // Tamaulipas (border municipalities)
+  'MX-NLE', // Nuevo Leon (border municipalities)
+]);
+
+function getIVARate(stateCode: string): number {
+  // Note: actual border zone eligibility depends on municipality, not just state
+  return borderZoneStates.has(stateCode) ? 8 : 16;
+}
+```
+
+### CFDI Invoice Generation
+
+Mexican electronic invoices (CFDI) require the RFC and state code for tax compliance. The ISO state code maps to the SAT catalog:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function validateInvoiceState(stateCode: string): boolean {
+  return subdivision.isValidCode(stateCode);
+}
+```
+
+### Shipping Zones
+
+Mexican logistics providers define shipping zones by region:
+
+```typescript copy
+function getShippingZone(stateCode: string): string {
+  const metro = ['MX-CMX', 'MX-MEX'];
+  const north = ['MX-BCN', 'MX-BCS', 'MX-SON', 'MX-CHH', 'MX-COA', 'MX-NLE', 'MX-TAM', 'MX-DUR', 'MX-SIN'];
+
+  if (metro.includes(stateCode)) return 'metro';
+  if (north.includes(stateCode)) return 'north';
+  return 'standard';
+}
+```
+
+## Related Resources
+
+- [Country Code Converter Tool](/tools/country-code-converter) -- look up MX and all other codes
+- [North American Countries List](/blog/north-american-countries-list-codes) -- all countries in North America
+- [Brazilian State Codes](/blog/brazilian-state-codes-list) -- similar guide for Brazil
+- [US State Codes](/blog/us-state-codes-list) -- similar guide for US states
+- [Subdivision API Reference](/docs/api/subdivision) -- full subdivision API documentation

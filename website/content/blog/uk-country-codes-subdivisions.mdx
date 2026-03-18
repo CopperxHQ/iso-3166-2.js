@@ -1,0 +1,398 @@
+---
+description: "Complete reference for UK country codes and ISO 3166-2:GB subdivisions. Explains the GB vs UK distinction, covers England, Scotland, Wales, and Northern Ireland with code examples for address validation, shipping, and compliance."
+---
+
+# UK Country Codes & Subdivisions: Complete ISO 3166-2:GB Reference (2026)
+
+The United Kingdom has one of the most complex subdivision systems in the ISO 3166 standard, with over 200 codes covering four constituent countries and their respective administrative regions. It also has one of the most commonly misunderstood country codes: the ISO code is **GB**, not UK.
+
+This reference explains the GB/UK distinction, covers the four constituent countries with their ISO codes, and provides practical examples for address validation, shipping, and compliance use cases.
+
+## GB vs UK: Understanding the Confusion
+
+The single most common mistake when working with UK country codes is using `UK` instead of `GB`. Here is why this matters:
+
+| Code | Type | Meaning | Valid ISO? |
+|------|------|---------|-----------|
+| GB | ISO 3166-1 alpha-2 | Great Britain (official) | Yes |
+| GBR | ISO 3166-1 alpha-3 | Great Britain (official) | Yes |
+| 826 | ISO 3166-1 numeric | United Kingdom | Yes |
+| UK | Exceptionally reserved | Reserved for use by the UK | No (not assignable) |
+
+**GB** comes from "Great Britain," which historically refers to England, Scotland, and Wales. When Northern Ireland joined to form the United Kingdom in 1922, the ISO code remained GB for political and historical continuity. The code `UK` is "exceptionally reserved" by ISO — meaning it cannot be assigned to another country, but it is also not a valid ISO 3166-1 code for the United Kingdom.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Correct: GB is the valid ISO alpha-2 code
+country.whereAlpha2('GB');
+// { name: 'United Kingdom of Great Britain and Northern Ireland', alpha2: 'GB', alpha3: 'GBR', numeric: '826' }
+
+country.whereAlpha3('GBR');
+// { name: 'United Kingdom of Great Britain and Northern Ireland', alpha2: 'GB', alpha3: 'GBR', numeric: '826' }
+
+// UK is not a valid ISO 3166-1 alpha-2 code
+country.isAlpha2('UK');  // false
+country.whereAlpha2('UK');  // null
+```
+
+## The Four Countries Within the UK
+
+The United Kingdom is a union of four constituent countries, each with their own ISO 3166-2:GB code, devolved parliament or assembly, legal system, and cultural identity:
+
+| Code | Name | Capital | Parliament / Assembly | Legal System |
+|------|------|---------|----------------------|-------------|
+| GB-ENG | England | London | UK Parliament (no separate body) | English law |
+| GB-SCT | Scotland | Edinburgh | Scottish Parliament | Scots law |
+| GB-WLS | Wales | Cardiff | Senedd Cymru (Welsh Parliament) | English law (with Welsh elements) |
+| GB-NIR | Northern Ireland | Belfast | Northern Ireland Assembly | Northern Ireland law |
+
+### Additional Grouping Codes
+
+ISO 3166-2:GB also includes grouping codes for the nations as combined units:
+
+| Code | Name | Type | Contains |
+|------|------|------|---------|
+| GB-EAW | England and Wales | Nation | GB-ENG + GB-WLS |
+| GB-GBN | Great Britain | Nation | GB-ENG + GB-SCT + GB-WLS |
+| GB-UKM | United Kingdom | Nation | All four countries |
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Get all UK subdivisions (200+)
+const all = subdivision.forCountry('GB');
+console.log(all.length);  // 200+
+
+// Get just the four constituent countries
+const countries = subdivision.forCountry('GB')
+  .filter(s => s.type === 'Country' || s.type === 'Province');
+
+// [
+//   { code: 'GB-ENG', name: 'England', type: 'Country', ... },
+//   { code: 'GB-NIR', name: 'Northern Ireland', type: 'Province', ... },
+//   { code: 'GB-SCT', name: 'Scotland', type: 'Country', ... },
+//   { code: 'GB-WLS', name: 'Wales', type: 'Country', ... },
+// ]
+```
+
+## Key Subdivisions by Constituent Country
+
+### England
+
+England has the most complex subdivision structure, divided into London boroughs, metropolitan districts, unitary authorities, and two-tier counties. England has no separate devolved parliament — it is governed directly by the UK Parliament at Westminster.
+
+**Major cities and regions:**
+
+| Code | Name | Type |
+|------|------|------|
+| GB-LND | London, City of | City corporation |
+| GB-WSM | Westminster | London borough |
+| GB-CMD | Camden | London borough |
+| GB-SWK | Southwark | London borough |
+| GB-MAN | Manchester | Metropolitan district |
+| GB-BIR | Birmingham | Metropolitan district |
+| GB-LDS | Leeds | Metropolitan district |
+| GB-LIV | Liverpool | Metropolitan district |
+| GB-SHF | Sheffield | Metropolitan district |
+| GB-NCL | Newcastle upon Tyne | Metropolitan district |
+| GB-BST | Bristol, City of | Unitary authority |
+| GB-OXF | Oxfordshire | Two-tier county |
+| GB-CAM | Cambridgeshire | Two-tier county |
+| GB-ESX | East Sussex | Two-tier county |
+| GB-KEN | Kent | Two-tier county |
+
+### Scotland
+
+Scotland has 32 council areas following local government reorganization in 1996. Scotland has its own Parliament at Holyrood (Edinburgh) with powers over health, education, justice, and more:
+
+| Code | Name | Type |
+|------|------|------|
+| GB-EDH | Edinburgh, City of | Council area |
+| GB-GLG | Glasgow City | Council area |
+| GB-ABE | Aberdeen City | Council area |
+| GB-DND | Dundee City | Council area |
+| GB-HLD | Highland | Council area |
+| GB-FIF | Fife | Council area |
+| GB-PKN | Perth and Kinross | Council area |
+| GB-STG | Stirling | Council area |
+| GB-IVC | Inverclyde | Council area |
+| GB-MLN | Midlothian | Council area |
+
+### Wales
+
+Wales has 22 unitary authorities following reorganization in 1996. The Senedd Cymru (Welsh Parliament) was granted expanded legislative powers in 2020. Welsh and English are both official languages:
+
+| Code | Name | Type |
+|------|------|------|
+| GB-CRF | Cardiff | Unitary authority |
+| GB-SWA | Swansea | Unitary authority |
+| GB-NWP | Newport | Unitary authority |
+| GB-GWN | Gwynedd | Unitary authority |
+| GB-POW | Powys | Unitary authority |
+| GB-PEM | Pembrokeshire | Unitary authority |
+| GB-CGN | Ceredigion | Unitary authority |
+| GB-MON | Monmouthshire | Unitary authority |
+| GB-VGL | Vale of Glamorgan | Unitary authority |
+| GB-CAY | Caerphilly | Unitary authority |
+
+### Northern Ireland
+
+Northern Ireland uses 26 district council areas. It has its own Assembly at Stormont (Belfast) with devolved powers, and shares the island of Ireland with the Republic of Ireland (IE):
+
+| Code | Name | Type |
+|------|------|------|
+| GB-BFS | Belfast | District council area |
+| GB-DRY | Derry | District council area |
+| GB-LSB | Lisburn | District council area |
+| GB-ANT | Antrim | District council area |
+| GB-ARM | Armagh | District council area |
+| GB-NYM | Newry and Mourne | District council area |
+| GB-CKT | Cookstown | District council area |
+| GB-OMH | Omagh | District council area |
+
+## Post-Brexit Membership Status
+
+The UK left the European Union on 31 January 2020, with the transition period ending 31 December 2020. However, the UK retained membership in SEPA (the Single Euro Payments Area) for cross-border bank transfers:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEU('GB');        // false — left the EU in 2020
+membership.isSEPA('GB');      // true  — still in SEPA
+membership.isEurozone('GB');  // false — never adopted the Euro
+membership.isSchengen('GB');  // false — never joined Schengen
+
+// Ireland (IE) remains in the EU, creating a unique border situation
+membership.isEU('IE');        // true
+membership.isSEPA('IE');      // true
+membership.isEurozone('IE');  // true
+```
+
+This has significant implications for compliance applications:
+- **GDPR**: The UK has its own equivalent, **UK GDPR**, administered by the Information Commissioner's Office (ICO)
+- **VAT**: UK VAT is separate from EU VAT; imports/exports require customs declarations
+- **Banking**: SEPA transfers still work, but the UK is no longer subject to EU banking regulations
+
+## Code Examples
+
+### Look Up Specific Regions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// England
+subdivision.whereCode('GB-ENG');
+// { code: 'GB-ENG', name: 'England', type: 'Country', countryCode: 'GB', regionCode: 'ENG' }
+
+// Scottish council area
+subdivision.whereCode('GB-EDH');
+// { code: 'GB-EDH', name: 'Edinburgh, City of', type: 'Council area', countryCode: 'GB', regionCode: 'EDH' }
+
+// London borough
+subdivision.where('GB', 'MAN');
+// { code: 'GB-MAN', name: 'Manchester', type: 'Metropolitan district', countryCode: 'GB', regionCode: 'MAN' }
+
+// Welsh unitary authority
+subdivision.where('GB', 'CRF');
+// { code: 'GB-CRF', name: 'Cardiff', type: 'Unitary authority', countryCode: 'GB', regionCode: 'CRF' }
+```
+
+### Validate Subdivision Codes
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('GB-ENG');      // true  — England
+subdivision.isValidCode('GB-SCT');      // true  — Scotland
+subdivision.isValidCode('GB-WLS');      // true  — Wales
+subdivision.isValidCode('GB-NIR');      // true  — Northern Ireland
+subdivision.isValidCode('GB-LON');      // false — not a valid code
+subdivision.isValidCode('GB-UK');       // false — not valid
+
+subdivision.isValidRegion('GB', 'ENG'); // true
+subdivision.isValidRegion('GB', 'WLS'); // true
+subdivision.isValidRegion('GB', 'ENG'); // true
+```
+
+### Build a UK Countries Dropdown
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Simple constituent countries dropdown
+const ukCountryOptions = subdivision.forCountry('GB')
+  .filter(s => s.type === 'Country' || s.type === 'Province')
+  .map(s => ({
+    value: s.code.split('-')[1],  // 'ENG', 'SCT', 'WLS', 'NIR'
+    label: s.name,
+  }));
+
+// [
+//   { value: 'ENG', label: 'England' },
+//   { value: 'NIR', label: 'Northern Ireland' },
+//   { value: 'SCT', label: 'Scotland' },
+//   { value: 'WLS', label: 'Wales' },
+// ]
+```
+
+### Get Subdivisions by Constituent Country
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// For address forms targeting a specific country within the UK,
+// you can filter by the type relevant to that country
+function getSubdivisionsForUKCountry(ukCountry: 'england' | 'scotland' | 'wales' | 'northern-ireland') {
+  const all = subdivision.forCountry('GB');
+
+  // Note: filtering by type gives approximate results
+  // For production, maintain a mapping of codes to constituent countries
+  const typeMap = {
+    'england': ['London borough', 'Metropolitan district', 'Unitary authority', 'Two-tier county', 'City corporation'],
+    'scotland': ['Council area'],
+    'wales': ['Unitary authority'],  // Wales uses the same type as some English areas
+    'northern-ireland': ['District council area'],
+  };
+
+  return all.filter(s => typeMap[ukCountry].includes(s.type));
+}
+```
+
+## Address Validation Use Cases
+
+### UK Postcode Validation
+
+UK postcodes follow a complex alphanumeric format that varies by region:
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+// England
+postalCode.isValid('GB', 'SW1A 1AA');   // true  — Westminster (Buckingham Palace area)
+postalCode.isValid('GB', 'EC2R 8AH');   // true  — City of London
+postalCode.isValid('GB', 'M1 1AE');     // true  — Manchester city centre
+postalCode.isValid('GB', 'B1 1BB');     // true  — Birmingham
+
+// Scotland
+postalCode.isValid('GB', 'EH1 1YZ');    // true  — Edinburgh
+postalCode.isValid('GB', 'G1 1AA');     // true  — Glasgow
+
+// Wales
+postalCode.isValid('GB', 'CF10 1EP');   // true  — Cardiff
+
+// Northern Ireland
+postalCode.isValid('GB', 'BT1 1AA');    // true  — Belfast (BT prefix = Northern Ireland)
+
+// Invalid
+postalCode.isValid('GB', '12345');      // false — US ZIP format
+postalCode.isValid('GB', 'INVALID');    // false
+
+postalCode.getName('GB');    // 'Postcode'
+postalCode.getFormat('GB');  // 'AA9A 9AA'
+```
+
+**Tip:** Northern Ireland postcodes always start with `BT`. This is useful for routing logic when you need to apply different rules (e.g., different VAT, delivery surcharges).
+
+### Shipping Compliance
+
+The UK's departure from the EU introduced new customs requirements for GB-EU shipments:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+interface ShipmentRoute {
+  originAlpha2: string;
+  destinationAlpha2: string;
+}
+
+function getShippingRequirements(route: ShipmentRoute) {
+  const { originAlpha2, destinationAlpha2 } = route;
+
+  const originEU = membership.isEU(originAlpha2);
+  const destinationEU = membership.isEU(destinationAlpha2);
+  const originSepa = membership.isSEPA(originAlpha2);
+  const destinationSepa = membership.isSEPA(destinationAlpha2);
+
+  const isGBShipment = originAlpha2 === 'GB' || destinationAlpha2 === 'GB';
+  const crossesEUGBBorder =
+    (originAlpha2 === 'GB' && destinationEU) ||
+    (destinationAlpha2 === 'GB' && originEU);
+
+  return {
+    requiresCustomsDeclaration: crossesEUGBBorder,
+    requiresVATRegistration: crossesEUGBBorder,
+    sepaPaymentsAvailable: originSepa && destinationSepa,
+    euVatApplies: originEU && destinationEU,
+    ukVatApplies: isGBShipment,
+  };
+}
+
+// GB to France
+getShippingRequirements({ originAlpha2: 'GB', destinationAlpha2: 'FR' });
+// { requiresCustomsDeclaration: true, requiresVATRegistration: true, sepaPaymentsAvailable: true, ... }
+
+// Germany to France (EU-EU)
+getShippingRequirements({ originAlpha2: 'DE', destinationAlpha2: 'FR' });
+// { requiresCustomsDeclaration: false, requiresVATRegistration: false, ... }
+```
+
+### UK GDPR Compliance
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function getPrivacyRegime(alpha2: string): string {
+  if (membership.isEU(alpha2)) {
+    return 'EU GDPR — supervised by national DPA';
+  }
+  if (alpha2 === 'GB') {
+    return 'UK GDPR — supervised by ICO (Information Commissioner\'s Office)';
+  }
+  // Other countries may have their own privacy laws
+  return 'Local privacy law — verify jurisdiction requirements';
+}
+
+getPrivacyRegime('GB');  // 'UK GDPR — supervised by ICO (Information Commissioner's Office)'
+getPrivacyRegime('DE');  // 'EU GDPR — supervised by national DPA'
+getPrivacyRegime('IE');  // 'EU GDPR — supervised by national DPA'
+```
+
+## Install @koshmoney/countries
+
+```bash
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+// UK country data
+const uk = country.whereAlpha2('GB');
+// { name: 'United Kingdom...', alpha2: 'GB', alpha3: 'GBR', numeric: '826' }
+
+// All UK constituent countries
+const ukCountries = subdivision.forCountry('GB')
+  .filter(s => ['Country', 'Province'].includes(s.type));
+
+// UK membership status (post-Brexit)
+const ukStatus = {
+  eu: membership.isEU('GB'),        // false
+  sepa: membership.isSEPA('GB'),    // true
+  eurozone: membership.isEurozone('GB'), // false
+  schengen: membership.isSchengen('GB'), // false
+};
+
+// UK postcode validation
+const isValidPostcode = postalCode.isValid('GB', 'SW1A 1AA'); // true
+```
+
+## Related Resources
+
+- [Subdivision API Reference](/docs/api/subdivision) — Full subdivision module API
+- [United Kingdom Country Page](/countries/gb) — Full UK reference with currency and dial code
+- [European Countries with ISO Codes](/blog/european-countries-list-codes) — All European country codes
+- [SEPA Countries List](/blog/sepa-countries-list) — All 36 SEPA countries including GB
+- [EU Country Codes List](/blog/eu-country-codes-list) — All 27 EU member states

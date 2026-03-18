@@ -1,0 +1,237 @@
+---
+description: "Migrate from iso-3166-1 or iso-3166-2 to @koshmoney/countries. Step-by-step code changes and compatibility wrapper."
+---
+
+# Migration Guide
+
+Migrate from `iso-3166-1` or `iso-3166-2` to `@koshmoney/countries`.
+
+## From iso-3166-1
+
+### Installation
+
+```bash copy
+npm uninstall iso-3166-1
+npm install @koshmoney/countries
+```
+
+### Code Changes
+
+**Before (iso-3166-1):**
+
+```typescript
+import * as iso from 'iso-3166-1';
+
+iso.whereAlpha2('US');
+iso.whereAlpha3('USA');
+iso.whereNumeric('840');
+iso.whereCountry('UNITED STATES');
+iso.all();
+```
+
+**After (@koshmoney/countries):**
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha2('US');
+country.whereAlpha3('USA');
+country.whereNumeric('840');
+country.whereName('United States');  // Changed from whereCountry
+country.all();
+```
+
+### Key Differences
+
+| iso-3166-1 | @koshmoney/countries | Notes |
+|------------|---------------------|-------|
+| `whereCountry()` | `whereName()` | Renamed for clarity |
+| Returns `undefined` | Returns `null` | For not found |
+| `country` property | `name` property | In Country object |
+| Direct import | `country.*` namespace | Namespaced API |
+
+### Return Type Changes
+
+**iso-3166-1:**
+```typescript
+interface Country {
+  country: string;  // "Norway"
+  alpha2: string;
+  alpha3: string;
+  numeric: string;
+}
+```
+
+**@koshmoney/countries:**
+```typescript
+interface Country {
+  name: string;     // "Norway" (renamed from country)
+  alpha2: string;
+  alpha3: string;
+  numeric: string;
+}
+```
+
+---
+
+## From iso-3166-2
+
+### Installation
+
+```bash copy
+npm uninstall iso-3166-2
+npm install @koshmoney/countries
+```
+
+### Code Changes
+
+**Before (iso-3166-2):**
+
+```typescript
+import * as iso3166 from 'iso-3166-2';
+
+iso3166.subdivision('US-CA');
+iso3166.subdivision('US', 'CA');
+iso3166.subdivision('US', 'California');
+iso3166.country('US');
+iso3166.data;
+iso3166.codes;
+```
+
+**After (@koshmoney/countries):**
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+subdivision.whereCode('US-CA');
+subdivision.where('US', 'CA');
+subdivision.whereName('US', 'California');
+country.withSubdivisions('US');
+```
+
+### Key Differences
+
+| iso-3166-2 | @koshmoney/countries | Notes |
+|------------|---------------------|-------|
+| `subdivision(code)` | `subdivision.whereCode(code)` | More explicit |
+| `subdivision(a, b)` | `subdivision.where(a, b)` or `subdivision.whereName(a, b)` | Separate functions |
+| `country(code)` | `country.withSubdivisions(code)` | Returns subdivisions too |
+| Returns `{}` | Returns `null` | For not found |
+
+### Handling Overloaded Functions
+
+The old `subdivision()` function was overloaded. In `@koshmoney/countries`, these are separate functions:
+
+```typescript copy
+// Before: One function, multiple signatures
+iso3166.subdivision('US-CA');           // by code
+iso3166.subdivision('US', 'CA');        // by country + region
+iso3166.subdivision('US', 'California'); // by country + name
+
+// After: Explicit functions
+subdivision.whereCode('US-CA');
+subdivision.where('US', 'CA');
+subdivision.whereName('US', 'California');
+```
+
+---
+
+## New Features
+
+`@koshmoney/countries` includes features not available in the older libraries:
+
+### Code Conversions
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.alpha2ToAlpha3('US');     // 'USA'
+country.alpha3ToAlpha2('USA');    // 'US'
+country.alpha2ToNumeric('US');    // '840'
+country.numericToAlpha2(840);     // 'US'
+country.toName('USA');            // 'United States'
+```
+
+### Validation
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+country.isAlpha2('US');           // true
+country.isAlpha3('USA');          // true
+country.isValid('US');            // true (any format)
+country.detectFormat('USA');      // 'alpha3'
+
+subdivision.isValidCode('US-CA');            // true
+subdivision.isValidRegion('US', 'CA');       // true
+subdivision.isValidName('US', 'California'); // true
+```
+
+### Postal Code Validation
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('US', '90210');     // true
+postalCode.isValid('GB', 'SW1A 1AA');  // true
+postalCode.getName('US');              // 'ZIP Code'
+```
+
+### Currency, Dial Codes, Geography, Memberships
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+
+currency.getCurrency('US');          // { code: 'USD', symbol: '$', name: 'US Dollar' }
+dialCode.getDialCode('US');          // '+1'
+geography.getContinent('US');        // 'North America'
+membership.isEU('FR');               // true
+```
+
+### Tree-Shakeable Imports
+
+```typescript copy
+// Import only country data (~8KB instead of ~60KB)
+import { whereAlpha2 } from '@koshmoney/countries/country';
+
+// Import specific country subdivisions
+import '@koshmoney/countries/subdivision/US';
+import { whereCode } from '@koshmoney/countries/subdivision';
+```
+
+---
+
+## Compatibility Wrapper
+
+If you need to maintain backward compatibility during migration, create a thin wrapper:
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+export const iso3166 = {
+  subdivision: (codeOrCountry: string, regionOrName?: string) => {
+    if (regionOrName === undefined) {
+      return subdivision.whereCode(codeOrCountry);
+    }
+    return subdivision.where(codeOrCountry, regionOrName) ||
+           subdivision.whereName(codeOrCountry, regionOrName);
+  },
+
+  country: (code: string) => {
+    return country.withSubdivisions(code);
+  },
+};
+```
+
+Then gradually replace `iso3166.*` calls with the new API throughout your codebase.
+
+---
+
+## Related
+
+- [Getting Started](/docs/getting-started) -- Quick start guide
+- [Country API](/docs/api/country) -- Full country API reference
+- [Subdivision API](/docs/api/subdivision) -- Full subdivision API reference

@@ -1,0 +1,210 @@
+---
+description: "Shipping zones, tax calculation, and checkout address validation for e-commerce applications using ISO country and subdivision codes."
+---
+
+# Country Data for E-commerce
+
+E-commerce applications use country and subdivision codes at every stage of the purchase flow: displaying localized prices, validating shipping addresses, calculating taxes, and configuring delivery zones. Getting these wrong costs money -- failed deliveries, incorrect tax filings, and abandoned checkouts.
+
+`@koshmoney/countries` gives you validated ISO 3166 data for all of these use cases, with tree-shakeable imports so you only load the countries you actually ship to.
+
+## Use Case 1: Shipping Zone Configuration
+
+Group countries into shipping zones with standardized rates and delivery estimates:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+import { geography } from '@koshmoney/countries/geography';
+
+interface ShippingZone {
+  id: string;
+  name: string;
+  countries: string[];
+  rate: number;
+  freeShippingThreshold: number;
+  deliveryDays: { min: number; max: number };
+}
+
+function buildShippingZones(): ShippingZone[] {
+  return [
+    {
+      id: 'domestic',
+      name: 'United States',
+      countries: ['US'],
+      rate: 5.99,
+      freeShippingThreshold: 35,
+      deliveryDays: { min: 2, max: 5 },
+    },
+    {
+      id: 'north-america',
+      name: 'Canada & Mexico',
+      countries: ['CA', 'MX'],
+      rate: 14.99,
+      freeShippingThreshold: 75,
+      deliveryDays: { min: 5, max: 10 },
+    },
+    {
+      id: 'eu',
+      name: 'European Union',
+      countries: membership.getMembers('EU'),
+      rate: 19.99,
+      freeShippingThreshold: 100,
+      deliveryDays: { min: 7, max: 14 },
+    },
+    {
+      id: 'apac',
+      name: 'Asia-Pacific',
+      countries: geography.countriesInContinent('Asia')
+        .concat(geography.countriesInContinent('Oceania')),
+      rate: 24.99,
+      freeShippingThreshold: 150,
+      deliveryDays: { min: 10, max: 21 },
+    },
+  ];
+}
+
+function getShippingRate(countryCode: string, orderTotal: number) {
+  const zones = buildShippingZones();
+  const zone = zones.find(z => z.countries.includes(countryCode));
+
+  if (!zone) {
+    return { zone: 'International', rate: 29.99, freeShipping: false };
+  }
+
+  const freeShipping = orderTotal >= zone.freeShippingThreshold;
+  return {
+    zone: zone.name,
+    rate: freeShipping ? 0 : zone.rate,
+    freeShipping,
+    deliveryDays: zone.deliveryDays,
+  };
+}
+```
+
+## Use Case 2: Checkout Address Validation
+
+Validate the shipping address before processing the order. Adapt form fields based on the selected country:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+function getCheckoutFormConfig(countryCode: string) {
+  const subs = subdivision.forCountry(countryCode);
+  const hasPostal = postalCode.hasPostalCode(countryCode);
+
+  return {
+    stateField: {
+      visible: subs.length > 0,
+      label: subs[0]?.type === 'Province' ? 'Province'
+        : subs[0]?.type === 'Region' ? 'Region'
+        : 'State',
+      options: subs.map(s => ({ value: s.regionCode, label: s.name })),
+      required: subs.length > 0,
+    },
+    postalCodeField: {
+      visible: hasPostal,
+      label: postalCode.getName(countryCode) ?? 'Postal Code',
+      placeholder: postalCode.getFormat(countryCode) ?? '',
+      required: hasPostal,
+    },
+  };
+}
+
+// US: shows State dropdown, ZIP Code field
+getCheckoutFormConfig('US');
+
+// UAE: no postal code field
+getCheckoutFormConfig('AE');
+
+// Canada: shows Province dropdown, Postal Code field with "A1A 1A1" placeholder
+getCheckoutFormConfig('CA');
+```
+
+## Use Case 3: Tax Calculation by Region
+
+Determine the applicable tax rate based on the customer's country and state:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+interface TaxRate {
+  rate: number;
+  type: string;
+  jurisdiction: string;
+}
+
+function getTaxRate(countryCode: string, stateCode?: string): TaxRate {
+  // EU VAT
+  const EU_VAT: Record<string, number> = {
+    DE: 0.19, FR: 0.20, IT: 0.22, ES: 0.21, NL: 0.21,
+    BE: 0.21, AT: 0.20, SE: 0.25, DK: 0.25, FI: 0.24,
+    IE: 0.23, PT: 0.23, PL: 0.23, CZ: 0.21, GR: 0.24,
+  };
+
+  if (membership.isEU(countryCode) && EU_VAT[countryCode]) {
+    return {
+      rate: EU_VAT[countryCode],
+      type: 'VAT',
+      jurisdiction: countryCode,
+    };
+  }
+
+  // US state sales tax (simplified)
+  if (countryCode === 'US' && stateCode) {
+    const US_TAX: Record<string, number> = {
+      CA: 0.0725, NY: 0.08, TX: 0.0625, FL: 0.06,
+      WA: 0.065, IL: 0.0625, PA: 0.06, OH: 0.0575,
+      // States with no sales tax
+      OR: 0, NH: 0, MT: 0, DE: 0, AK: 0,
+    };
+    return {
+      rate: US_TAX[stateCode] ?? 0.06,
+      type: 'Sales Tax',
+      jurisdiction: `US-${stateCode}`,
+    };
+  }
+
+  // Canada GST/HST
+  if (countryCode === 'CA') {
+    const CA_TAX: Record<string, number> = {
+      AB: 0.05, BC: 0.12, MB: 0.12, NB: 0.15,
+      NL: 0.15, NS: 0.15, NT: 0.05, NU: 0.05,
+      ON: 0.13, PE: 0.15, QC: 0.14975, SK: 0.11, YT: 0.05,
+    };
+    return {
+      rate: stateCode ? (CA_TAX[stateCode] ?? 0.05) : 0.05,
+      type: 'GST/HST',
+      jurisdiction: stateCode ? `CA-${stateCode}` : 'CA',
+    };
+  }
+
+  return { rate: 0, type: 'None', jurisdiction: countryCode };
+}
+```
+
+## Best Practices
+
+**Load only the subdivision data you need.** If you only ship to North America and Europe, import those countries individually to keep your checkout page fast:
+
+```typescript copy
+import '@koshmoney/countries/subdivision/US';
+import '@koshmoney/countries/subdivision/CA';
+import '@koshmoney/countries/subdivision/GB';
+import '@koshmoney/countries/subdivision/DE';
+import '@koshmoney/countries/subdivision/FR';
+```
+
+**Validate addresses server-side before charging.** Client-side validation improves UX, but server-side validation prevents bad data from reaching your order management system.
+
+**Use the country's local postal code terminology.** Display "ZIP Code" for US, "Postcode" for UK, "PIN Code" for India. The `postalCode.getName()` function handles this automatically.
+
+**Maintain a separate restricted countries list.** Some countries cannot receive shipments due to carrier restrictions, customs complexity, or import regulations. Keep this list in your application configuration, not hardcoded.
+
+## Related Resources
+
+- [International Shipping Zones](/blog/international-shipping-zones-country-state) -- detailed shipping zone implementation guide
+- [Canadian Province Codes](/blog/canadian-province-codes) -- Canadian tax and shipping zone data
+- [Address Validation Guide](/docs/guides/address-validation) -- building validated address forms
+- [Postal Code API Reference](/docs/api/postal-code) -- postal code validation for 150+ countries

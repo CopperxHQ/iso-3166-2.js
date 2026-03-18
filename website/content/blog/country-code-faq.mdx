@@ -1,0 +1,357 @@
+---
+description: "Answers to the most common questions about ISO 3166 country codes. What is the country code for the US, UK, Germany? What is ISO 3166? How to validate country codes in JavaScript?"
+---
+
+import { Callout } from 'nextra/components'
+
+# Country Code FAQ: Common Questions Answered
+
+This page answers the most frequently asked questions about ISO 3166 country codes. Whether you are a developer building international software or just trying to find the right code for a country, you will find the answer here.
+
+## General Questions
+
+### What is ISO 3166?
+
+ISO 3166 is an international standard published by the International Organization for Standardization (ISO) that defines codes for countries, subdivisions, and formerly used country names. It has three parts:
+
+- **ISO 3166-1** defines codes for 249 countries and territories using three formats: alpha-2, alpha-3, and numeric
+- **ISO 3166-2** defines codes for subdivisions (states, provinces, regions) -- over 5,000 entries
+- **ISO 3166-3** defines codes for formerly used country names
+
+### What is the difference between alpha-2, alpha-3, and numeric codes?
+
+| Format | Length | Example (USA) | Used For |
+|--------|--------|---------------|----------|
+| Alpha-2 | 2 letters | US | Domain names (.us), currency codes, most APIs |
+| Alpha-3 | 3 letters | USA | International shipping, Olympic codes, customs |
+| Numeric | 3 digits | 840 | Language-independent systems, banking |
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Convert between formats
+country.alpha2ToAlpha3('US');    // 'USA'
+country.alpha3ToAlpha2('GBR');   // 'GB'
+country.alpha2ToNumeric('DE');   // '276'
+country.numericToAlpha2(840);    // 'US'
+```
+
+### How many countries are in ISO 3166?
+
+ISO 3166-1 includes **249 entries**. This covers 193 UN member states plus 56 additional territories, dependencies, and special areas (like Antarctica, Hong Kong, and the Faroe Islands).
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+const all = country.all();
+console.log(all.length); // 249
+```
+
+### How do I validate a country code?
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Validate any format
+country.isAlpha2('US');     // true
+country.isAlpha3('USA');    // true
+country.isValid('US');      // true (any format)
+country.isValid('XX');      // false
+
+// Detect the format
+country.detectFormat('US');    // 'alpha2'
+country.detectFormat('USA');   // 'alpha3'
+country.detectFormat('840');   // 'numeric'
+```
+
+## Country Code Lookups
+
+### What is the country code for the United States?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | US |
+| Alpha-3 | USA |
+| Numeric | 840 |
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+```
+
+### What is the country code for the United Kingdom?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | GB |
+| Alpha-3 | GBR |
+| Numeric | 826 |
+
+The alpha-2 code is **GB**, not UK. This is one of the most common mistakes in software. The code derives from "Great Britain."
+
+```typescript copy
+country.whereAlpha2('GB');
+// { name: 'United Kingdom', alpha2: 'GB', alpha3: 'GBR', numeric: '826' }
+
+country.isAlpha2('UK'); // false -- UK is not a valid ISO code
+```
+
+### What is the country code for Germany?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | DE |
+| Alpha-3 | DEU |
+| Numeric | 276 |
+
+The code **DE** comes from "Deutschland," the German name for Germany.
+
+```typescript copy
+country.whereAlpha2('DE');
+// { name: 'Germany', alpha2: 'DE', alpha3: 'DEU', numeric: '276' }
+```
+
+### What is the country code for China?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | CN |
+| Alpha-3 | CHN |
+| Numeric | 156 |
+
+Note: Hong Kong (HK/HKG), Macau (MO/MAC), and Taiwan (TW/TWN) have their own separate ISO codes.
+
+### What is the country code for Japan?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | JP |
+| Alpha-3 | JPN |
+| Numeric | 392 |
+
+### What is the country code for India?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | IN |
+| Alpha-3 | IND |
+| Numeric | 356 |
+
+### What is the country code for France?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | FR |
+| Alpha-3 | FRA |
+| Numeric | 250 |
+
+### What is the country code for Brazil?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | BR |
+| Alpha-3 | BRA |
+| Numeric | 076 |
+
+### What is the country code for Canada?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | CA |
+| Alpha-3 | CAN |
+| Numeric | 124 |
+
+### What is the country code for Australia?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | AU |
+| Alpha-3 | AUS |
+| Numeric | 036 |
+
+### What is the country code for South Korea?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | KR |
+| Alpha-3 | KOR |
+| Numeric | 410 |
+
+South Korea's official ISO name is "Korea, Republic of." The code KR stands for Korea. North Korea uses KP/PRK.
+
+### What is the country code for Mexico?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | MX |
+| Alpha-3 | MEX |
+| Numeric | 484 |
+
+### What is the country code for Switzerland?
+
+| Format | Code |
+|--------|------|
+| Alpha-2 | CH |
+| Alpha-3 | CHE |
+| Numeric | 756 |
+
+**CH** comes from "Confoederatio Helvetica," the Latin name for Switzerland. This is language-neutral since Switzerland has four official languages.
+
+## Technical Questions
+
+### How do I get all subdivisions for a country?
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Get all US states
+const usStates = subdivision.forCountry('US');
+// [{ code: 'US-AL', name: 'Alabama', type: 'State' }, ...]
+
+// Look up a specific subdivision
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State', countryCode: 'US', regionCode: 'CA' }
+
+// Validate a subdivision belongs to a country
+subdivision.isValidRegion('US', 'CA');  // true
+subdivision.isValidRegion('US', 'ON');  // false (ON is Canadian)
+```
+
+### How do I check if a country is in the EU?
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEU('FR');   // true (France)
+membership.isEU('CH');   // false (Switzerland)
+membership.isEU('GB');   // false (UK left the EU)
+
+// Get all EU members
+const euMembers = membership.getMembers('EU');  // 27 countries
+```
+
+### How do I validate a postal code?
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('US', '90210');       // true
+postalCode.isValid('GB', 'SW1A 1AA');    // true
+postalCode.isValid('US', 'ABCDE');       // false
+
+// Get the local name for postal codes
+postalCode.getName('US');   // 'ZIP Code'
+postalCode.getName('IN');   // 'PIN Code'
+postalCode.getName('DE');   // 'PLZ'
+
+// Get format pattern
+postalCode.getFormat('US');  // 'NNNNN or NNNNN-NNNN'
+postalCode.getFormat('CA');  // 'A1A 1A1'
+```
+
+### How do I get a country's currency?
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+currency.getCurrency('JP');
+// { code: 'JPY', symbol: '\u00a5', name: 'Japanese Yen' }
+
+// Reverse lookup: which countries use EUR?
+currency.getCountriesByCurrency('EUR');
+// ['AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', ...]
+```
+
+### How do I look up a country by name?
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereName('United States');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+country.whereName('Germany');
+// { name: 'Germany', alpha2: 'DE', alpha3: 'DEU', numeric: '276' }
+```
+
+### How do I get a country's continent or region?
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getContinent('US');  // 'North America'
+geography.getContinent('JP');  // 'Asia'
+geography.getContinent('NG');  // 'Africa'
+
+geography.getRegion('US');     // 'Northern America'
+geography.getRegion('JP');     // 'Eastern Asia'
+geography.getRegion('NG');     // 'Western Africa'
+
+// Get all countries in a continent
+geography.countriesInContinent('Europe');
+// ['AD', 'AL', 'AT', 'AX', 'BA', 'BE', 'BG', ...]
+```
+
+### Does this library support tree-shaking?
+
+Yes. You can import only the modules you need:
+
+```typescript copy
+// Core modules from the main bundle (~8KB for countries only)
+import { country } from '@koshmoney/countries';
+
+// Specialized modules via subpath imports (only loaded when imported)
+import { currency } from '@koshmoney/countries/currency';
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+
+// Per-country subdivision imports
+import '@koshmoney/countries/subdivision/US';  // Only US subdivisions
+import '@koshmoney/countries/subdivision/CA';  // Only CA subdivisions
+```
+
+See the [tree-shaking guide](/docs/guides/tree-shaking) for more details.
+
+## Common Mistakes
+
+### Using UK instead of GB
+
+The ISO alpha-2 code for the United Kingdom is **GB** (from Great Britain), not UK. This is the single most common country code mistake in software.
+
+### Confusing Korea codes
+
+- South Korea: **KR** / KOR / 410
+- North Korea: **KP** / PRK / 408
+
+Most applications only need South Korea (KR).
+
+### Using 2-digit numeric codes
+
+Numeric codes are always 3 digits with leading zeros. The code for Albania is **008**, not 8. Store numeric codes as strings if possible.
+
+### Assuming all countries have postal codes
+
+Not all countries use postal codes. Hong Kong (HK), UAE (AE), Qatar (QA), and about 60 others do not have postal code systems.
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.hasPostalCode('HK');  // false
+postalCode.hasPostalCode('US');  // true
+```
+
+### Confusing Cyprus geography
+
+The UN classifies Cyprus (CY) as part of Asia (Western Asia), even though it is an EU member state. This can cause issues if you use geographic classification for EU-related logic.
+
+## Related Resources
+
+- [Country Code Converter Tool](/tools/country-code-converter) -- Interactive lookup tool
+- [ISO 3166 Country Codes Guide](/blog/iso-3166-country-codes-guide) -- Complete ISO 3166 overview
+- [Getting Started](/docs/getting-started) -- Quick setup guide
+- [Country API Reference](/docs/api/country) -- Full API documentation
+- [Subdivision API Reference](/docs/api/subdivision) -- Subdivision data and validation

@@ -1,0 +1,253 @@
+---
+description: "Complete list of all 20 Eurozone countries with ISO codes and Euro adoption dates. Understand the difference between EU and Eurozone. TypeScript code examples for currency and membership checks."
+---
+
+# Eurozone Countries List: All 20 Members Using the Euro
+
+The Eurozone (also called the Euro area) is the group of European Union member states that have adopted the Euro as their official currency. As of 2024, the Eurozone has 20 members. If you build payment processing, currency conversion, or e-commerce applications that serve European customers, understanding which countries use the Euro is essential for correct pricing and checkout flows.
+
+This reference lists every Eurozone member with their ISO codes and Euro adoption dates, explains how the Eurozone relates to the EU, and provides code examples for checking Eurozone membership programmatically.
+
+## What Is the Eurozone?
+
+The Eurozone is a monetary union within the European Union where the Euro (EUR) is the sole legal tender. It was established in 1999 when 11 EU member states adopted the Euro for electronic transactions, followed by physical coins and banknotes in 2002. Since then, 9 more countries have joined, bringing the total to 20.
+
+Key facts:
+
+- **20 member countries** out of 27 EU members
+- **Currency:** Euro (EUR), symbol: EUR
+- **Central bank:** European Central Bank (ECB) in Frankfurt
+- **Monetary policy:** Set by the ECB for all Eurozone members
+- **Not all EU members use EUR:** 7 EU countries retain their own currencies
+
+## Quick Access with Code
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Get all 20 Eurozone member codes
+const eurozoneCountries = membership.getMembers('Eurozone');
+// ['AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR',
+//  'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PT', 'SI', 'SK']
+
+console.log(eurozoneCountries.length); // 20
+
+// Check if a specific country uses the Euro
+membership.isEurozone('DE'); // true (Germany)
+membership.isEurozone('SE'); // false (Sweden uses SEK)
+membership.isEurozone('GB'); // false (UK uses GBP)
+```
+
+## All 20 Eurozone Members
+
+| Country | Alpha-2 | Alpha-3 | Numeric | Euro Adopted | Previous Currency |
+|---------|---------|---------|---------|-------------|-------------------|
+| Austria | AT | AUT | 040 | 1999 | Austrian Schilling |
+| Belgium | BE | BEL | 056 | 1999 | Belgian Franc |
+| Croatia | HR | HRV | 191 | 2023 | Croatian Kuna |
+| Cyprus | CY | CYP | 196 | 2008 | Cypriot Pound |
+| Estonia | EE | EST | 233 | 2011 | Estonian Kroon |
+| Finland | FI | FIN | 246 | 1999 | Finnish Markka |
+| France | FR | FRA | 250 | 1999 | French Franc |
+| Germany | DE | DEU | 276 | 1999 | Deutsche Mark |
+| Greece | GR | GRC | 300 | 2001 | Greek Drachma |
+| Ireland | IE | IRL | 372 | 1999 | Irish Pound |
+| Italy | IT | ITA | 380 | 1999 | Italian Lira |
+| Latvia | LV | LVA | 428 | 2014 | Latvian Lats |
+| Lithuania | LT | LTU | 440 | 2015 | Lithuanian Litas |
+| Luxembourg | LU | LUX | 442 | 1999 | Luxembourgish Franc |
+| Malta | MT | MLT | 470 | 2008 | Maltese Lira |
+| Netherlands | NL | NLD | 528 | 1999 | Dutch Guilder |
+| Portugal | PT | PRT | 620 | 1999 | Portuguese Escudo |
+| Slovakia | SK | SVK | 703 | 2009 | Slovak Koruna |
+| Slovenia | SI | SVN | 705 | 2007 | Slovenian Tolar |
+| Spain | ES | ESP | 724 | 1999 | Spanish Peseta |
+
+The 11 founding members (1999) were: Austria, Belgium, Finland, France, Germany, Ireland, Italy, Luxembourg, Netherlands, Portugal, and Spain. Greece joined in 2001, and the most recent member is Croatia, which adopted the Euro in January 2023.
+
+## EU Members NOT in the Eurozone
+
+Seven EU member states have not adopted the Euro:
+
+| Country | Alpha-2 | Currency | Code |
+|---------|---------|----------|------|
+| Bulgaria | BG | Bulgarian Lev | BGN |
+| Czech Republic | CZ | Czech Koruna | CZK |
+| Denmark | DK | Danish Krone | DKK |
+| Hungary | HU | Hungarian Forint | HUF |
+| Poland | PL | Polish Zloty | PLN |
+| Romania | RO | Romanian Leu | RON |
+| Sweden | SE | Swedish Krona | SEK |
+
+> [!NOTE]
+> Denmark has a formal opt-out from the Euro. The other 6 countries are technically required to adopt the Euro eventually (as part of their EU accession treaties), but there is no deadline, and several have no near-term plans to join.
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+
+// Find EU members that are NOT in the Eurozone
+const euMembers = membership.getMembers('EU');
+const nonEurozone = euMembers.filter((code) => !membership.isEurozone(code));
+
+nonEurozone.map((code) => ({
+  country: country.toName(code),
+  currency: currency.getCurrencyCode(code),
+}));
+// [
+//   { country: 'Bulgaria', currency: 'BGN' },
+//   { country: 'Czech Republic', currency: 'CZK' },
+//   { country: 'Denmark', currency: 'DKK' },
+//   { country: 'Hungary', currency: 'HUF' },
+//   { country: 'Poland', currency: 'PLN' },
+//   { country: 'Romania', currency: 'RON' },
+//   { country: 'Sweden', currency: 'SEK' },
+// ]
+```
+
+## Eurozone vs EU vs SEPA
+
+These three groupings serve different purposes and have different members:
+
+| Group | Size | What It Governs | Key for Developers |
+|-------|------|-----------------|-------------------|
+| **EU** | 27 | Political union, regulations | GDPR, VAT, compliance |
+| **Eurozone** | 20 | EUR as official currency | Currency display, pricing |
+| **SEPA** | 36 | EUR payment transfers | Payment method eligibility |
+
+A critical distinction: SEPA enables EUR bank transfers in 36 countries, but only 20 of those actually use EUR as their official currency. A Polish bank can send and receive EUR via SEPA, but Poland's official currency is the Zloty (PLN).
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Poland: EU and SEPA but not Eurozone
+membership.getMemberships('PL');
+// { EU: true, SEPA: true, EEA: true, Eurozone: false, Schengen: true }
+
+// France: member of everything
+membership.getMemberships('FR');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+
+// UK: only SEPA (post-Brexit)
+membership.getMemberships('GB');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: false }
+```
+
+## Why Developers Need Eurozone Checks
+
+### Dynamic Currency Display
+
+When showing prices to European users, you need to know whether to display EUR or a local currency:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+function getDisplayCurrency(countryCode: string) {
+  if (membership.isEurozone(countryCode)) {
+    return { code: 'EUR', symbol: '\u20ac', name: 'Euro' };
+  }
+  return currency.getCurrency(countryCode);
+}
+
+getDisplayCurrency('DE'); // { code: 'EUR', symbol: '\u20ac', name: 'Euro' }
+getDisplayCurrency('SE'); // { code: 'SEK', symbol: 'kr', name: 'Swedish Krona' }
+getDisplayCurrency('PL'); // { code: 'PLN', symbol: 'z\u0142', name: 'Polish Zloty' }
+```
+
+### Checkout Flow Logic
+
+For e-commerce platforms, Eurozone membership determines whether to show a EUR price or convert to local currency:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+function getPricingStrategy(countryCode: string) {
+  if (membership.isEurozone(countryCode)) {
+    return { currency: 'EUR', strategy: 'direct', fxNeeded: false };
+  }
+
+  if (membership.isSEPA(countryCode)) {
+    // SEPA country but not Eurozone -- can accept EUR via SEPA but local currency differs
+    const local = currency.getCurrencyCode(countryCode);
+    return { currency: local || 'EUR', strategy: 'local_preferred', fxNeeded: local !== 'EUR' };
+  }
+
+  // Non-European country
+  const local = currency.getCurrencyCode(countryCode);
+  return { currency: local || 'USD', strategy: 'international', fxNeeded: true };
+}
+
+getPricingStrategy('DE');
+// { currency: 'EUR', strategy: 'direct', fxNeeded: false }
+
+getPricingStrategy('SE');
+// { currency: 'SEK', strategy: 'local_preferred', fxNeeded: true }
+
+getPricingStrategy('US');
+// { currency: 'USD', strategy: 'international', fxNeeded: true }
+```
+
+### VAT Handling
+
+While VAT applies to all EU members (not just Eurozone), the currency in which VAT is calculated depends on Eurozone membership. Eurozone VAT is always in EUR; non-Eurozone EU members calculate VAT in their local currency:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+function getVATCurrency(countryCode: string): string | null {
+  if (!membership.isEU(countryCode)) return null; // No EU VAT
+  if (membership.isEurozone(countryCode)) return 'EUR';
+  // Non-Eurozone EU member: VAT in local currency
+  return null; // Use local currency from currency module
+}
+```
+
+## Non-EU Countries Using the Euro
+
+Several countries and territories outside the EU use the Euro, either through formal monetary agreements or unilateral adoption:
+
+- **Monaco** (MC) -- monetary agreement with France
+- **San Marino** (SM) -- monetary agreement with Italy
+- **Vatican City** (VA) -- monetary agreement with Italy
+- **Andorra** (AD) -- monetary agreement with the EU
+- **Kosovo** and **Montenegro** -- unilateral adoption (not recognized in ISO 3166-1 for Kosovo)
+
+These countries use the Euro but are NOT in the Eurozone (which is strictly an EU institution). The `membership.isEurozone()` function correctly returns `false` for these countries:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEurozone('MC'); // false (Monaco uses EUR but is not in the Eurozone)
+membership.isEurozone('SM'); // false (San Marino uses EUR but is not in the Eurozone)
+membership.isEurozone('AD'); // false (Andorra uses EUR but is not in the Eurozone)
+```
+
+> [!TIP]
+> If you need to check whether a country uses EUR as its currency (regardless of Eurozone membership), use the currency module instead: `currency.getCurrencyCode('MC') === 'EUR'`.
+
+## Common Mistakes
+
+**Assuming all EU countries use the Euro.** Only 20 of 27 EU members are in the Eurozone. Showing EUR prices to users in Poland, Sweden, or Denmark without a currency selector is a poor user experience.
+
+**Confusing Eurozone with SEPA.** SEPA is a payment network for EUR transfers. A country can participate in SEPA without using EUR as its official currency. The UK is in SEPA but uses GBP.
+
+**Ignoring non-EU Euro users.** Monaco, San Marino, Vatican City, and Andorra all use the Euro but are not EU or Eurozone members. If you only check `isEurozone()`, you will miss these.
+
+**Hardcoding the Eurozone list.** Croatia joined in 2023. Bulgaria and Romania are candidates for future adoption. Use a maintained library to avoid stale data.
+
+## Summary
+
+The Eurozone has 20 EU member states that use the Euro as their official currency. It is a subset of the EU (27 members) and a subset of SEPA (36 members). For developers, Eurozone membership is the key check for currency display, pricing, and VAT calculation logic. The `@koshmoney/countries` library provides `membership.isEurozone()` and `membership.getMembers('Eurozone')` for reliable programmatic checks.
+
+---
+
+## Related
+
+- [EU Country Codes List](/blog/eu-country-codes-list) -- All 27 EU member state codes
+- [SEPA Countries List](/blog/sepa-countries-list) -- All 36 SEPA members
+- [Schengen Countries List](/blog/schengen-countries-list) -- All 27 Schengen members
+- [Membership API](/docs/api/membership) -- Full membership module reference
+- [Currency API](/docs/api/currency) -- Currency lookups by country

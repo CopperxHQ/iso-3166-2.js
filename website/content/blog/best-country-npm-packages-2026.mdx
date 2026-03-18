@@ -1,0 +1,332 @@
+---
+description: "Comprehensive comparison of the best country code npm packages in 2026: i18n-iso-countries, countries-list, country-state-city, iso-3166-1, and @koshmoney/countries."
+---
+
+# Best Country Code npm Packages in 2026: Comprehensive Comparison
+
+Choosing the right npm package for country data affects your bundle size, TypeScript experience, and how much glue code you write. This guide compares the five most popular country code packages available today, with honest assessments of each one's strengths and weaknesses.
+
+## Why the Right Package Matters
+
+Country data seems simple until you need it to do more than populate a dropdown. Real applications need:
+
+- **Subdivision data** (states, provinces, regions) for address forms
+- **Postal code validation** for checkout flows
+- **Currency information** for payment processing
+- **TypeScript types** that actually work
+- **Small bundle sizes** for frontend applications
+- **A license** compatible with your project (GPL vs MIT matters)
+
+No single package has historically covered all of these, which is why many projects end up installing multiple packages. Let's look at what is available.
+
+## The Packages
+
+### 1. i18n-iso-countries
+
+**Version:** 7.14.0 | **License:** MIT | **Dependencies:** 0
+
+`i18n-iso-countries` is the most downloaded country code package on npm. Its standout feature is internationalization -- it provides country names in 30+ languages.
+
+**What it does well:**
+- Country names in dozens of languages (English, Spanish, German, Chinese, Arabic, and many more)
+- Supports alpha-2, alpha-3, and numeric lookups
+- Locale-based name retrieval
+- Well maintained with regular updates
+
+**Limitations:**
+- No subdivision data (states, provinces)
+- No postal code validation
+- No currency or dial code data
+- Bundle includes all language data unless you manually register individual locales
+- TypeScript types are community-maintained via `@types/i18n-iso-countries`
+
+**Example usage:**
+
+```typescript
+import countries from 'i18n-iso-countries';
+import en from 'i18n-iso-countries/langs/en.json';
+
+countries.registerLocale(en);
+
+countries.getName('US', 'en');    // 'United States of America'
+countries.getAlpha3Code('US', 'en'); // 'USA'
+countries.getNames('en');        // { AF: 'Afghanistan', ... }
+```
+
+**Best for:** Applications that need country names in multiple languages. If your app serves users in 10+ locales and you need translated country names, this is a strong choice.
+
+### 2. countries-list
+
+**Version:** 3.3.0 | **License:** MIT | **Dependencies:** 0 | **Unpacked:** ~268 KB
+
+`countries-list` provides a rich data set per country including name, native name, phone code, currency, languages, capital, and continent.
+
+**What it does well:**
+- Rich country metadata in a single package
+- Native names for each country
+- Currency codes, phone codes, and capital cities
+- Continent classification
+- Built-in TypeScript types
+- Actively maintained (last updated March 2026)
+
+**Limitations:**
+- No subdivision data
+- No postal code validation
+- No currency symbols or full currency names (just codes)
+- Data is exported as large objects -- no tree-shaking support
+- All data is loaded even if you only need country names
+
+**Example usage:**
+
+```typescript
+import { getCountryCode, getCountryData, getCountryDataList } from 'countries-list';
+
+getCountryData('US');
+// { name: 'United States', native: 'United States',
+//   phone: [1], continent: 'NA', capital: 'Washington D.C.',
+//   currency: ['USD'], languages: ['en'] }
+
+getCountryDataList();  // Array of all countries
+```
+
+**Best for:** Projects that need a broad overview of country metadata (capital, languages, native names) without subdivision or postal code needs.
+
+### 3. country-state-city
+
+**Version:** 3.2.1 | **License:** GPL-3.0 | **Dependencies:** 0
+
+`country-state-city` is the go-to package when you need countries, states, and cities in a single package. It includes over 5,000 states and 150,000+ cities worldwide.
+
+**What it does well:**
+- Comprehensive country + state + city data
+- City-level data (latitude, longitude, population)
+- Covers nearly every country
+- Built-in TypeScript types
+- Recent v3.2.0 optimized bundle with minified JSON
+
+**Limitations:**
+- **GPL-3.0 license** -- this is a deal-breaker for many commercial projects. If your application is not open source, GPL requires you to release your entire codebase under GPL
+- Large bundle size even after optimization (city data alone is ~8MB minified)
+- No postal code validation
+- No currency, dial code, or membership data
+- Last published September 2023 -- less recent updates
+
+**Example usage:**
+
+```typescript
+import { Country, State, City } from 'country-state-city';
+
+Country.getAllCountries();
+// [{ name: 'United States', isoCode: 'US', ... }, ...]
+
+State.getStatesOfCountry('US');
+// [{ name: 'Alabama', isoCode: 'AL', ... }, ...]
+
+City.getCitiesOfState('US', 'CA');
+// [{ name: 'Los Angeles', ... }, ...]
+```
+
+**Best for:** Applications that need city-level data and can comply with GPL-3.0 licensing. If you need to populate a "City" dropdown, this is your best option -- just be aware of the license implications.
+
+### 4. iso-3166-1 + iso-3166-2
+
+**iso-3166-1:** Version 2.1.1 | **License:** MIT | **Unpacked:** ~38 KB
+**iso-3166-2:** Version 1.0.0 | **License:** MIT
+
+These two packages are the classic ISO 3166 implementations. `iso-3166-1` covers country codes, and `iso-3166-2` covers subdivisions.
+
+**What they do well:**
+- Focused, minimal packages
+- `iso-3166-1` is small (~38 KB unpacked)
+- Clean API for basic lookups
+- MIT licensed
+
+**Limitations:**
+- **`iso-3166-2` has not been updated since August 2017** -- nearly 9 years without updates means missing countries and subdivisions that have changed since then
+- Requires installing and coordinating two separate packages
+- No postal code validation, currency, or other data
+- No built-in TypeScript types (community `@types/` packages exist but may lag behind)
+- No tree-shaking support
+
+**Example usage:**
+
+```typescript
+import iso3166 from 'iso-3166-1';
+
+iso3166.whereAlpha2('US');
+// { country: 'United States of America', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+import iso31662 from 'iso-3166-2';
+
+iso31662.subdivision('US-CA');
+// { name: 'California', type: 'state', ... }
+```
+
+**Best for:** Legacy projects already using these packages. For new projects, there are better options with more features and active maintenance.
+
+### 5. @koshmoney/countries
+
+**License:** MIT | **Dependencies:** 0 (core), 1 (dialCode module only)
+
+`@koshmoney/countries` is a unified library that combines ISO 3166-1 country codes, ISO 3166-2 subdivisions, postal code validation, currency data, dial codes, geography, and EU/SEPA membership checks in a single package with true tree-shaking.
+
+**What it does well:**
+- Unified API covering countries, subdivisions, postal codes, currencies, dial codes, geography, and memberships
+- True tree-shaking via subpath exports -- import only what you need
+- Built-in TypeScript types with no `@types/` package needed
+- Consistent API patterns across all modules
+- Automatic input normalization (case-insensitive)
+- MIT licensed
+- Both ESM and CommonJS support
+- Zero dependencies in core modules
+
+**Limitations:**
+- Newer package, smaller community compared to established alternatives
+- No internationalized country names (English only)
+- No city-level data
+
+**Example usage:**
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State', ... }
+
+postalCode.isValid('US', '90210'); // true
+
+// Specialized modules via subpath imports
+import { currency } from '@koshmoney/countries/currency';
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+import { membership } from '@koshmoney/countries/membership';
+membership.isEU('FR'); // true
+membership.isSEPA('CH'); // true
+```
+
+**Best for:** New TypeScript projects that need comprehensive country data with good bundle size control. Especially strong for fintech, e-commerce, and compliance applications.
+
+## Feature Comparison Table
+
+| Feature | i18n-iso-countries | countries-list | country-state-city | iso-3166-1 | @koshmoney/countries |
+|---------|-------------------|---------------|-------------------|-----------|---------------------|
+| Country codes | Yes | Yes | Yes | Yes | Yes |
+| Alpha-2/3/Numeric | Yes | Alpha-2 only | Alpha-2 only | Yes | Yes |
+| Subdivisions | No | No | Yes (5,000+) | No* | Yes (5,000+) |
+| Cities | No | No | Yes (150,000+) | No | No |
+| Postal code validation | No | No | No | No | Yes (150+ countries) |
+| Currency data | No | Code only | No | No | Code + symbol + name |
+| Dial codes | No | Yes | Phone code | No | Yes |
+| Geography | No | Continent | No | No | Continent + region |
+| EU/SEPA/EEA membership | No | No | No | No | Yes |
+| Multi-language names | Yes (30+) | Native name | No | No | No |
+| TypeScript | @types/ | Built-in | Built-in | @types/ | Built-in |
+| Tree-shakeable | Partial | No | No | No | Yes |
+| License | MIT | MIT | **GPL-3.0** | MIT | MIT |
+| Actively maintained | Yes | Yes | Last: Sep 2023 | Last: Oct 2021 | Yes |
+
+*iso-3166-2 is a separate package
+
+## Side-by-Side Code Comparison
+
+Here is the same task -- get a country name and its subdivisions -- in each package:
+
+**i18n-iso-countries:**
+
+```typescript
+import countries from 'i18n-iso-countries';
+import en from 'i18n-iso-countries/langs/en.json';
+countries.registerLocale(en);
+
+const name = countries.getName('US', 'en');
+// Subdivisions? Install another package.
+```
+
+**countries-list:**
+
+```typescript
+import { getCountryData } from 'countries-list';
+
+const data = getCountryData('US');
+const name = data.name;
+// Subdivisions? Not available.
+```
+
+**country-state-city:**
+
+```typescript
+import { Country, State } from 'country-state-city';
+
+const country = Country.getCountryByCode('US');
+const name = country?.name;
+const states = State.getStatesOfCountry('US');
+// Works! But GPL-3.0 license.
+```
+
+**iso-3166-1 + iso-3166-2:**
+
+```typescript
+import iso3166 from 'iso-3166-1';
+import iso31662 from 'iso-3166-2';
+
+const country = iso3166.whereAlpha2('US');
+const name = country?.country;
+const california = iso31662.subdivision('US-CA');
+// Works, but iso-3166-2 data may be outdated.
+```
+
+**@koshmoney/countries:**
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+const us = country.whereAlpha2('US');
+const name = us?.name;
+const states = subdivision.forCountry('US');
+// All from one package, up-to-date, MIT licensed.
+```
+
+## Recommendation by Use Case
+
+### For simple country dropdowns (no subdivisions needed)
+**countries-list** or **@koshmoney/countries**. Both are MIT licensed with good TypeScript support. Choose `countries-list` if you need native names and capital cities. Choose `@koshmoney/countries` if you might need subdivisions or postal codes later.
+
+### For country + state/province selection
+**@koshmoney/countries**. It provides both country and subdivision data in a single MIT-licensed package with tree-shaking. `country-state-city` is the alternative if you also need city data and can accept GPL-3.0.
+
+### For multi-language applications
+**i18n-iso-countries**. Nothing else comes close for internationalized country names. If you also need subdivisions, pair it with `@koshmoney/countries` for subdivision lookups.
+
+### For fintech and compliance
+**@koshmoney/countries**. It is the only package that includes EU/SEPA membership checks, postal code validation, and currency data -- all common requirements in [KYC/AML compliance workflows](/blog/iso-country-codes-kyc-compliance).
+
+### For applications needing city data
+**country-state-city**. It is the only package with city-level data. Just be sure the GPL-3.0 license is compatible with your project.
+
+### For maximum bundle optimization
+**@koshmoney/countries**. Its subpath exports let you import only the specific modules you need. Import just country codes without subdivision data, or just the US subdivisions without loading all 5,000+.
+
+## Migration Path
+
+Already using another package? See the [migration guide](/docs/guides/migration) for step-by-step instructions on moving from `iso-3166-1`, `iso-3166-2`, or `country-state-city` to `@koshmoney/countries`.
+
+## Conclusion
+
+The best package depends on your requirements:
+
+- Need translated names? Use **i18n-iso-countries**
+- Need rich metadata? Use **countries-list**
+- Need cities? Use **country-state-city** (mind the GPL)
+- Need a unified, modern solution? Use **@koshmoney/countries**
+
+For most new TypeScript projects, `@koshmoney/countries` provides the best combination of features, bundle size control, and developer experience. Install it and try it out:
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+Read the [full documentation](/docs/getting-started) or explore the [API reference](/docs/api/country).

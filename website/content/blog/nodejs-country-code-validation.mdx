@@ -1,0 +1,498 @@
+---
+description: "Server-side country code validation in Node.js with Express middleware. Input sanitization, API endpoint design, and error handling patterns."
+---
+
+# Server-Side Country Code Validation in Node.js
+
+Client-side validation is for user experience. Server-side validation is for data integrity. Any country code that arrives at your API -- from form submissions, webhook payloads, third-party integrations, or mobile apps -- must be validated before it touches your database.
+
+This guide covers Express middleware for country validation, API endpoint design, input normalization, and error handling patterns using `@koshmoney/countries`.
+
+## Why Server-Side Validation Matters
+
+Country codes appear everywhere in backend systems: user profiles, shipping addresses, KYC records, payment processing, and compliance checks. Invalid codes cause cascading failures:
+
+- Database queries return wrong results
+- Payment processors reject transactions
+- Compliance checks produce false negatives
+- Reports and analytics become unreliable
+
+A single validation layer at the API boundary prevents all of these problems.
+
+## Basic Validation Functions
+
+### Validate a Country Code
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Validate any format (alpha-2, alpha-3, or numeric)
+country.isValid('US');      // true
+country.isValid('USA');     // true
+country.isValid(840);       // true
+country.isValid('XX');      // false
+country.isValid('');        // false
+
+// Validate a specific format
+country.isAlpha2('US');     // true
+country.isAlpha2('USA');    // false (that's alpha-3)
+country.isAlpha3('USA');    // true
+country.isNumeric(840);     // true
+
+// Detect the format
+country.detectFormat('US');   // 'alpha2'
+country.detectFormat('USA');  // 'alpha3'
+country.detectFormat('840');  // 'numeric'
+country.detectFormat('XX');   // null
+```
+
+### Validate a Subdivision Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Validate full ISO 3166-2 code
+subdivision.isValidCode('US-CA');     // true
+subdivision.isValidCode('US-XX');     // false
+subdivision.isValidCode('XX-YY');     // false
+
+// Validate region code within a country
+subdivision.isValidRegion('US', 'CA');     // true
+subdivision.isValidRegion('US', 'XX');     // false
+
+// Validate by name
+subdivision.isValidName('US', 'California');  // true
+subdivision.isValidName('US', 'Atlantis');    // false
+```
+
+### Validate Postal Codes
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('US', '90210');        // true
+postalCode.isValid('US', 'ABCDE');        // false
+postalCode.isValid('GB', 'SW1A 1AA');     // true
+postalCode.isValid('CA', 'K1A 0B1');      // true
+```
+
+## Express Middleware
+
+### Country Code Validation Middleware
+
+Create a reusable middleware that validates country codes in request body, query parameters, or route params:
+
+```typescript copy
+import { Request, Response, NextFunction } from 'express';
+import { country } from '@koshmoney/countries';
+
+interface ValidationOptions {
+  field: string;
+  source: 'body' | 'query' | 'params';
+  required?: boolean;
+  format?: 'alpha2' | 'alpha3' | 'numeric' | 'any';
+  normalize?: boolean; // Convert to alpha-2
+}
+
+function validateCountryCode(options: ValidationOptions) {
+  const {
+    field,
+    source,
+    required = true,
+    format = 'any',
+    normalize = true,
+  } = options;
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    const value = req[source]?.[field];
+
+    // Handle missing value
+    if (!value && !required) return next();
+    if (!value) {
+      return res.status(400).json({
+        error: 'VALIDATION_ERROR',
+        message: `${field} is required`,
+        field,
+      });
+    }
+
+    // Validate format
+    let isValid = false;
+    switch (format) {
+      case 'alpha2':
+        isValid = country.isAlpha2(value);
+        break;
+      case 'alpha3':
+        isValid = country.isAlpha3(value);
+        break;
+      case 'numeric':
+        isValid = country.isNumeric(Number(value));
+        break;
+      default:
+        isValid = country.isValid(value);
+    }
+
+    if (!isValid) {
+      return res.status(400).json({
+        error: 'INVALID_COUNTRY_CODE',
+        message: `Invalid country code: ${value}`,
+        field,
+        hint: format === 'alpha2'
+          ? 'Expected a 2-letter ISO 3166-1 code (e.g., US, GB, DE)'
+          : 'Expected a valid ISO 3166-1 code',
+      });
+    }
+
+    // Normalize to alpha-2 if requested
+    if (normalize && format !== 'alpha2') {
+      const detected = country.detectFormat(String(value));
+      if (detected === 'alpha3') {
+        req[source][field] = country.alpha3ToAlpha2(value);
+      } else if (detected === 'numeric') {
+        req[source][field] = country.numericToAlpha2(Number(value));
+      }
+    }
+
+    next();
+  };
+}
+```
+
+### Using the Middleware
+
+```typescript copy
+import express from 'express';
+
+const app = express();
+app.use(express.json());
+
+// Validate country in request body
+app.post('/api/addresses',
+  validateCountryCode({ field: 'countryCode', source: 'body', format: 'alpha2' }),
+  (req, res) => {
+    // req.body.countryCode is guaranteed to be a valid alpha-2 code
+    res.json({ status: 'ok', country: req.body.countryCode });
+  }
+);
+
+// Validate country in route params
+app.get('/api/countries/:code/subdivisions',
+  validateCountryCode({ field: 'code', source: 'params', normalize: true }),
+  (req, res) => {
+    // req.params.code is normalized to alpha-2
+    const subs = subdivision.forCountry(req.params.code);
+    res.json(subs);
+  }
+);
+
+// Optional country in query string
+app.get('/api/users',
+  validateCountryCode({ field: 'country', source: 'query', required: false }),
+  (req, res) => {
+    // req.query.country is either valid or undefined
+    res.json({ filter: req.query.country ?? 'all' });
+  }
+);
+```
+
+### Full Address Validation Middleware
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+interface AddressBody {
+  countryCode: string;
+  stateCode?: string;
+  postalCodeValue?: string;
+  city: string;
+  line1: string;
+}
+
+function validateAddress(req: Request, res: Response, next: NextFunction) {
+  const { countryCode, stateCode, postalCodeValue } = req.body as AddressBody;
+  const errors: Array<{ field: string; message: string }> = [];
+
+  // Country is always required
+  if (!countryCode) {
+    errors.push({ field: 'countryCode', message: 'Country code is required' });
+  } else if (!country.isAlpha2(countryCode)) {
+    errors.push({ field: 'countryCode', message: `Invalid country code: ${countryCode}` });
+  } else {
+    // Only validate dependent fields if country is valid
+    if (stateCode && !subdivision.isValidRegion(countryCode, stateCode)) {
+      errors.push({
+        field: 'stateCode',
+        message: `Invalid state/province: ${stateCode} for ${countryCode}`,
+      });
+    }
+
+    if (!stateCode && subdivision.hasSubdivisions(countryCode)) {
+      errors.push({
+        field: 'stateCode',
+        message: 'State/province is required for this country',
+      });
+    }
+
+    if (postalCodeValue && !postalCode.isValid(countryCode, postalCodeValue)) {
+      const format = postalCode.getFormat(countryCode);
+      const name = postalCode.getName(countryCode) ?? 'Postal code';
+      errors.push({
+        field: 'postalCodeValue',
+        message: `Invalid ${name}. Expected format: ${format}`,
+      });
+    }
+
+    if (!postalCodeValue && postalCode.hasPostalCode(countryCode)) {
+      const name = postalCode.getName(countryCode) ?? 'Postal code';
+      errors.push({ field: 'postalCodeValue', message: `${name} is required` });
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({ error: 'VALIDATION_ERROR', errors });
+  }
+
+  next();
+}
+```
+
+## API Endpoint Design
+
+### Country Lookup Endpoint
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+
+// GET /api/countries/:code
+app.get('/api/countries/:code', (req, res) => {
+  const data = country.whereAlpha2(req.params.code.toUpperCase());
+
+  if (!data) {
+    return res.status(404).json({
+      error: 'COUNTRY_NOT_FOUND',
+      message: `No country found for code: ${req.params.code}`,
+    });
+  }
+
+  const subs = subdivision.forCountry(data.alpha2);
+
+  res.json({
+    ...data,
+    subdivisionCount: subs.length,
+    hasSubdivisions: subs.length > 0,
+  });
+});
+
+// GET /api/countries/:code/subdivisions
+app.get('/api/countries/:code/subdivisions', (req, res) => {
+  const code = req.params.code.toUpperCase();
+
+  if (!country.isAlpha2(code)) {
+    return res.status(400).json({
+      error: 'INVALID_COUNTRY_CODE',
+      message: `Invalid country code: ${req.params.code}`,
+    });
+  }
+
+  const subs = subdivision.forCountry(code);
+  res.json({
+    countryCode: code,
+    count: subs.length,
+    subdivisions: subs,
+  });
+});
+```
+
+### Validation Endpoint
+
+Expose a validation endpoint so clients can check addresses before submission:
+
+```typescript copy
+// POST /api/validate/address
+app.post('/api/validate/address', (req, res) => {
+  const { countryCode, stateCode, postalCodeValue } = req.body;
+  const result: Record<string, boolean> = {};
+
+  result.countryValid = country.isAlpha2(countryCode);
+
+  if (result.countryValid) {
+    result.stateValid = !stateCode || subdivision.isValidRegion(countryCode, stateCode);
+    result.postalCodeValid = !postalCodeValue || postalCode.isValid(countryCode, postalCodeValue);
+    result.stateRequired = subdivision.hasSubdivisions(countryCode);
+    result.postalCodeRequired = postalCode.hasPostalCode(countryCode);
+  }
+
+  result.valid = result.countryValid
+    && result.stateValid !== false
+    && result.postalCodeValid !== false;
+
+  res.json(result);
+});
+```
+
+## Input Sanitization
+
+Country codes arrive in many formats. Normalize them before validation:
+
+```typescript copy
+function normalizeCountryInput(input: unknown): string | null {
+  if (typeof input !== 'string') return null;
+
+  // Trim whitespace and convert to uppercase
+  const cleaned = input.trim().toUpperCase();
+
+  // Reject empty strings
+  if (cleaned.length === 0) return null;
+
+  // Try alpha-2 first (most common)
+  if (country.isAlpha2(cleaned)) return cleaned;
+
+  // Try alpha-3 and convert
+  if (country.isAlpha3(cleaned)) return country.alpha3ToAlpha2(cleaned);
+
+  // Try numeric
+  const num = Number(cleaned);
+  if (!isNaN(num) && country.isNumeric(num)) return country.numericToAlpha2(num);
+
+  // Try by name
+  const byName = country.whereName(cleaned);
+  if (byName) return byName.alpha2;
+
+  return null;
+}
+
+normalizeCountryInput('us');              // 'US'
+normalizeCountryInput('USA');             // 'US'
+normalizeCountryInput('840');             // 'US'
+normalizeCountryInput('United States');   // 'US'
+normalizeCountryInput('Narnia');          // null
+normalizeCountryInput(undefined);         // null
+```
+
+## Error Response Patterns
+
+### Consistent Error Format
+
+```typescript copy
+interface ApiError {
+  error: string;
+  message: string;
+  field?: string;
+  hint?: string;
+}
+
+function countryError(value: string, field: string): ApiError {
+  return {
+    error: 'INVALID_COUNTRY_CODE',
+    message: `'${value}' is not a valid ISO 3166-1 country code`,
+    field,
+    hint: 'Use a 2-letter code like US, GB, or DE. See https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2',
+  };
+}
+
+function subdivisionError(countryCode: string, stateCode: string): ApiError {
+  const subs = subdivision.forCountry(countryCode);
+  const validCodes = subs.slice(0, 5).map(s => s.regionCode).join(', ');
+
+  return {
+    error: 'INVALID_SUBDIVISION_CODE',
+    message: `'${stateCode}' is not a valid subdivision of ${countryCode}`,
+    field: 'stateCode',
+    hint: `Valid codes include: ${validCodes}${subs.length > 5 ? ', ...' : ''}`,
+  };
+}
+```
+
+## NestJS Integration
+
+If you are using NestJS instead of Express, use a custom validation pipe:
+
+```typescript copy
+import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
+import { country } from '@koshmoney/countries';
+
+@Injectable()
+export class CountryCodePipe implements PipeTransform {
+  transform(value: string): string {
+    const normalized = value?.trim().toUpperCase();
+    if (!normalized || !country.isAlpha2(normalized)) {
+      throw new BadRequestException(`Invalid country code: ${value}`);
+    }
+    return normalized;
+  }
+}
+
+// Usage in controller
+@Get(':countryCode/subdivisions')
+getSubdivisions(@Param('countryCode', CountryCodePipe) countryCode: string) {
+  return subdivision.forCountry(countryCode);
+}
+```
+
+### DTO Validation with class-validator
+
+```typescript copy
+import { IsString, Validate } from 'class-validator';
+import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
+import { country } from '@koshmoney/countries';
+
+@ValidatorConstraint({ name: 'isCountryCode', async: false })
+class IsCountryCodeConstraint implements ValidatorConstraintInterface {
+  validate(value: string) {
+    return country.isAlpha2(value?.toUpperCase());
+  }
+  defaultMessage() {
+    return 'Must be a valid ISO 3166-1 alpha-2 country code';
+  }
+}
+
+class CreateAddressDto {
+  @IsString()
+  @Validate(IsCountryCodeConstraint)
+  countryCode: string;
+}
+```
+
+## Testing Your Validation
+
+```typescript copy
+import { describe, it, expect } from 'vitest';
+
+describe('Country validation middleware', () => {
+  it('accepts valid alpha-2 codes', () => {
+    expect(normalizeCountryInput('US')).toBe('US');
+    expect(normalizeCountryInput('gb')).toBe('GB');
+    expect(normalizeCountryInput('DE')).toBe('DE');
+  });
+
+  it('normalizes alpha-3 to alpha-2', () => {
+    expect(normalizeCountryInput('USA')).toBe('US');
+    expect(normalizeCountryInput('GBR')).toBe('GB');
+  });
+
+  it('rejects invalid codes', () => {
+    expect(normalizeCountryInput('XX')).toBeNull();
+    expect(normalizeCountryInput('')).toBeNull();
+    expect(normalizeCountryInput(undefined)).toBeNull();
+  });
+
+  it('handles numeric codes', () => {
+    expect(normalizeCountryInput('840')).toBe('US');
+  });
+});
+```
+
+## Summary
+
+- Always validate country codes server-side, even if the client already validated them
+- Normalize input to alpha-2 format early in the request pipeline
+- Use middleware to keep validation logic out of route handlers
+- Return helpful error messages with the expected format and examples
+- Combine country, subdivision, and postal code validation for complete address checking
+
+## Related Resources
+
+- [Country API Reference](/docs/api/country) -- validation and conversion functions
+- [Subdivision API Reference](/docs/api/subdivision) -- state/province validation
+- [Postal Code API Reference](/docs/api/postal-code) -- postal code patterns and validation
+- [Node.js Examples](/docs/examples/nodejs) -- backend integration examples

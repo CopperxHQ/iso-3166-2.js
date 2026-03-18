@@ -1,0 +1,198 @@
+---
+description: "Complete list of all Asian countries with ISO 3166-1 alpha-2, alpha-3, and numeric codes. Organized by UN M49 subregion with code examples."
+---
+
+# Asian Countries: Complete List with ISO 3166 Codes
+
+Asia is the largest and most populous continent, home to over 4.5 billion people across 49 sovereign states and several dependent territories. This reference lists every Asian country and territory recognized in ISO 3166, organized by UN M49 subregion.
+
+## Quick Access with Code
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { country } from '@koshmoney/countries';
+
+const asianCodes = geography.getCountriesByContinent('Asia');
+// ['AE', 'AF', 'AM', 'AZ', 'BD', 'BH', 'BN', 'BT', 'CN', ...]
+
+const asianCountries = asianCodes.map((code) => country.whereAlpha2(code));
+console.log(asianCountries.length); // 51 (including territories)
+```
+
+## Central Asia
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Kazakhstan | KZ | KAZ | 398 |
+| Kyrgyzstan | KG | KGZ | 417 |
+| Tajikistan | TJ | TJK | 762 |
+| Turkmenistan | TM | TKM | 795 |
+| Uzbekistan | UZ | UZB | 860 |
+
+The five Central Asian republics, all former Soviet states, share similar ISO code patterns. Kazakhstan (KZ) is the largest country in Central Asia and the ninth largest in the world by land area.
+
+## Eastern Asia
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| China | CN | CHN | 156 |
+| Hong Kong | HK | HKG | 344 |
+| Japan | JP | JPN | 392 |
+| Macau | MO | MAC | 446 |
+| Mongolia | MN | MNG | 496 |
+| North Korea | KP | PRK | 408 |
+| South Korea | KR | KOR | 410 |
+| Taiwan | TW | TWN | 158 |
+
+> [!NOTE]
+> Hong Kong (HK) and Macau (MO) have their own ISO 3166 codes despite being Special Administrative Regions of China. This is important for address validation, shipping, and payment processing -- treat them as separate entries in forms and APIs.
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+geography.getCountriesByRegion('Eastern Asia');
+// ['CN', 'HK', 'JP', 'KP', 'KR', 'MN', 'MO', 'TW']
+```
+
+## South-eastern Asia
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Brunei Darussalam | BN | BRN | 096 |
+| Cambodia | KH | KHM | 116 |
+| East Timor | TL | TLS | 626 |
+| Indonesia | ID | IDN | 360 |
+| Laos | LA | LAO | 418 |
+| Malaysia | MY | MYS | 458 |
+| Myanmar | MM | MMR | 104 |
+| Philippines | PH | PHL | 608 |
+| Singapore | SG | SGP | 702 |
+| Thailand | TH | THA | 764 |
+| Viet Nam | VN | VNM | 704 |
+
+South-eastern Asia includes the ASEAN member states plus East Timor. Indonesia (ID) is the world's fourth most populous country and the largest archipelagic state.
+
+## Southern Asia
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Afghanistan | AF | AFG | 004 |
+| Bangladesh | BD | BGD | 050 |
+| Bhutan | BT | BTN | 064 |
+| British Indian Ocean Territory | IO | IOT | 086 |
+| India | IN | IND | 356 |
+| Iran | IR | IRN | 364 |
+| Maldives | MV | MDV | 462 |
+| Nepal | NP | NPL | 524 |
+| Pakistan | PK | PAK | 586 |
+| Sri Lanka | LK | LKA | 144 |
+
+India (IN) is the world's most populous country. The subcontinent region uses diverse postal code systems -- India uses 6-digit PIN Codes while Pakistan uses 5-digit postal codes.
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.getName('IN'); // 'PIN Code'
+postalCode.getName('PK'); // 'Postal code'
+postalCode.isValid('IN', '110001'); // true
+postalCode.isValid('PK', '44000');  // true
+```
+
+## Western Asia
+
+| Country | Alpha-2 | Alpha-3 | Numeric |
+|---------|---------|---------|---------|
+| Armenia | AM | ARM | 051 |
+| Azerbaijan | AZ | AZE | 031 |
+| Bahrain | BH | BHR | 048 |
+| Cyprus | CY | CYP | 196 |
+| Georgia | GE | GEO | 268 |
+| Iraq | IQ | IRQ | 368 |
+| Israel | IL | ISR | 376 |
+| Jordan | JO | JOR | 400 |
+| Kuwait | KW | KWT | 414 |
+| Lebanon | LB | LBN | 422 |
+| Oman | OM | OMN | 512 |
+| Palestine | PS | PSE | 275 |
+| Qatar | QA | QAT | 634 |
+| Saudi Arabia | SA | SAU | 682 |
+| Syria | SY | SYR | 760 |
+| Turkey | TR | TUR | 792 |
+| United Arab Emirates | AE | ARE | 784 |
+| Yemen | YE | YEM | 887 |
+
+Western Asia is the largest subregion with 18 entries. Note that Cyprus (CY) is geographically in Western Asia per the UN classification but is politically part of the European Union -- the `membership` module handles this distinction:
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { membership } from '@koshmoney/countries/membership';
+
+geography.getContinent('CY'); // 'Asia' (geographic)
+membership.isEU('CY');       // true  (political)
+```
+
+## Working with Asian Country Data
+
+### Get currencies for Asian countries
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+
+const asianCodes = geography.getCountriesByContinent('Asia');
+
+const currencies = asianCodes
+  .map((code) => ({
+    country: country.toName(code),
+    ...currency.getCurrency(code),
+  }))
+  .filter((c) => c.code);
+// [{ country: 'Afghanistan', code: 'AFN', symbol: '؋', name: 'Afghan Afghani' }, ...]
+```
+
+### Get dial codes for Asian countries
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+import { dialCode } from '@koshmoney/countries/dialCode';
+import { country } from '@koshmoney/countries';
+
+const asianCodes = geography.getCountriesByContinent('Asia');
+
+const phoneCodes = asianCodes
+  .map((code) => ({
+    country: country.toName(code),
+    code,
+    dialCode: dialCode.getDialCode(code),
+  }))
+  .filter((c) => c.dialCode);
+// [{ country: 'United Arab Emirates', code: 'AE', dialCode: '+971' }, ...]
+```
+
+### Filter by region
+
+```typescript copy
+import { geography } from '@koshmoney/countries/geography';
+
+// Get only ASEAN-region countries
+const southeastAsia = geography.getCountriesByRegion('South-eastern Asia');
+// ['BN', 'ID', 'KH', 'LA', 'MM', 'MY', 'PH', 'SG', 'TH', 'TL', 'VN']
+
+// Get Middle East / Gulf countries
+const westernAsia = geography.getCountriesByRegion('Western Asia');
+// ['AE', 'AM', 'AZ', 'BH', 'CY', 'GE', 'IL', 'IQ', 'JO', 'KW', 'LB', 'OM', 'PS', 'QA', 'SA', 'SY', 'TR', 'YE']
+```
+
+## Summary
+
+Asia has 51 entries in the ISO 3166 standard across 5 UN M49 subregions. The diversity of the continent is reflected in the variety of postal code systems, currencies, and dial codes -- all accessible through the `@koshmoney/countries` library.
+
+---
+
+## Related
+
+- [Geography API](/docs/api/geography) -- Continent and region lookups
+- [European Countries List](/blog/european-countries-list-codes) -- All European country codes
+- [African Countries List](/blog/african-countries-list-codes) -- All African country codes
+- [South American Countries List](/blog/south-american-countries-list-codes) -- South American country codes

@@ -1,0 +1,141 @@
+---
+description: "The complete ISO 3166-1 and ISO 3166-2 library for JavaScript and TypeScript. 249 countries, 5,000+ subdivisions, postal codes, currencies, dial codes, geography, and EU/SEPA membership."
+---
+
+import { Tabs, Steps, Callout } from 'nextra/components'
+
+# @koshmoney/countries
+
+**The Complete ISO 3166 Library for JavaScript & TypeScript**
+
+249 countries. 5,000+ subdivisions. One package.
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+## Quick Example
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+// Look up any country
+country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+// Get subdivisions
+subdivision.whereCode('US-CA');
+// { code: 'US-CA', name: 'California', type: 'State', ... }
+
+// Validate postal codes with local names
+postalCode.isValid('US', '90210');   // true
+postalCode.getName('US');            // 'ZIP Code'
+postalCode.getName('IN');            // 'PIN Code'
+```
+
+## Everything You Need
+
+| Feature | What You Get |
+|---------|-------------|
+| **249 Countries** | Full ISO 3166-1 with alpha-2, alpha-3, and numeric codes |
+| **5,000+ Subdivisions** | ISO 3166-2 states, provinces, regions, and territories |
+| **Postal Codes** | Validate ZIP codes, postcodes, PIN codes for 150+ countries |
+| **Currencies** | ISO 4217 currency code, symbol, and name for every country |
+| **Dial Codes** | International dialing codes powered by libphonenumber-js |
+| **Geography** | Continent and region classification (UN M49 standard) |
+| **Memberships** | EU, SEPA, EEA, Eurozone, and Schengen checks |
+| **Tree-Shakeable** | Import only what you need -- from 60KB down to 8KB |
+| **TypeScript** | Full type definitions with strict typing |
+| **Zero Dependencies** | Core modules have no runtime dependencies |
+
+## Specialized Modules
+
+Import only the data you need with subpath exports:
+
+```typescript copy
+// Currency data
+import { currency } from '@koshmoney/countries/currency';
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+
+// Phone dial codes
+import { dialCode } from '@koshmoney/countries/dialCode';
+dialCode.getDialCode('GB');  // '+44'
+
+// Geography (continent/region)
+import { geography } from '@koshmoney/countries/geography';
+geography.getContinent('JP');  // 'Asia'
+
+// EU/SEPA membership
+import { membership } from '@koshmoney/countries/membership';
+membership.isEU('FR');     // true
+membership.isSEPA('CH');   // true
+```
+
+## Before and After
+
+**Before:** Multiple packages, inconsistent APIs, no TypeScript, no tree-shaking.
+
+```typescript
+// 3 packages for basic country data
+import * as iso3166_1 from 'iso-3166-1';
+import * as iso3166_2 from 'iso-3166-2';
+import currencies from 'currency-codes';
+
+// Different APIs, different return types, no validation
+const country = iso3166_1.whereAlpha2('US'); // { country: 'United States', ... }
+const sub = iso3166_2.subdivision('US-CA');  // { name: 'California', ... }
+```
+
+**After:** One package, unified API, full TypeScript, tree-shakeable.
+
+```typescript copy
+import { country, subdivision } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+
+const us = country.whereAlpha2('US');       // { name: 'United States', ... }
+const ca = subdivision.whereCode('US-CA');  // { name: 'California', ... }
+const usd = currency.getCurrency('US');     // { code: 'USD', symbol: '$', ... }
+```
+
+## How It Compares
+
+| Feature | @koshmoney/countries | i18n-iso-countries | countries-list | country-state-city |
+|---------|---------------------|-------------------|----------------|-------------------|
+| Countries | 249 | 249 | 249 | 249 |
+| Subdivisions | 5,000+ | None | None | 5,000+ |
+| Postal Codes | 150+ countries | None | None | None |
+| Currencies | All countries | None | Partial | None |
+| TypeScript | Built-in | @types needed | Built-in | Partial |
+| Tree-Shaking | Per-country granularity | No | No | No |
+| Zero Deps | Core modules | No | Yes | Yes |
+| Code Conversion | All formats | All formats | None | None |
+| Validation | Full | Limited | None | None |
+
+<Steps>
+### Install
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+### Import
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+```
+
+### Use
+
+```typescript copy
+const us = country.whereAlpha2('US');
+const states = subdivision.forCountry('US');
+const valid = postalCode.isValid('US', '90210');
+```
+</Steps>
+
+<Callout type="info">
+  **Tree-shaking tip:** Need only country data? Import from `@koshmoney/countries/country` for just ~8KB instead of ~60KB. See the [Tree Shaking Guide](/docs/guides/tree-shaking).
+</Callout>
+
+[Get Started](/docs/getting-started) | [API Reference](/docs/api/country) | [View on GitHub](https://github.com/CopperxHQ/countries)

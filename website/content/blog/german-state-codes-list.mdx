@@ -1,0 +1,312 @@
+---
+description: "Complete reference for all 16 German federal states (Bundesländer) with ISO 3166-2:DE codes, capitals, and types. Includes code examples for GDPR, VAT, and shipping applications."
+---
+
+# German State Codes: Complete ISO 3166-2:DE Bundesländer Reference (2026)
+
+Germany's federal structure divides the country into 16 states called **Bundesländer** (singular: Bundesland). Each state has its own government, constitution, and legislature, making Germany one of the most decentralized countries in Europe. Every Bundesland carries an ISO 3166-2:DE code used in tax systems, shipping logistics, address validation, and regulatory compliance across the EU.
+
+This reference covers all 16 German state codes with their capitals, types, and practical code examples using `@koshmoney/countries`.
+
+## Complete ISO 3166-2:DE Table
+
+| Code | Name (German) | Name (English) | Capital | Type |
+|------|--------------|----------------|---------|------|
+| DE-BB | Brandenburg | Brandenburg | Potsdam | Area state |
+| DE-BE | Berlin | Berlin | Berlin | City-state |
+| DE-BW | Baden-Württemberg | Baden-Württemberg | Stuttgart | Area state |
+| DE-BY | Bayern | Bavaria | Munich | Area state |
+| DE-HB | Bremen | Bremen | Bremen | City-state |
+| DE-HE | Hessen | Hesse | Wiesbaden | Area state |
+| DE-HH | Hamburg | Hamburg | Hamburg | City-state |
+| DE-MV | Mecklenburg-Vorpommern | Mecklenburg-Western Pomerania | Schwerin | Area state |
+| DE-NI | Niedersachsen | Lower Saxony | Hannover | Area state |
+| DE-NW | Nordrhein-Westfalen | North Rhine-Westphalia | Düsseldorf | Area state |
+| DE-RP | Rheinland-Pfalz | Rhineland-Palatinate | Mainz | Area state |
+| DE-SH | Schleswig-Holstein | Schleswig-Holstein | Kiel | Area state |
+| DE-SL | Saarland | Saarland | Saarbrücken | Area state |
+| DE-SN | Sachsen | Saxony | Dresden | Area state |
+| DE-ST | Sachsen-Anhalt | Saxony-Anhalt | Magdeburg | Area state |
+| DE-TH | Thüringen | Thuringia | Erfurt | Area state |
+
+## City-States vs Area States
+
+Germany's 16 Bundesländer fall into two structural categories:
+
+### City-States (Stadtstaaten)
+
+Three Bundesländer are city-states where a single city forms the entire state:
+
+| Code | Name | Population | Notes |
+|------|------|-----------|-------|
+| DE-BE | Berlin | ~3.7 million | Capital of Germany; reunified in 1990 |
+| DE-HH | Hamburg | ~1.9 million | Germany's largest port city |
+| DE-HB | Bremen | ~700,000 | Comprises Bremen and Bremerhaven |
+
+City-states have unique administrative structures: the state parliament (Bürgerschaft in Hamburg and Bremen, Abgeordnetenhaus in Berlin) serves as both the city council and the state legislature. The head of government is called **Bürgermeister** (Mayor) rather than **Ministerpräsident** (Minister-President).
+
+### Area States (Flächenländer)
+
+The remaining 13 Bundesländer are area states with conventional state governments headed by a Ministerpräsident:
+
+- **Bayern (Bavaria)** — DE-BY — Germany's largest state by area
+- **Nordrhein-Westfalen** — DE-NW — Most populous state (~18 million residents)
+- **Baden-Württemberg** — DE-BW — Major industrial hub (Mercedes-Benz, Porsche, Bosch)
+- **Niedersachsen** — DE-NI — Second largest by area
+- **Hessen** — DE-HE — Home to Frankfurt, the EU's financial capital
+- **Sachsen** — DE-SN — Most populous of the eastern states
+- **Rheinland-Pfalz** — DE-RP — Wine country along the Rhine and Moselle
+- **Sachsen-Anhalt** — DE-ST — Eastern state, former DDR territory
+- **Thüringen** — DE-TH — "Green Heart of Germany"
+- **Schleswig-Holstein** — DE-SH — Northernmost state, borders Denmark
+- **Brandenburg** — DE-BB — Surrounds Berlin
+- **Mecklenburg-Vorpommern** — DE-MV — Baltic coast state
+- **Saarland** — DE-SL — Germany's smallest area state, borders France and Luxembourg
+
+## Germany's EU and European Membership
+
+Germany is a founding member of the European Union and participates in all major European frameworks:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEU('DE');        // true  — founding EU member (1957)
+membership.isSEPA('DE');      // true  — SEPA payment area
+membership.isEurozone('DE');  // true  — uses the Euro since 2002
+membership.isSchengen('DE');  // true  — Schengen Area member
+```
+
+This membership context matters significantly for compliance work: GDPR applies in all 16 Bundesländer, VAT rules follow EU directives, and cross-border SEPA payments work seamlessly between Germany and all other SEPA countries.
+
+## Code Examples
+
+### Get All 16 German States
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const states = subdivision.forCountry('DE');
+console.log(states.length);  // 16
+
+// [
+//   { code: 'DE-BB', name: 'Brandenburg', type: 'Laender', countryCode: 'DE', regionCode: 'BB' },
+//   { code: 'DE-BE', name: 'Berlin', type: 'Laender', countryCode: 'DE', regionCode: 'BE' },
+//   { code: 'DE-BW', name: 'Baden-Wuerttemberg', type: 'Laender', countryCode: 'DE', regionCode: 'BW' },
+//   ...
+// ]
+```
+
+### Look Up a Specific State
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Look up by full ISO code
+subdivision.whereCode('DE-BY');
+// { code: 'DE-BY', name: 'Bayern', type: 'Laender', countryCode: 'DE', regionCode: 'BY' }
+
+// Look up by country + region code
+subdivision.where('DE', 'NW');
+// { code: 'DE-NW', name: 'Nordrhein-Westfalen', type: 'Laender', countryCode: 'DE', regionCode: 'NW' }
+
+subdivision.where('DE', 'HH');
+// { code: 'DE-HH', name: 'Hamburg', type: 'Laender', countryCode: 'DE', regionCode: 'HH' }
+```
+
+### Validate German State Codes
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('DE-BY');       // true  — Bavaria
+subdivision.isValidCode('DE-NW');       // true  — North Rhine-Westphalia
+subdivision.isValidCode('DE-XX');       // false — not a valid state
+subdivision.isValidCode('DE-BV');       // false — common mistake (BY, not BV)
+
+subdivision.isValidRegion('DE', 'NW');  // true
+subdivision.isValidRegion('DE', 'BE');  // true  — Berlin
+subdivision.isValidRegion('DE', 'DE');  // false
+```
+
+### Build a Sorted State Dropdown
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// German-locale sort for correct alphabetical order
+const stateOptions = subdivision.forCountry('DE')
+  .sort((a, b) => a.name.localeCompare(b.name, 'de'))
+  .map(s => ({
+    value: s.code.split('-')[1],  // 'BY', 'NW', 'BE', etc.
+    label: s.name,                // 'Bayern', 'Nordrhein-Westfalen', etc.
+    code: s.code,                 // 'DE-BY', 'DE-NW', 'DE-BE', etc.
+  }));
+
+// stateOptions[0] => { value: 'BB', label: 'Baden-Württemberg', code: 'DE-BW' }
+// Note: German locale sorts Ü correctly, unlike default sort
+```
+
+### Check Country Data
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.whereAlpha2('DE');
+// { name: 'Germany', alpha2: 'DE', alpha3: 'DEU', numeric: '276' }
+
+country.whereAlpha3('DEU');
+// { name: 'Germany', alpha2: 'DE', alpha3: 'DEU', numeric: '276' }
+```
+
+## Use Cases
+
+### GDPR Compliance
+
+The GDPR applies uniformly across all 16 German states as EU law. However, each Bundesland has its own **Datenschutzbehörde** (data protection authority) — the supervisory authority you must notify in case of a data breach:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+function getDataProtectionAuthority(stateCode: string): string {
+  const state = subdivision.whereCode(`DE-${stateCode}`);
+  if (!state) throw new Error(`Invalid German state code: ${stateCode}`);
+
+  // Each German state has its own DPA
+  const dpaMap: Record<string, string> = {
+    'BY': 'Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)',
+    'BE': 'Berliner Beauftragte für Datenschutz und Informationsfreiheit',
+    'NW': 'Landesbeauftragte für Datenschutz und Informationsfreiheit NRW',
+    'HH': 'Der Hamburgische Beauftragte für Datenschutz und Informationsfreiheit',
+    'HB': 'Die Landesbeauftragte für Datenschutz und Informationsfreiheit Bremen',
+    // ... etc.
+  };
+
+  return dpaMap[stateCode] ?? 'Bundesdatenschutzbeauftragter (BfDI)';
+}
+```
+
+### VAT and Tax Applications
+
+Germany applies a uniform federal VAT rate (19% standard, 7% reduced), but state-level information matters for certain tax filings and business registrations:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+interface GermanAddress {
+  street: string;
+  postalCode: string;
+  city: string;
+  state: string;  // e.g. 'BY', 'NW'
+}
+
+function validateGermanAddress(address: GermanAddress): boolean {
+  const isValidState = subdivision.isValidRegion('DE', address.state);
+  if (!isValidState) {
+    throw new Error(`Invalid German state code: ${address.state}`);
+  }
+
+  // The Finanzamt (tax office) jurisdiction is determined by the state
+  // DE-BY: Bayerisches Landesamt für Steuern
+  // DE-NW: Finanzministerium NRW
+  return true;
+}
+```
+
+### Shipping and Logistics
+
+German postal codes (PLZ) are 5 digits, and certain PLZ ranges map to specific Bundesländer:
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+// Validate a German PLZ
+postalCode.isValid('DE', '10115');  // true  — Berlin Mitte
+postalCode.isValid('DE', '80331');  // true  — Munich city center
+postalCode.isValid('DE', '20095');  // true  — Hamburg city center
+postalCode.isValid('DE', '60311');  // true  — Frankfurt am Main
+postalCode.isValid('DE', '1234');   // false — too short
+postalCode.isValid('DE', '123456'); // false — too long
+
+postalCode.getName('DE');    // 'PLZ'
+postalCode.getFormat('DE');  // 'NNNNN'
+```
+
+For shipping zone calculations, combine state codes with carrier APIs:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function getShippingZone(stateCode: string): 'domestic' | 'island' | 'remote' {
+  const state = subdivision.whereCode(`DE-${stateCode}`);
+  if (!state) throw new Error(`Invalid state: ${stateCode}`);
+
+  // Standard Germany: all states are domestic
+  // Some carriers charge premiums for certain remote areas
+  const remoteRegions = ['SH']; // Some island areas in Schleswig-Holstein
+  if (remoteRegions.includes(stateCode)) return 'remote';
+
+  return 'domestic';
+}
+```
+
+### Address Form with State Dropdown
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+function buildGermanAddressForm() {
+  const states = subdivision.forCountry('DE')
+    .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+  return {
+    fields: {
+      street: { type: 'text', label: 'Straße und Hausnummer' },
+      postalCode: { type: 'text', label: 'Postleitzahl', pattern: '[0-9]{5}' },
+      city: { type: 'text', label: 'Ort' },
+      state: {
+        type: 'select',
+        label: 'Bundesland',
+        options: states.map(s => ({
+          value: s.code.split('-')[1],
+          label: s.name,
+        })),
+      },
+    },
+    country: 'DE',
+  };
+}
+```
+
+## Historical Context
+
+Germany's current federal structure dates to the post-WWII era. The Basic Law (Grundgesetz) of 1949 established the Federal Republic with 11 western states. After German reunification in 1990, five eastern states — Brandenburg (DE-BB), Mecklenburg-Vorpommern (DE-MV), Sachsen (DE-SN), Sachsen-Anhalt (DE-ST), and Thüringen (DE-TH) — were re-established and joined the federation, bringing the total to 16.
+
+Berlin (DE-BE), formerly divided between East and West, became a single unified state and the capital of reunified Germany.
+
+## Install @koshmoney/countries
+
+```bash
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+// All 16 German Bundesländer
+const states = subdivision.forCountry('DE');
+
+// Germany's EU membership status
+const isEU = membership.isEU('DE');       // true
+const isEurozone = membership.isEurozone('DE'); // true
+const isSEPA = membership.isSEPA('DE');   // true
+```
+
+## Related Resources
+
+- [Subdivision API Reference](/docs/api/subdivision) — Full subdivision module API
+- [Germany Country Page](/countries/de) — Full Germany reference with currency and dial code
+- [European Countries with ISO Codes](/blog/european-countries-list-codes) — All European country codes
+- [EU Country Codes List](/blog/eu-country-codes-list) — All 27 EU member states
+- [SEPA Countries List](/blog/sepa-countries-list) — All 36 SEPA countries

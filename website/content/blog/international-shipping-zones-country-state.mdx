@@ -1,0 +1,390 @@
+---
+description: "How to define international shipping zones by country and state using ISO 3166 codes. Zone-based pricing, e-commerce checkout validation, and TypeScript examples."
+---
+
+# Setting Up International Shipping Zones by Country and State
+
+International shipping is one of the most complex parts of e-commerce. Every carrier, marketplace, and fulfillment provider structures their rates differently, but they all share one thing in common: they need standardized country and subdivision codes to define shipping zones.
+
+This guide shows how to build a shipping zone system using ISO 3166 codes, implement zone-based pricing, and integrate it into your checkout flow with `@koshmoney/countries`.
+
+## What Are Shipping Zones?
+
+A shipping zone is a grouping of countries or regions that share the same shipping rate and delivery timeline. For example:
+
+- **Domestic** -- your home country
+- **North America** -- US, Canada, Mexico
+- **EU** -- European Union member states
+- **Rest of World** -- everything else
+
+Carriers like FedEx, UPS, and DHL use their own zone numbering systems, but the underlying concept is the same: group destinations by geographic proximity and charge accordingly.
+
+## Defining Zones with Country Codes
+
+### Basic Zone Configuration
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+import { geography } from '@koshmoney/countries/geography';
+
+interface ShippingZone {
+  id: string;
+  name: string;
+  countries: string[];
+  baseRate: number;
+  perKgRate: number;
+  estimatedDays: { min: number; max: number };
+}
+
+function defineZones(homeCountry: string): ShippingZone[] {
+  const euCountries = membership.getMembers('EU');
+  const northAmerica = ['US', 'CA', 'MX'];
+  const asiaCountries = geography.countriesInContinent('Asia');
+
+  return [
+    {
+      id: 'domestic',
+      name: 'Domestic',
+      countries: [homeCountry],
+      baseRate: 5.99,
+      perKgRate: 0.50,
+      estimatedDays: { min: 1, max: 3 },
+    },
+    {
+      id: 'north-america',
+      name: 'North America',
+      countries: northAmerica.filter(c => c !== homeCountry),
+      baseRate: 12.99,
+      perKgRate: 2.00,
+      estimatedDays: { min: 3, max: 7 },
+    },
+    {
+      id: 'eu',
+      name: 'European Union',
+      countries: euCountries.filter(c => c !== homeCountry),
+      baseRate: 14.99,
+      perKgRate: 2.50,
+      estimatedDays: { min: 5, max: 10 },
+    },
+    {
+      id: 'asia',
+      name: 'Asia-Pacific',
+      countries: asiaCountries,
+      baseRate: 19.99,
+      perKgRate: 3.50,
+      estimatedDays: { min: 7, max: 14 },
+    },
+    {
+      id: 'rest-of-world',
+      name: 'Rest of World',
+      countries: [], // Catch-all
+      baseRate: 24.99,
+      perKgRate: 4.00,
+      estimatedDays: { min: 10, max: 21 },
+    },
+  ];
+}
+```
+
+### Finding the Zone for a Destination
+
+```typescript copy
+function getShippingZone(
+  zones: ShippingZone[],
+  destinationCountry: string
+): ShippingZone {
+  // Check specific zones first
+  for (const zone of zones) {
+    if (zone.countries.includes(destinationCountry)) {
+      return zone;
+    }
+  }
+  // Fall back to rest-of-world
+  return zones.find(z => z.id === 'rest-of-world')!;
+}
+```
+
+### Calculating Shipping Cost
+
+```typescript copy
+interface ShippingQuote {
+  zone: string;
+  cost: number;
+  estimatedDays: { min: number; max: number };
+}
+
+function calculateShipping(
+  zones: ShippingZone[],
+  destinationCountry: string,
+  weightKg: number
+): ShippingQuote {
+  const zone = getShippingZone(zones, destinationCountry);
+
+  return {
+    zone: zone.name,
+    cost: Math.round((zone.baseRate + zone.perKgRate * weightKg) * 100) / 100,
+    estimatedDays: zone.estimatedDays,
+  };
+}
+
+const zones = defineZones('US');
+calculateShipping(zones, 'CA', 2.5);
+// { zone: 'North America', cost: 17.99, estimatedDays: { min: 3, max: 7 } }
+
+calculateShipping(zones, 'DE', 1.0);
+// { zone: 'European Union', cost: 17.49, estimatedDays: { min: 5, max: 10 } }
+
+calculateShipping(zones, 'AU', 3.0);
+// { zone: 'Rest of World', cost: 36.99, estimatedDays: { min: 10, max: 21 } }
+```
+
+## State-Level Shipping Zones
+
+For large countries, shipping rates vary by state or province. This is especially important for domestic shipping in the US, Canada, and Australia.
+
+### US Domestic Zones by Region
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+type USRegion = 'west' | 'midwest' | 'south' | 'northeast' | 'non-contiguous';
+
+const US_REGIONS: Record<string, USRegion> = {
+  // West
+  WA: 'west', OR: 'west', CA: 'west', NV: 'west', ID: 'west',
+  MT: 'west', WY: 'west', CO: 'west', UT: 'west', AZ: 'west', NM: 'west',
+  // Midwest
+  ND: 'midwest', SD: 'midwest', NE: 'midwest', KS: 'midwest',
+  MN: 'midwest', IA: 'midwest', MO: 'midwest', WI: 'midwest',
+  IL: 'midwest', MI: 'midwest', IN: 'midwest', OH: 'midwest',
+  // South
+  TX: 'south', OK: 'south', AR: 'south', LA: 'south', MS: 'south',
+  AL: 'south', TN: 'south', KY: 'south', WV: 'south', VA: 'south',
+  NC: 'south', SC: 'south', GA: 'south', FL: 'south', DE: 'south',
+  MD: 'south', DC: 'south',
+  // Northeast
+  PA: 'northeast', NJ: 'northeast', NY: 'northeast', CT: 'northeast',
+  RI: 'northeast', MA: 'northeast', VT: 'northeast', NH: 'northeast',
+  ME: 'northeast',
+  // Non-contiguous
+  AK: 'non-contiguous', HI: 'non-contiguous',
+};
+
+const REGION_SURCHARGES: Record<USRegion, number> = {
+  west: 0,
+  midwest: 0,
+  south: 0,
+  northeast: 0,
+  'non-contiguous': 15.00, // Alaska/Hawaii surcharge
+};
+
+function getDomesticSurcharge(stateCode: string): number {
+  if (!subdivision.isValidRegion('US', stateCode)) {
+    throw new Error(`Invalid US state code: ${stateCode}`);
+  }
+  const region = US_REGIONS[stateCode] ?? 'south';
+  return REGION_SURCHARGES[region];
+}
+```
+
+### Distance-Based Zone Calculation
+
+```typescript copy
+interface DomesticZone {
+  zone: number; // 1-8 (like USPS zones)
+  surcharge: number;
+}
+
+// Simplified zone calculation based on origin and destination regions
+function getUSPSZone(originRegion: USRegion, destRegion: USRegion): number {
+  if (originRegion === destRegion) return 1;
+
+  const ZONE_MATRIX: Record<string, number> = {
+    'west-midwest': 4, 'west-south': 5, 'west-northeast': 6,
+    'midwest-south': 3, 'midwest-northeast': 3,
+    'south-northeast': 4,
+  };
+
+  const key = [originRegion, destRegion].sort().join('-');
+  return ZONE_MATRIX[key] ?? 7;
+}
+```
+
+## Restricted Destinations
+
+Some countries or regions cannot receive shipments due to sanctions, embargoes, or carrier restrictions. Build this into your zone system:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+const RESTRICTED_COUNTRIES = new Set([
+  'KP', // North Korea
+  'CU', // Cuba (US restriction)
+  'IR', // Iran
+  'SY', // Syria
+]);
+
+function canShipTo(countryCode: string): { allowed: boolean; reason?: string } {
+  if (!country.isValid(countryCode)) {
+    return { allowed: false, reason: 'Invalid country code' };
+  }
+
+  if (RESTRICTED_COUNTRIES.has(countryCode)) {
+    return { allowed: false, reason: 'Shipping restricted to this destination' };
+  }
+
+  return { allowed: true };
+}
+```
+
+## Checkout Integration
+
+### Address Validation at Checkout
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+interface ShippingAddress {
+  countryCode: string;
+  stateCode?: string;
+  postalCodeValue?: string;
+  city: string;
+  line1: string;
+}
+
+interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+}
+
+function validateShippingAddress(address: ShippingAddress): ValidationResult {
+  const errors: string[] = [];
+
+  // Validate country
+  if (!country.isValid(address.countryCode)) {
+    errors.push('Invalid country code');
+    return { valid: false, errors };
+  }
+
+  // Validate state/province if provided
+  if (address.stateCode) {
+    if (!subdivision.isValidRegion(address.countryCode, address.stateCode)) {
+      errors.push('Invalid state/province code');
+    }
+  } else if (subdivision.hasSubdivisions(address.countryCode)) {
+    // Require state for countries that have subdivisions
+    errors.push('State/province is required');
+  }
+
+  // Validate postal code if the country uses them
+  if (address.postalCodeValue) {
+    if (!postalCode.isValid(address.countryCode, address.postalCodeValue)) {
+      const format = postalCode.getFormat(address.countryCode);
+      errors.push(`Invalid ${postalCode.getName(address.countryCode) ?? 'postal code'}. Expected format: ${format}`);
+    }
+  } else if (postalCode.hasPostalCode(address.countryCode)) {
+    errors.push(`${postalCode.getName(address.countryCode) ?? 'Postal code'} is required`);
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+```
+
+### Dynamic Form Fields Based on Country
+
+Different countries require different address fields. Use country data to adapt your checkout form:
+
+```typescript copy
+import { subdivision, postalCode } from '@koshmoney/countries';
+
+interface AddressFormConfig {
+  showState: boolean;
+  stateLabel: string;
+  stateOptions: Array<{ value: string; label: string }>;
+  showPostalCode: boolean;
+  postalCodeLabel: string;
+  postalCodePlaceholder: string;
+}
+
+function getAddressFormConfig(countryCode: string): AddressFormConfig {
+  const hasSubs = subdivision.hasSubdivisions(countryCode);
+  const subs = hasSubs ? subdivision.forCountry(countryCode) : [];
+  const hasPostal = postalCode.hasPostalCode(countryCode);
+
+  // Determine label for state field
+  const stateType = subs[0]?.type ?? 'State';
+  const stateLabel = stateType === 'Province' ? 'Province'
+    : stateType === 'Territory' ? 'Territory'
+    : stateType === 'Region' ? 'Region'
+    : 'State';
+
+  return {
+    showState: hasSubs,
+    stateLabel,
+    stateOptions: subs.map(s => ({ value: s.regionCode, label: s.name })),
+    showPostalCode: hasPostal,
+    postalCodeLabel: postalCode.getName(countryCode) ?? 'Postal Code',
+    postalCodePlaceholder: postalCode.getFormat(countryCode) ?? '',
+  };
+}
+
+getAddressFormConfig('US');
+// { showState: true, stateLabel: 'State', stateOptions: [...50 states],
+//   showPostalCode: true, postalCodeLabel: 'ZIP Code', postalCodePlaceholder: 'NNNNN or NNNNN-NNNN' }
+
+getAddressFormConfig('HK');
+// { showState: true, stateLabel: 'District', stateOptions: [...],
+//   showPostalCode: false, postalCodeLabel: 'Postal Code', postalCodePlaceholder: '' }
+```
+
+## Free Shipping Thresholds by Zone
+
+```typescript copy
+const FREE_SHIPPING_THRESHOLDS: Record<string, number> = {
+  domestic: 35,
+  'north-america': 75,
+  eu: 100,
+  asia: 150,
+  'rest-of-world': Infinity, // No free shipping
+};
+
+function getShippingCost(
+  zones: ShippingZone[],
+  destinationCountry: string,
+  weightKg: number,
+  orderTotal: number
+): ShippingQuote {
+  const zone = getShippingZone(zones, destinationCountry);
+  const threshold = FREE_SHIPPING_THRESHOLDS[zone.id] ?? Infinity;
+
+  if (orderTotal >= threshold) {
+    return {
+      zone: zone.name,
+      cost: 0,
+      estimatedDays: zone.estimatedDays,
+    };
+  }
+
+  return {
+    zone: zone.name,
+    cost: Math.round((zone.baseRate + zone.perKgRate * weightKg) * 100) / 100,
+    estimatedDays: zone.estimatedDays,
+  };
+}
+```
+
+## Summary
+
+- Define shipping zones using ISO 3166 country codes for consistency across carriers and platforms
+- Use `@koshmoney/countries` for country validation, subdivision lookups, and geographic groupings
+- Handle state-level zones for large countries (US, CA, AU) where domestic rates vary by region
+- Build restricted destination checks into your zone system
+- Adapt checkout form fields dynamically based on the selected country
+
+## Related Resources
+
+- [E-commerce Use Cases](/use-cases/ecommerce) -- shipping, tax, and checkout patterns
+- [Canadian Province Codes](/blog/canadian-province-codes) -- Canadian province reference with shipping zones
+- [Address Validation Guide](/docs/guides/address-validation) -- building validated address forms
+- [Postal Code API Reference](/docs/api/postal-code) -- postal code validation documentation

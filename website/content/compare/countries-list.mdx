@@ -1,0 +1,178 @@
+---
+description: "Compare @koshmoney/countries vs countries-list npm package. Feature comparison, TypeScript support, API differences, and migration guide."
+---
+
+# @koshmoney/countries vs countries-list
+
+`countries-list` is a comprehensive dataset package that provides country data including ISO codes, currencies, capitals, languages, and emoji flags in JSON, CSV, and SQL formats. Here is how it compares to `@koshmoney/countries`.
+
+## Feature Comparison
+
+| Feature | @koshmoney/countries | countries-list |
+|---|---|---|
+| ISO 3166-1 Countries | 249 countries | 249 countries |
+| ISO 3166-2 Subdivisions | 5,000+ subdivisions | Not included |
+| Postal Code Validation | 150+ countries | Not included |
+| Currency Data | Code, symbol, name | Code, name, symbol |
+| Phone Dial Codes | Via libphonenumber-js | Calling codes |
+| **Capitals** | **Not included** | **Included** |
+| **Languages** | **Not included** | **ISO 639-1 languages** |
+| **Emoji Flags** | **Not included** | **Included** |
+| **Continents** | UN M49 classification | Basic continent mapping |
+| EU/SEPA/EEA Membership | Built-in | Not included |
+| Geography (Region) | UN M49 subregions | Not included |
+| Alpha-2/Alpha-3 Conversion | Yes | Limited |
+| Numeric Code Support | Yes | Not included |
+| Code Validation | Full validation suite | Not included |
+| TypeScript Support | Built-in | Built-in |
+| Tree-Shaking | Subpath exports | No |
+| **Export Formats** | **JS/TS only** | **JSON, CSV, SQL** |
+| Dependencies | 0 (core) | 0 |
+
+## Where countries-list Wins
+
+### Data Breadth
+
+`countries-list` includes data that `@koshmoney/countries` does not provide: capital cities, languages with native names, emoji flags, and right-to-left indicators:
+
+```typescript
+// countries-list
+import { getCountryData, getEmojiFlag } from 'countries-list';
+
+getCountryData('US');
+// { name: 'United States', capital: 'Washington D.C.',
+//   languages: ['en'], currency: 'USD,USN,USS', ... }
+
+getEmojiFlag('US'); // '\ud83c\uddfa\ud83c\uddf8'
+```
+
+### Multiple Export Formats
+
+`countries-list` provides data in JSON, CSV, and SQL formats, making it useful for seeding databases or non-JavaScript environments.
+
+## Where @koshmoney/countries Wins
+
+### Subdivision Data
+
+The biggest difference. `@koshmoney/countries` includes 5,000+ subdivisions; `countries-list` has none:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Get all states for a country
+subdivision.forCountry('US');
+// [{ code: 'US-CA', name: 'California', type: 'State' }, ...]
+
+// Look up a specific subdivision
+subdivision.where('CA', 'ON');
+// { code: 'CA-ON', name: 'Ontario', type: 'Province' }
+```
+
+### Validation Functions
+
+`@koshmoney/countries` provides a full validation suite. `countries-list` is a data package without validation logic:
+
+```typescript copy
+import { country, subdivision, postalCode } from '@koshmoney/countries';
+
+country.isValid('US');                          // true
+country.isValid('XX');                          // false
+subdivision.isValidCode('US-CA');               // true
+postalCode.isValid('US', '90210');              // true
+country.detectFormat('USA');                    // 'alpha3'
+```
+
+### Code Conversion
+
+Full alpha-2, alpha-3, and numeric code conversion:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+country.alpha2ToAlpha3('US');     // 'USA'
+country.alpha3ToAlpha2('GBR');    // 'GB'
+country.alpha2ToNumeric('DE');    // '276'
+country.numericToAlpha2(840);     // 'US'
+```
+
+### Membership Checks
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+membership.isEU('FR');          // true
+membership.isSEPA('CH');        // true
+membership.isEurozone('DE');    // true
+membership.getMembers('EU');    // ['AT', 'BE', 'BG', ...]
+```
+
+### Tree-Shaking
+
+```typescript copy
+// Only load what you need
+import { country } from '@koshmoney/countries';              // ~8KB
+import '@koshmoney/countries/subdivision/US';                 // +1.5KB
+import { membership } from '@koshmoney/countries/membership'; // +1KB
+```
+
+## Migration Guide
+
+### Before (countries-list)
+
+```typescript
+import { getCountryData, getCountryCode } from 'countries-list';
+
+const us = getCountryData('US');
+// { name: 'United States', ... }
+
+const code = getCountryCode('United States');
+// 'US'
+```
+
+### After (@koshmoney/countries)
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+const us = country.whereAlpha2('US');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+
+const byName = country.whereName('United States');
+// { name: 'United States', alpha2: 'US', alpha3: 'USA', numeric: '840' }
+```
+
+### Currency Data
+
+```typescript
+// countries-list
+const data = getCountryData('US');
+data.currency; // 'USD,USN,USS' (comma-separated string)
+
+// @koshmoney/countries
+import { currency } from '@koshmoney/countries/currency';
+currency.getCurrency('US');
+// { code: 'USD', symbol: '$', name: 'US Dollar' }
+```
+
+## When to Choose Which
+
+**Choose `countries-list` if:**
+- You need capital cities, languages, or emoji flags
+- You need data in CSV or SQL format for database seeding
+- You do not need subdivision data
+- You do not need validation functions
+
+**Choose `@koshmoney/countries` if:**
+- You need subdivisions (states, provinces, regions)
+- You need postal code validation
+- You need code conversion and validation functions
+- You need EU/SEPA/Eurozone membership checks
+- You want tree-shakeable imports for smaller bundles
+- You are building address forms, checkout flows, or compliance features
+
+## Related Resources
+
+- [Getting Started](/docs/getting-started) -- quick setup guide
+- [vs i18n-iso-countries](/compare/i18n-iso-countries) -- comparison with another alternative
+- [vs country-state-city](/compare/country-state-city) -- comparison with city-level data package
+- [Tree-Shaking Guide](/docs/guides/tree-shaking) -- optimizing bundle size

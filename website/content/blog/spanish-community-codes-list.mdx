@@ -1,0 +1,254 @@
+---
+description: "Complete list of Spanish autonomous community and province codes (ISO 3166-2:ES). All 17 communities, 2 autonomous cities, and 50 provinces with TypeScript examples."
+---
+
+# Spanish Autonomous Community Codes: Complete ISO 3166-2 Guide
+
+Spain is divided into 17 autonomous communities (comunidades autonomas), 2 autonomous cities, and 50 provinces, all with standardized ISO 3166-2 codes. These codes are used in address forms, shipping, tax calculations, and applications serving the Spanish market.
+
+This page lists every Spanish community and key provinces, and shows how to work with them using `@koshmoney/countries`.
+
+## Autonomous Communities (17)
+
+Spain's 17 autonomous communities are the primary administrative divisions, each with significant self-governing powers:
+
+| Code | Name | Capital | Provinces |
+|------|------|---------|-----------|
+| ES-AN | Andalucia | Seville | 8 |
+| ES-AR | Aragon | Zaragoza | 3 |
+| ES-AS | Asturias, Principado de | Oviedo | 1 |
+| ES-CB | Cantabria | Santander | 1 |
+| ES-CL | Castilla y Leon | Valladolid | 9 |
+| ES-CM | Castilla-La Mancha | Toledo | 5 |
+| ES-CN | Canarias | Las Palmas / Santa Cruz | 2 |
+| ES-CT | Catalunya | Barcelona | 4 |
+| ES-EX | Extremadura | Merida | 2 |
+| ES-GA | Galicia | Santiago de Compostela | 4 |
+| ES-IB | Illes Balears | Palma | 1 |
+| ES-MC | Murcia, Region de | Murcia | 1 |
+| ES-MD | Madrid, Comunidad de | Madrid | 1 |
+| ES-NC | Navarra | Pamplona | 1 |
+| ES-PV | Euskal Herria (Basque Country) | Vitoria-Gasteiz | 3 |
+| ES-RI | La Rioja | Logrono | 1 |
+| ES-VC | Valenciana, Comunidad | Valencia | 3 |
+
+## Autonomous Cities (2)
+
+Spain's two autonomous cities are located in North Africa:
+
+| Code | Name | Type |
+|------|------|------|
+| ES-CE | Ceuta | Autonomous city in north africa |
+| ES-ML | Melilla | Autonomous city in north africa |
+
+## Key Provinces
+
+Spain has 50 provinces (type "Province" in ISO 3166-2). Here are the most commonly referenced:
+
+| Code | Province | Community |
+|------|----------|-----------|
+| ES-M | Madrid | Madrid |
+| ES-B | Barcelona | Catalunya |
+| ES-V | Valencia | Comunidad Valenciana |
+| ES-SE | Sevilla | Andalucia |
+| ES-BI | Bizkaia | Basque Country |
+| ES-MA | Malaga | Andalucia |
+| ES-Z | Zaragoza | Aragon |
+| ES-GC | Las Palmas | Canarias |
+| ES-TF | Santa Cruz de Tenerife | Canarias |
+| ES-C | A Coruna | Galicia |
+| ES-CA | Cadiz | Andalucia |
+| ES-GR | Granada | Andalucia |
+| ES-BA | Badajoz | Extremadura |
+| ES-SA | Salamanca | Castilla y Leon |
+| ES-SS | Gipuzkoa | Basque Country |
+
+> [!NOTE]
+> Some Spanish provinces use names in regional languages. Codes marked with asterisks in the ISO data (e.g. Alacant*, Bizkaia*, Gipuzkoa*) indicate names in Catalan, Basque, or other co-official languages.
+
+## Understanding Spanish Subdivision Codes
+
+Spain uses alphabetic codes of varying lengths (1-2 letters):
+
+| Component | Example | Meaning |
+|-----------|---------|---------|
+| Country prefix | ES | Spain (Espana) |
+| Separator | - | Standard delimiter |
+| Community/Province code | CT | Catalunya |
+| Full code | ES-CT | Catalunya, Spain |
+
+Community codes are typically 2 letters, while some historical province codes use a single letter (ES-B for Barcelona, ES-M for Madrid).
+
+## Using Spanish Codes in Code
+
+### Look Up a Subdivision
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+// Community
+subdivision.whereCode('ES-CT');
+// { code: 'ES-CT', name: 'Catalunya', type: 'Autonomous community', countryCode: 'ES' }
+
+// Province
+subdivision.whereCode('ES-B');
+// { code: 'ES-B', name: 'Barcelona', type: 'Province', countryCode: 'ES' }
+
+// Autonomous city
+subdivision.whereCode('ES-CE');
+// { code: 'ES-CE', name: 'Ceuta', type: 'Autonomous city in north africa', countryCode: 'ES' }
+```
+
+### Get All Spanish Subdivisions
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const allES = subdivision.forCountry('ES');
+
+// Filter by type
+const communities = allES.filter(s => s.type === 'Autonomous community');
+console.log(communities.length);  // 17
+
+const provinces = allES.filter(s => s.type === 'Province');
+console.log(provinces.length);  // 50
+
+const cities = allES.filter(s => s.type === 'Autonomous city in north africa');
+console.log(cities.length);  // 2
+```
+
+### Validate a Code
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+subdivision.isValidCode('ES-CT');    // true (Catalunya)
+subdivision.isValidCode('ES-M');     // true (Madrid province)
+subdivision.isValidCode('ES-XX');    // false
+
+subdivision.isValidRegion('ES', 'AN');  // true (Andalucia)
+```
+
+### Tree-Shaking for Spanish Data Only
+
+```typescript copy
+import '@koshmoney/countries/subdivision/ES';
+import { whereCode, forCountry } from '@koshmoney/countries/subdivision';
+
+const catalunya = whereCode('ES-CT');
+const allES = forCountry('ES');
+```
+
+## Postal Code System
+
+Spain uses a 5-digit postal code system. The first two digits indicate the province:
+
+| First Digits | Province |
+|-------------|----------|
+| 01 | Alava |
+| 08 | Barcelona |
+| 15 | A Coruna |
+| 28 | Madrid |
+| 29 | Malaga |
+| 38 | Santa Cruz de Tenerife |
+| 41 | Sevilla |
+| 46 | Valencia |
+| 48 | Bizkaia |
+| 50 | Zaragoza |
+| 51 | Ceuta |
+| 52 | Melilla |
+
+```typescript copy
+import { postalCode } from '@koshmoney/countries';
+
+postalCode.isValid('ES', '28001');  // true (Madrid)
+postalCode.isValid('ES', '08001');  // true (Barcelona)
+postalCode.isValid('ES', '1234');   // false (only 4 digits)
+```
+
+## EU Membership and Currency
+
+Spain is an EU member and uses the Euro:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+membership.getMemberships('ES');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+
+currency.getCurrency('ES');
+// { code: 'EUR', symbol: '\u20ac', name: 'Euro' }
+```
+
+> [!TIP]
+> The Canary Islands (ES-CN) are part of the EU but have a special tax regime (IGIC instead of IVA/VAT). Ceuta and Melilla also have distinct tax rules (IPSI).
+
+## Common Use Cases
+
+### Address Forms
+
+Spanish address forms typically require the province. Build a province dropdown:
+
+```typescript copy
+import { subdivision } from '@koshmoney/countries';
+
+const provinces = subdivision.forCountry('ES')
+  .filter(s => s.type === 'Province')
+  .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
+const dropdown = provinces.map(p => ({
+  label: p.name,
+  value: p.code,
+}));
+```
+
+### IVA Tax Calculation
+
+Spanish VAT (IVA) is 21% on the peninsula, but different rates apply in special territories:
+
+```typescript copy
+function getVATRate(communityCode: string): number {
+  if (communityCode === 'ES-CN') return 7;  // Canary Islands (IGIC)
+  if (communityCode === 'ES-CE' || communityCode === 'ES-ML') return 0.5; // Ceuta/Melilla (IPSI)
+  return 21; // Standard IVA
+}
+```
+
+### Regional Language Support
+
+Spain has several co-official languages. Community codes help determine language preferences:
+
+```typescript copy
+const communityLanguages: Record<string, string[]> = {
+  'ES-CT': ['ca', 'es'],    // Catalan + Spanish
+  'ES-PV': ['eu', 'es'],    // Basque + Spanish
+  'ES-GA': ['gl', 'es'],    // Galician + Spanish
+  'ES-VC': ['ca', 'es'],    // Valencian (Catalan) + Spanish
+  'ES-IB': ['ca', 'es'],    // Catalan + Spanish
+  'ES-NC': ['eu', 'es'],    // Basque + Spanish (parts)
+};
+
+function getLanguages(communityCode: string): string[] {
+  return communityLanguages[communityCode] ?? ['es'];
+}
+```
+
+### Shipping Zones
+
+Shipping to the Canary Islands, Ceuta, and Melilla requires customs declarations:
+
+```typescript copy
+function requiresCustoms(code: string): boolean {
+  return ['ES-CN', 'ES-CE', 'ES-ML'].includes(code);
+}
+```
+
+## Related Resources
+
+- [Country Code Converter Tool](/tools/country-code-converter) -- look up ES and all other codes
+- [European Countries List](/blog/european-countries-list-codes) -- all countries in Europe
+- [Eurozone Countries](/blog/eurozone-countries-list) -- all 20 Euro-using countries
+- [Italian Region Codes](/blog/italian-region-codes-list) -- similar guide for Italy
+- [French Region Codes](/blog/french-region-codes-list) -- similar guide for France
+- [Subdivision API Reference](/docs/api/subdivision) -- full subdivision API documentation
