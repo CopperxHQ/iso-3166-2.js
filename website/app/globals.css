@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@source "../app/**/*.{ts,tsx}";
+@source "../content/**/*.{md,mdx}";
+@source "../mdx-components.tsx";
+
+/* Design Tokens */
+:root {
+  --hero-bg: #0f172a;
+  --hero-bg-subtle: #1e293b;
+  --accent: #38bdf8;
+  --accent-hover: #0ea5e9;
+  --accent-muted: #0c4a6e;
+  --surface: #ffffff;
+  --surface-elevated: #f8fafc;
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --code-bg: #f1f5f9;
+}
+
+.dark {
+  --surface: #0f172a;
+  --surface-elevated: #1e293b;
+  --border: #334155;
+  --border-subtle: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --code-bg: #1e293b;
+}
+
+/* Override Nextra prose defaults for tighter, more polished feel */
+article.nextra-body-typesetting-article {
+  max-width: 48rem;
+}
+
+/* Custom scrollbar for code blocks */
+pre::-webkit-scrollbar {
+  height: 6px;
+}
+pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+pre::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}

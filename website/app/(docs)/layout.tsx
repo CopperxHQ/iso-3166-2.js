@@ -6,8 +6,8 @@ import 'nextra-theme-docs/style.css'
 
 export const metadata: Metadata = {
   title: {
-    default: '@koshmoney/countries - ISO 3166 Countries & Subdivisions for JavaScript',
-    template: '%s | @koshmoney/countries',
+    default: 'Countries by Kosh Money - ISO 3166 Countries & Subdivisions for JavaScript',
+    template: '%s | Countries by Kosh Money',
   },
   description:
     'The complete ISO 3166-1 and ISO 3166-2 library. 249 countries, 5,000+ subdivisions, postal codes, currencies, dial codes, geography, and EU/SEPA membership. TypeScript, tree-shakeable, zero dependencies.',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const navbar = (
   <Navbar
-    logo={<strong>@koshmoney/countries</strong>}
+    logo={<strong>Countries by Kosh Money</strong>}
     projectLink="https://github.com/CopperxHQ/countries"
   />
 )
@@ -26,7 +26,7 @@ const footer = (
   </Footer>
 )
 
-export default async function RootLayout({
+export default async function DocsLayout({
   children,
 }: {
   children: React.ReactNode

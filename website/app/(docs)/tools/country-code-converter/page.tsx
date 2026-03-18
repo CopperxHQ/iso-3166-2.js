@@ -9,7 +9,7 @@ import {
   EUROZONE_MEMBERS,
   SCHENGEN_MEMBERS,
 } from '@pkg/membership/data';
-import { getFlagEmoji } from '../../../lib/country-data';
+import { getFlagEmoji } from '../../../../lib/country-data';
 import { CountryCodeConverter } from './converter';
 
 export interface ConverterCountry {
