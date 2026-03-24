@@ -1,0 +1,155 @@
+---
+description: "EU vs Eurozone explained: 27 EU countries vs 21 Eurozone members. Side-by-side comparison table, which countries are in the EU but not the Eurozone, and TypeScript membership checks."
+faqs:
+  - q: "What is the difference between the EU and the Eurozone?"
+    a: "The EU (European Union) is a political and economic union of 27 countries. The Eurozone is a monetary subset of 21 EU countries that use the Euro (EUR) as their official currency. All Eurozone members are EU members, but not all EU members are in the Eurozone."
+  - q: "Which EU countries are not in the Eurozone?"
+    a: "Six EU member states are not in the Eurozone: Czech Republic, Denmark, Hungary, Poland, Romania, and Sweden. Denmark has a formal opt-out; the others are expected to join eventually but have no set timeline."
+  - q: "How many countries are in the Eurozone in 2026?"
+    a: "There are 21 countries in the Eurozone as of 2026. Bulgaria became the newest member on January 1, 2026."
+  - q: "Is the UK in the EU or Eurozone?"
+    a: "No. The United Kingdom left the EU on January 31, 2020 (Brexit) and was never in the Eurozone. The UK retains the British Pound (GBP) and remains in SEPA for payment transfers."
+---
+
+# EU Countries vs Eurozone Countries: What's the Difference?
+
+The EU and the Eurozone are often confused, but they serve different purposes and have different members. If you build applications that handle European payments, compliance, or currency logic, understanding the distinction is essential. Getting it wrong means showing EUR prices to users in countries that use different currencies, or misapplying GDPR rules.
+
+This guide provides a clear side-by-side comparison with ISO codes and code examples.
+
+## Quick Summary
+
+| | EU | Eurozone |
+|---|---|---|
+| **What it is** | Political and economic union | Monetary union (subset of EU) |
+| **Members** | 27 countries | 21 countries |
+| **Currency** | Each country may use its own | All use Euro (EUR) |
+| **Key for developers** | GDPR, VAT, regulations | Currency display, pricing |
+| **Governed by** | European Commission, Parliament | European Central Bank (ECB) |
+
+## Side-by-Side: All 27 EU Countries
+
+| Country | Alpha-2 | EU Member | Eurozone | Currency |
+|---------|---------|:---------:|:--------:|----------|
+| Austria | AT | Yes | Yes | EUR |
+| Belgium | BE | Yes | Yes | EUR |
+| Bulgaria | BG | Yes | Yes | EUR |
+| Croatia | HR | Yes | Yes | EUR |
+| Cyprus | CY | Yes | Yes | EUR |
+| Czech Republic | CZ | Yes | No | CZK |
+| Denmark | DK | Yes | No | DKK |
+| Estonia | EE | Yes | Yes | EUR |
+| Finland | FI | Yes | Yes | EUR |
+| France | FR | Yes | Yes | EUR |
+| Germany | DE | Yes | Yes | EUR |
+| Greece | GR | Yes | Yes | EUR |
+| Hungary | HU | Yes | No | HUF |
+| Ireland | IE | Yes | Yes | EUR |
+| Italy | IT | Yes | Yes | EUR |
+| Latvia | LV | Yes | Yes | EUR |
+| Lithuania | LT | Yes | Yes | EUR |
+| Luxembourg | LU | Yes | Yes | EUR |
+| Malta | MT | Yes | Yes | EUR |
+| Netherlands | NL | Yes | Yes | EUR |
+| Poland | PL | Yes | No | PLN |
+| Portugal | PT | Yes | Yes | EUR |
+| Romania | RO | Yes | No | RON |
+| Slovakia | SK | Yes | Yes | EUR |
+| Slovenia | SI | Yes | Yes | EUR |
+| Spain | ES | Yes | Yes | EUR |
+| Sweden | SE | Yes | No | SEK |
+
+## EU Countries NOT in the Eurozone (6)
+
+These six EU members retain their own currencies:
+
+| Country | Alpha-2 | Currency | Code | Notes |
+|---------|---------|----------|------|-------|
+| Czech Republic | CZ | Czech Koruna | CZK | No target date for Euro adoption |
+| Denmark | DK | Danish Krone | DKK | Formal opt-out from the Euro |
+| Hungary | HU | Hungarian Forint | HUF | No target date |
+| Poland | PL | Polish Zloty | PLN | No target date |
+| Romania | RO | Romanian Leu | RON | Targeting Euro adoption |
+| Sweden | SE | Swedish Krona | SEK | De facto opt-out (rejected in 2003 referendum) |
+
+> [!NOTE]
+> Except Denmark, all non-Eurozone EU members are technically required to adopt the Euro as a condition of EU membership. However, there is no enforcement mechanism or deadline, and several countries have delayed indefinitely.
+
+## When the Distinction Matters for Developers
+
+### Currency Display
+
+The most common mistake is showing EUR prices to all EU users. Only Eurozone countries use EUR:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+import { currency } from '@koshmoney/countries/currency';
+
+function getDisplayCurrency(countryCode: string) {
+  if (membership.isEurozone(countryCode)) {
+    return 'EUR';
+  }
+  return currency.getCurrencyCode(countryCode) || 'USD';
+}
+
+getDisplayCurrency('DE'); // 'EUR' (Germany - Eurozone)
+getDisplayCurrency('SE'); // 'SEK' (Sweden - EU but not Eurozone)
+getDisplayCurrency('PL'); // 'PLN' (Poland - EU but not Eurozone)
+```
+
+### GDPR Compliance
+
+GDPR applies to all EU and EEA countries, not just the Eurozone. Use `isEU()` or `isEEA()` for compliance checks:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// GDPR applies to EEA (EU + Iceland, Liechtenstein, Norway)
+function isGDPRApplicable(countryCode: string): boolean {
+  return membership.isEEA(countryCode);
+}
+
+isGDPRApplicable('SE'); // true (EU member, even though not Eurozone)
+isGDPRApplicable('NO'); // true (EEA member, not EU)
+isGDPRApplicable('US'); // false
+```
+
+### Payment Processing
+
+SEPA (Single Euro Payments Area) is yet another grouping. It includes 36 countries -- all EU plus several non-EU countries:
+
+```typescript copy
+import { membership } from '@koshmoney/countries/membership';
+
+// Check all memberships at once
+membership.getMemberships('DE');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+
+membership.getMemberships('SE');
+// { EU: true, SEPA: true, EEA: true, Eurozone: false, Schengen: true }
+
+membership.getMemberships('GB');
+// { EU: false, SEPA: true, EEA: false, Eurozone: false, Schengen: false }
+```
+
+## Common Mistakes
+
+**Showing EUR to all EU users.** Poland, Sweden, Denmark, Czech Republic, Hungary, and Romania do not use the Euro. Always check `isEurozone()`, not `isEU()`, for currency decisions.
+
+**Applying GDPR only to Eurozone.** GDPR covers all EEA countries (30), not just the Eurozone (21). Use `isEEA()` for GDPR checks.
+
+**Assuming non-EU means no EUR.** Monaco, San Marino, Vatican City, Andorra, and Montenegro all use the Euro but are not in the EU.
+
+## Summary
+
+The EU (27 members) is a political union. The Eurozone (21 members) is a monetary union within the EU where countries use the Euro. For developers, use `isEU()` for regulatory checks (GDPR, VAT) and `isEurozone()` for currency checks. Never assume all EU countries use the same currency.
+
+---
+
+## Related
+
+- [Eurozone Countries List 2026](/blog/eurozone-countries-list) -- All 21 Eurozone members with adoption dates
+- [EU Country Codes List](/blog/eu-country-codes-list) -- All 27 EU member state codes
+- [SEPA Countries List](/blog/sepa-countries-list) -- All 36 SEPA members
+- [Countries Using the Euro](/blog/countries-using-euro) -- All 36 countries using EUR
+- [Membership API](/docs/api/membership) -- Full membership module reference

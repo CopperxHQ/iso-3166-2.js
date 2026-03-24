@@ -1,0 +1,125 @@
+---
+description: "Every dollar currency in the world: USD, AUD, CAD, SGD, HKD, NZD, and 20+ more. Complete list of all dollar-denominated currencies with ISO 4217 codes, countries, and TypeScript examples."
+faqs:
+  - q: "How many dollar currencies are there in the world?"
+    a: "There are over 20 currencies named 'dollar' worldwide, including the US Dollar (USD), Australian Dollar (AUD), Canadian Dollar (CAD), Singapore Dollar (SGD), and Hong Kong Dollar (HKD), among others."
+  - q: "Why are so many currencies called dollar?"
+    a: "The word 'dollar' derives from the German 'thaler', a silver coin widely used in Europe from the 16th century. Countries that were colonized or heavily influenced by European powers (especially Britain and Spain) often adopted the term for their own currencies."
+  - q: "What is the most traded dollar currency?"
+    a: "The US Dollar (USD) is by far the most traded, accounting for roughly 88% of all forex transactions. The Euro, not a dollar currency, is second. Among dollar currencies, AUD, CAD, and HKD are the next most traded."
+---
+
+# Every Dollar Currency in the World: USD, AUD, CAD, and 20+ More
+
+When someone says "dollar", they usually mean the US Dollar. But over 20 countries have currencies named "dollar", spanning every inhabited continent. If you build multi-currency applications, you need to handle these correctly -- they have different ISO 4217 codes, symbols, and exchange rates despite sharing a name.
+
+This guide lists every dollar currency with its ISO code, the countries that use it, and code examples for working with them programmatically.
+
+## All Dollar Currencies
+
+| Currency | ISO Code | Symbol | Countries |
+|----------|----------|--------|-----------|
+| US Dollar | USD | $ | United States, Ecuador, El Salvador, Panama, + territories |
+| Australian Dollar | AUD | A$ | Australia, Kiribati, Nauru, Tuvalu |
+| Canadian Dollar | CAD | C$ | Canada |
+| Singapore Dollar | SGD | S$ | Singapore |
+| Hong Kong Dollar | HKD | HK$ | Hong Kong |
+| New Zealand Dollar | NZD | NZ$ | New Zealand, Cook Islands, Niue, Pitcairn Islands, Tokelau |
+| Taiwan Dollar | TWD | NT$ | Taiwan |
+| Jamaican Dollar | JMD | J$ | Jamaica |
+| Trinidad and Tobago Dollar | TTD | TT$ | Trinidad and Tobago |
+| Barbadian Dollar | BBD | Bds$ | Barbados |
+| Bahamian Dollar | BSD | B$ | Bahamas |
+| Belize Dollar | BZD | BZ$ | Belize |
+| Bermudian Dollar | BMD | BD$ | Bermuda |
+| Brunei Dollar | BND | B$ | Brunei |
+| Fijian Dollar | FJD | FJ$ | Fiji |
+| Guyanese Dollar | GYD | G$ | Guyana |
+| Cayman Islands Dollar | KYD | CI$ | Cayman Islands |
+| Liberian Dollar | LRD | L$ | Liberia |
+| Namibian Dollar | NAD | N$ | Namibia |
+| Solomon Islands Dollar | SBD | SI$ | Solomon Islands |
+| Surinamese Dollar | SRD | Sr$ | Suriname |
+| East Caribbean Dollar | XCD | EC$ | Antigua & Barbuda, Dominica, Grenada, Saint Kitts & Nevis, Saint Lucia, Saint Vincent & the Grenadines, Anguilla, Montserrat |
+| Zimbabwe Dollar | ZWL | Z$ | Zimbabwe |
+
+## By Region
+
+### North America and Caribbean
+
+The **US Dollar (USD)** dominates this region. Beyond the United States, it is the official currency in:
+- **Ecuador** -- fully dollarized since 2000 after abandoning the Sucre
+- **El Salvador** -- dollarized since 2001 (also accepts Bitcoin as legal tender)
+- **Panama** -- uses USD alongside the Balboa (PAB), which is pegged 1:1
+
+The **East Caribbean Dollar (XCD)** serves 8 island nations and territories, managed by the Eastern Caribbean Central Bank.
+
+The **Canadian Dollar (CAD)** is the 6th most traded currency globally and is heavily correlated with commodity prices, especially oil.
+
+### Asia-Pacific
+
+The **Australian Dollar (AUD)** is used by Australia and three Pacific island nations (Kiribati, Nauru, Tuvalu). It is the 5th most traded currency globally.
+
+The **Singapore Dollar (SGD)** and **Brunei Dollar (BND)** are interchangeable at par through a Currency Interchangeability Agreement since 1967.
+
+The **Hong Kong Dollar (HKD)** is pegged to the USD through a linked exchange rate system, trading in a narrow band of 7.75-7.85 HKD per USD.
+
+The **New Taiwan Dollar (TWD)** is the currency of Taiwan and uses the ISO code TWD (not NTD, despite the common NT$ symbol).
+
+### Africa
+
+The **Namibian Dollar (NAD)** is pegged 1:1 to the South African Rand (ZAR), and both currencies circulate freely in Namibia.
+
+The **Liberian Dollar (LRD)** circulates alongside the US Dollar, which is also widely used in daily transactions.
+
+The **Zimbabwe Dollar (ZWL)** was reintroduced in 2019 after years of hyperinflation and multicurrency use. USD and other currencies still circulate widely.
+
+### South America
+
+The **Guyanese Dollar (GYD)** and **Surinamese Dollar (SRD)** are the two South American dollar currencies. Both are relatively low-value compared to USD.
+
+### Oceania
+
+The **Fijian Dollar (FJD)**, **Solomon Islands Dollar (SBD)**, and **New Zealand Dollar (NZD)** serve the Pacific region. NZD is also used by several smaller Pacific territories.
+
+## Working with Dollar Currencies in Code
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+
+// Look up any dollar currency
+currency.getCurrency('AU'); // { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' }
+currency.getCurrency('SG'); // { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' }
+currency.getCurrency('JM'); // { code: 'JMD', symbol: 'J$', name: 'Jamaican Dollar' }
+
+// Find all countries using a specific dollar
+currency.getCountriesByCurrency('NZD');
+// ['CK', 'NU', 'NZ', 'PN', 'TK']
+
+// Find all countries using USD
+currency.getCountriesByCurrency('USD');
+// ['AS', 'BQ', 'EC', 'FM', 'GU', 'IO', 'MH', 'MP', 'PA', 'PR', 'PW', 'SV',
+//  'TC', 'TL', 'UM', 'US', 'VG', 'VI']
+```
+
+## Common Pitfalls
+
+**Assuming $ means USD.** The $ symbol is used by most dollar currencies. Always use the ISO code (USD, AUD, CAD) to identify currencies unambiguously. Never store or transmit amounts with just a $ symbol.
+
+**Confusing currency names with values.** A "dollar" in Suriname (SRD) is worth far less than a dollar in the US (USD) or Singapore (SGD). Currency name similarity has no bearing on exchange rates.
+
+**Mixing up pegged and independent currencies.** Some dollars are pegged (HKD to USD, NAD to ZAR, BND to SGD), meaning their exchange rate is fixed. Others float freely (AUD, CAD, NZD).
+
+## Summary
+
+Over 20 currencies worldwide use the name "dollar", each with its own ISO 4217 code and independent (or pegged) exchange rate. The US Dollar is by far the most dominant, serving as both the currency of 18 territories and the world's primary reserve currency. When building financial applications, always use ISO currency codes rather than currency names to avoid ambiguity.
+
+---
+
+## Related
+
+- [Countries Using the US Dollar](/blog/countries-using-us-dollar) -- All 18 USD territories
+- [Countries Using the Euro](/blog/countries-using-euro) -- All 36 EUR countries
+- [Currency API](/docs/api/currency) -- Full currency module reference
+- [Country Code FAQ](/blog/country-code-faq) -- Common ISO code questions

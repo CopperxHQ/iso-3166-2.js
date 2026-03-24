@@ -22,8 +22,8 @@ export async function generateMetadata({
   const data = getCountryPageData(code.toUpperCase());
   if (!data) return {};
 
-  const title = `${data.name} (${data.alpha2}) - ISO 3166 Country Code | @koshmoney/countries`;
-  const description = `Get ${data.name} ISO codes: Alpha-2 (${data.alpha2}), Alpha-3 (${data.alpha3}), Numeric (${data.numeric}). ${data.subdivisionCount} subdivisions. TypeScript npm package.`;
+  const title = `${data.name} (${data.alpha2}) - ISO 3166 Country Code, Subdivisions & Currency`;
+  const description = `${data.name} ISO 3166 codes: Alpha-2 ${data.alpha2}, Alpha-3 ${data.alpha3}, Numeric ${data.numeric}. ${data.subdivisionCount} subdivisions${data.currency ? `, currency ${data.currency.code}` : ''}, and more.`;
 
   return {
     title,

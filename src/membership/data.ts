@@ -57,11 +57,12 @@ export const SEPA_MEMBERS = new Set([
 ]);
 
 /**
- * Eurozone Members (20) - EU countries using EUR
+ * Eurozone Members (21) - EU countries using EUR
  */
 export const EUROZONE_MEMBERS = new Set([
   'AT', // Austria
   'BE', // Belgium
+  'BG', // Bulgaria (joined 2026)
   'CY', // Cyprus
   'EE', // Estonia
   'FI', // Finland

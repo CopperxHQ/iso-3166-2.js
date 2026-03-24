@@ -190,7 +190,7 @@ function buildCountryData(alpha2: string): CountryPageData | null {
     continent: geo?.continent ?? null,
     region: geo?.region ?? null,
     subdivisionCount: subEntries.length,
-    subdivisionPreview: subEntries.slice(0, 5).map(([code, info]) => ({
+    subdivisionPreview: subEntries.map(([code, info]) => ({
       code,
       name: info.name,
       type: info.type,
