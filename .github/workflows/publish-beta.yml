@@ -3,10 +3,8 @@ name: Publish Beta
 on:
   push:
     branches: [dev]
-    paths-ignore:
-      - '*.md'
-      - 'docs/**'
-      - 'website/**'
+    paths:
+      - 'package.json'
 
 jobs:
   publish-beta:
