@@ -1,5 +1,6 @@
 import type { CountryPageData } from '../../lib/country-data';
 import { CopyButton } from './copy-button';
+import { BreadcrumbSchema } from './breadcrumb-schema';
 
 function CodeCard({
   label,
@@ -49,6 +50,12 @@ country.getCountryByNumeric('${data.numeric}');`;
 function SubdivisionPreview({ data }: { data: CountryPageData }) {
   if (data.subdivisionCount === 0) return null;
 
+  const INITIAL_SHOW = 15;
+  const showAll = data.subdivisionPreview.length <= INITIAL_SHOW;
+  const visibleSubs = showAll
+    ? data.subdivisionPreview
+    : data.subdivisionPreview.slice(0, INITIAL_SHOW);
+
   return (
     <div className="mt-6">
       <h2 className="text-xl font-normal text-white">
@@ -64,7 +71,7 @@ function SubdivisionPreview({ data }: { data: CountryPageData }) {
             </tr>
           </thead>
           <tbody>
-            {data.subdivisionPreview.map((sub) => (
+            {visibleSubs.map((sub) => (
               <tr key={sub.code} className="border-b border-slate-800">
                 <td className="px-4 py-2 font-mono text-slate-200">{sub.code}</td>
                 <td className="px-4 py-2 text-slate-300">{sub.name}</td>
@@ -74,9 +81,9 @@ function SubdivisionPreview({ data }: { data: CountryPageData }) {
           </tbody>
         </table>
       </div>
-      {data.subdivisionCount > 5 && (
+      {!showAll && (
         <p className="mt-2 text-sm text-slate-500">
-          ...and {data.subdivisionCount - 5} more.{' '}
+          Showing {INITIAL_SHOW} of {data.subdivisionCount}.{' '}
           <a
             href={`/subdivisions/${data.alpha2.toLowerCase()}`}
             className="text-sky-500 hover:text-sky-400"
@@ -193,6 +200,13 @@ export function CountryPageLayout({ data }: { data: CountryPageData }) {
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Countries', href: '/docs/api/country' },
+          { name: data.name },
+        ]}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}

@@ -9,6 +9,7 @@ import rehypePrettyCode from 'rehype-pretty-code'
 import { getContentBySlug, extractHeadings, getBlogArticles } from '@/lib/content'
 import { mdxComponents } from '@/app/_components/mdx-components'
 import { TOC } from '@/app/_components/toc'
+import { BreadcrumbSchema } from '@/app/_components/breadcrumb-schema'
 
 export function generateStaticParams() {
   return getBlogArticles().map((article) => ({ slug: article.slug }))
@@ -49,10 +50,36 @@ export default async function BlogArticlePage(props: {
 
   const headings = extractHeadings(content)
 
+  const faqs = frontmatter.faqs as { q: string; a: string }[] | undefined
+  const faqSchema = faqs?.length
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: { '@type': 'Answer', text: faq.a },
+        })),
+      }
+    : null
+
   return (
     <div className="mx-auto flex max-w-[90rem]">
       <main className="min-w-0 flex-1 px-6 py-10 md:px-8">
         <article className="mx-auto max-w-3xl">
+          <BreadcrumbSchema
+            items={[
+              { name: 'Home', href: '/' },
+              { name: 'Blog', href: '/blog' },
+              { name: article.title },
+            ]}
+          />
+          {faqSchema && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+            />
+          )}
           <Link
             href="/blog"
             className="inline-flex items-center gap-1 text-sm text-sky-500 transition hover:text-sky-400"

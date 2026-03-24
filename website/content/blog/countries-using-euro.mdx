@@ -4,7 +4,7 @@ description: "Complete list of all countries and territories that use the Euro (
 
 # Countries Using the Euro: Complete List with ISO Codes
 
-The Euro (EUR) is the official currency in 35 countries and territories worldwide, making it the second most traded currency after the US Dollar. While the Eurozone has 20 members, many additional microstates, overseas departments, and territories also use the Euro. If you build applications that handle European payments, currency display, or international commerce, you need the full picture -- not just the Eurozone list.
+The Euro (EUR) is the official currency in 36 countries and territories worldwide, making it the second most traded currency after the US Dollar. While the Eurozone has 21 members, many additional microstates, overseas departments, and territories also use the Euro. If you build applications that handle European payments, currency display, or international commerce, you need the full picture -- not just the Eurozone list.
 
 This reference lists every country and territory that uses the Euro, organized by category, with ISO codes and code examples.
 
@@ -27,7 +27,7 @@ currency.getCurrency('DE');
 // { code: 'EUR', symbol: '€', name: 'Euro' }
 ```
 
-## Eurozone Members (20)
+## Eurozone Members (21)
 
 The Eurozone is the formal monetary union of EU member states that have adopted the Euro. For a detailed breakdown with adoption dates, see our [Eurozone Countries List](/blog/eurozone-countries-list).
 
@@ -35,6 +35,7 @@ The Eurozone is the formal monetary union of EU member states that have adopted 
 |---------|---------|---------|---------|---------|
 | Austria | AT | AUT | 040 | 1999 |
 | Belgium | BE | BEL | 056 | 1999 |
+| Bulgaria | BG | BGR | 100 | 2026 |
 | Croatia | HR | HRV | 191 | 2023 |
 | Cyprus | CY | CYP | 196 | 2008 |
 | Estonia | EE | EST | 233 | 2011 |
@@ -122,12 +123,12 @@ This is a critical distinction for developers:
 
 | Category | Count | `isEurozone()` | `getCurrencyCode() === 'EUR'` |
 |----------|-------|:---------------:|:-----------------------------:|
-| Eurozone members | 20 | true | true |
+| Eurozone members | 21 | true | true |
 | European microstates | 4 | false | true |
 | Unilateral adopters | 1 | false | true |
 | French overseas territories | 8 | false | true |
 | Other EUR territories | 2 | false | true |
-| **Total** | **35** | **20** | **35** |
+| **Total** | **36** | **21** | **36** |
 
 Use `membership.isEurozone()` when you need to know if a country is part of the formal Eurozone (for ECB monetary policy, Eurozone-specific regulations). Use `currency.getCurrencyCode()` when you need to know if a country uses the Euro as its currency (for pricing, payment processing, currency display).
 
@@ -135,10 +136,10 @@ Use `membership.isEurozone()` when you need to know if a country is part of the 
 import { currency } from '@koshmoney/countries/currency';
 import { membership } from '@koshmoney/countries/membership';
 
-// All countries that USE the Euro (35)
+// All countries that USE the Euro (36)
 const allEurUsers = currency.getCountriesByCurrency('EUR');
 
-// Only formal Eurozone members (20)
+// Only formal Eurozone members (21)
 const eurozoneMembers = membership.getMembers('Eurozone');
 
 // EUR users outside the Eurozone (15)
@@ -199,7 +200,7 @@ nonEuropeanEUR.map((code) => ({
 
 ## Summary
 
-The Euro is the official currency in 35 countries and territories: 20 Eurozone members, 4 European microstates with monetary agreements, 1 unilateral adopter (Montenegro), and 10 overseas territories (mostly French). The `@koshmoney/countries` library distinguishes between Eurozone membership (`membership.isEurozone()`) and actual EUR usage (`currency.getCurrencyCode()`), giving developers precise control over currency and compliance logic.
+The Euro is the official currency in 36 countries and territories: 21 Eurozone members, 4 European microstates with monetary agreements, 1 unilateral adopter (Montenegro), and 10 overseas territories (mostly French). The `@koshmoney/countries` library distinguishes between Eurozone membership (`membership.isEurozone()`) and actual EUR usage (`currency.getCurrencyCode()`), giving developers precise control over currency and compliance logic.
 
 ---
 

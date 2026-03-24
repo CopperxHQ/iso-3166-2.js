@@ -1,4 +1,5 @@
 import type { SubdivisionPageData } from '../../lib/subdivision-data';
+import { BreadcrumbSchema } from './breadcrumb-schema';
 
 function SubdivisionTable({ data }: { data: SubdivisionPageData }) {
   const grouped = data.subdivisionTypes.length > 1;
@@ -153,6 +154,13 @@ export function SubdivisionPageLayout({ data }: { data: SubdivisionPageData }) {
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8">
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', href: '/' },
+          { name: data.name, href: `/countries/${data.alpha2.toLowerCase()}` },
+          { name: `${typeLabel}` },
+        ]}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}

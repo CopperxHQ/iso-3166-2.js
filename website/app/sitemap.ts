@@ -96,6 +96,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'all-249-country-codes-list',
     'south-korean-province-codes-list',
     'phone-country-codes-dial-codes',
+    'eu-vs-eurozone-countries',
+    'dollar-currencies-worldwide',
   ]
 
   const blogPages: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({

@@ -98,6 +98,7 @@ describe('Membership Module', () => {
       expect(isEurozone('IT')).toBe(true);
       expect(isEurozone('ES')).toBe(true);
       expect(isEurozone('HR')).toBe(true); // Croatia joined 2023
+      expect(isEurozone('BG')).toBe(true); // Bulgaria joined 2026
     });
 
     it('should return false for EU non-Eurozone members', () => {
@@ -107,7 +108,6 @@ describe('Membership Module', () => {
       expect(isEurozone('CZ')).toBe(false); // Czech uses CZK
       expect(isEurozone('HU')).toBe(false); // Hungary uses HUF
       expect(isEurozone('RO')).toBe(false); // Romania uses RON
-      expect(isEurozone('BG')).toBe(false); // Bulgaria uses BGN
     });
 
     it('should return false for non-EU', () => {
@@ -209,7 +209,7 @@ describe('Membership Module', () => {
 
     it('should return all Eurozone members', () => {
       const members = getMembers('Eurozone');
-      expect(members).toHaveLength(20);
+      expect(members).toHaveLength(21);
       expect(members).toContain('FR');
       expect(members).not.toContain('SE');
     });
@@ -231,7 +231,7 @@ describe('Membership Module', () => {
     });
 
     it('should have correct Eurozone member count', () => {
-      expect(EUROZONE_MEMBERS.size).toBe(20);
+      expect(EUROZONE_MEMBERS.size).toBe(21);
     });
 
     it('should have correct Schengen member count', () => {
