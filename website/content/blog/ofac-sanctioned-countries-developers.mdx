@@ -1,0 +1,752 @@
+---
+description: "Complete 2026 OFAC sanctioned countries list for developers. Build sanctions screening in TypeScript with code examples, comparison of OFAC vs EU vs UN sanctions, and common compliance mistakes."
+faqs:
+  - q: "What countries are on the OFAC sanctions list in 2026?"
+    a: "As of 2026, OFAC maintains comprehensive sanctions programs against Iran, North Korea, Cuba, Syria, and the Crimea/Donetsk/Luhansk regions of Ukraine (Russian-occupied). Targeted or partial sanctions also apply to Myanmar, Venezuela, Belarus, and Russia more broadly."
+  - q: "Do developers need to worry about OFAC sanctions?"
+    a: "Yes. Any software that processes financial transactions, provides digital services to users worldwide, or handles payments must screen against sanctioned countries and the SDN list. OFAC violations carry strict liability, meaning even accidental violations can result in fines up to $361,000 per occurrence for civil penalties."
+  - q: "What is the difference between OFAC comprehensive and targeted sanctions?"
+    a: "Comprehensive sanctions prohibit virtually all transactions with an entire country (e.g., Iran, North Korea). Targeted sanctions restrict dealings with specific individuals, entities, or sectors within a country, while allowing some lawful transactions with non-sanctioned parties in that country."
+  - q: "How often do OFAC sanctions lists change?"
+    a: "OFAC updates the SDN list and other sanctions lists frequently, sometimes multiple times per week. Country-level comprehensive sanctions change less often but can shift rapidly based on geopolitical events. Applications should pull from regularly updated compliance feeds rather than hardcoding any list."
+---
+
+# OFAC Sanctioned Countries: A Developer's Guide to Sanctions Compliance
+
+If you are building software that touches financial transactions, user onboarding, or cross-border payments, sanctions compliance is not optional. The Office of Foreign Assets Control (OFAC) administers some of the most consequential trade and financial sanctions programs in the world, and violations carry strict liability -- meaning you can be penalized even if you did not know a transaction was prohibited.
+
+This guide covers what OFAC sanctions mean for developers, which countries are currently sanctioned, how to implement sanctions screening programmatically, and the differences between OFAC, EU, and UN sanctions regimes.
+
+## What Is OFAC and Why Developers Need to Know
+
+OFAC is a division of the U.S. Department of the Treasury. It administers and enforces economic and trade sanctions based on U.S. foreign policy and national security goals. OFAC sanctions apply to:
+
+- All U.S. persons (citizens, permanent residents, and anyone physically in the U.S.)
+- All U.S.-incorporated entities and their foreign branches
+- Any transaction that touches the U.S. financial system (including USD-denominated transactions cleared through U.S. correspondent banks)
+- Foreign persons who cause U.S. persons to violate sanctions
+
+That last point is critical for software companies. If your platform processes USD payments, uses U.S. banking infrastructure, or serves U.S. customers, OFAC sanctions apply to you regardless of where your company is incorporated.
+
+### Why This Matters for Software
+
+Consider these common scenarios where sanctions compliance intersects with software:
+
+- **Payment platforms** must screen senders and recipients against sanctioned countries and the Specially Designated Nationals (SDN) list before processing transactions
+- **SaaS applications** must restrict access from comprehensively sanctioned countries if they use U.S. cloud infrastructure or process payments in USD
+- **Cryptocurrency and stablecoin platforms** must implement wallet screening and geographic restrictions -- OFAC has actively pursued enforcement actions against crypto services
+- **Marketplace and e-commerce platforms** must prevent listings, purchases, and shipments involving sanctioned jurisdictions
+- **Onboarding flows** must collect and validate country data as part of KYC/AML procedures to flag sanctioned jurisdictions early
+
+> [!NOTE]
+> OFAC violations carry strict liability. Unlike most regulatory frameworks where intent matters, OFAC can impose civil penalties even for unintentional violations. Civil penalties can reach up to $361,000 per violation (adjusted annually for inflation), and willful violations can result in criminal penalties of up to $1 million and 20 years imprisonment per violation.
+
+## Comprehensive OFAC Sanctioned Countries List (2026)
+
+OFAC sanctions programs fall into two categories: **comprehensive sanctions** (which prohibit nearly all transactions with an entire country or region) and **targeted sanctions** (which restrict dealings with specific persons, entities, or sectors). Here is the current landscape.
+
+### Comprehensively Sanctioned Countries and Regions
+
+These jurisdictions are subject to broad, economy-wide sanctions. Virtually all transactions involving these countries are prohibited without a specific OFAC license:
+
+| Country/Region | ISO Alpha-2 | ISO Alpha-3 | Program | Key Restrictions |
+|---|---|---|---|---|
+| Iran | IR | IRN | Iranian Transactions and Sanctions Regulations | Near-total trade and financial embargo |
+| North Korea | KP | PRK | North Korea Sanctions Regulations | Near-total trade and financial embargo |
+| Cuba | CU | CUB | Cuban Assets Control Regulations | Broad trade and financial restrictions |
+| Syria | SY | SYR | Syrian Sanctions Regulations | Broad trade, financial, and energy restrictions |
+| Crimea Region (Ukraine) | UA | UKR | Ukraine-/Russia-Related Sanctions | Applies to Crimea, Donetsk, and Luhansk regions specifically |
+
+### Targeted/Partial Sanctions Programs
+
+These countries are subject to sanctions against specific sectors, government officials, or entities. Not all transactions with these countries are prohibited, but many require careful screening:
+
+| Country | ISO Alpha-2 | ISO Alpha-3 | Program | Scope |
+|---|---|---|---|---|
+| Russia | RU | RUS | Ukraine-/Russia-Related Sanctions | Financial sector, energy, defense, technology exports; extensive SDN designations |
+| Belarus | BY | BLR | Belarus Sanctions Regulations | Government officials, state-owned enterprises, key sectors |
+| Myanmar (Burma) | MM | MMR | Burma Sanctions | Military regime officials, military-owned enterprises |
+| Venezuela | VE | VEN | Venezuela Sanctions | Government of Venezuela, PdVSA (state oil company), gold sector |
+
+### Other Active OFAC Sanctions Programs
+
+OFAC also maintains sanctions programs targeting specific persons, entities, and sectors in numerous other countries. These are not country-wide embargoes but involve significant SDN (Specially Designated Nationals) designations:
+
+- **Afghanistan** -- Taliban-related designations
+- **Balkans** -- Persons undermining stability
+- **Central African Republic** -- Armed groups
+- **Democratic Republic of the Congo** -- Armed groups, mining sector
+- **Ethiopia** -- Conflict-related designations
+- **Hong Kong** -- Officials undermining autonomy
+- **Iraq** -- Specific individuals and former regime elements
+- **Lebanon** -- Hezbollah-related designations
+- **Libya** -- Government of National Accord-related
+- **Mali** -- Wagner Group and conflict-related
+- **Nicaragua** -- Government officials
+- **Somalia** -- Al-Shabaab and related
+- **South Sudan** -- Conflict-related
+- **Sudan** -- Transitional period sanctions
+- **Yemen** -- Houthi-related designations
+- **Zimbabwe** -- Government officials
+
+> [!TIP]
+> For a complete, up-to-date list of all OFAC sanctions programs, refer to the [OFAC Sanctions Programs and Information](https://ofac.treasury.gov/sanctions-programs-and-information) page on the U.S. Treasury website.
+
+## Types of Sanctions Programs
+
+Understanding the distinction between comprehensive and targeted sanctions is essential for building correct screening logic.
+
+### Comprehensive Sanctions
+
+Comprehensive sanctions prohibit virtually all direct and indirect commercial, financial, and trade transactions with an entire country. Under a comprehensive program:
+
+- U.S. persons cannot export goods or services to the country
+- U.S. persons cannot import goods or services from the country
+- Financial transactions (including transfers through U.S. banks) are blocked
+- U.S. persons cannot invest in or provide financing to entities in the country
+- Facilitating transactions on behalf of non-U.S. persons is also prohibited
+
+For software, this means you generally cannot provide services -- including digital services -- to users in comprehensively sanctioned countries if your platform has any U.S. nexus.
+
+### Targeted Sanctions (SDN List and Sectoral Sanctions)
+
+Targeted sanctions are more surgical. They block specific:
+
+- **Individuals and entities** listed on the Specially Designated Nationals and Blocked Persons List (SDN List)
+- **Sectors** of a country's economy (e.g., Russia's financial sector, energy sector, or defense sector)
+- **Types of transactions** (e.g., new debt or equity for certain Russian financial institutions)
+
+The SDN list contains over 12,000 entries and is updated frequently. Screening against the SDN list requires name-matching algorithms, not just country checks, because sanctioned individuals can appear in any country.
+
+### Sectoral Sanctions Identifications (SSI) List
+
+The SSI List identifies persons operating in sectors of the Russian economy targeted by Directive 1, 2, 3, or 4 of Executive Order 13662. Restrictions vary by directive:
+
+- **Directive 1**: Prohibits new debt > 14 days for listed financial institutions
+- **Directive 2**: Prohibits new debt > 60 days for listed energy companies
+- **Directive 3**: Prohibits new debt > 30 days for listed defense/intelligence entities
+- **Directive 4**: Prohibits provision of goods/services for deepwater, Arctic offshore, or shale projects
+
+## How to Check Sanctions Programmatically
+
+Sanctions screening has two layers: **country-level checks** (is this a sanctioned jurisdiction?) and **entity-level checks** (is this person or company on the SDN list?). The `@koshmoney/countries` library helps with the country-level layer.
+
+### Defining Your Sanctioned Countries Set
+
+Start by defining your sanctions configuration. This should be loaded from a regularly updated data source, not hardcoded:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Define sanctions tiers based on your compliance policy
+// These sets should be loaded from your compliance data source and updated regularly
+const COMPREHENSIVE_SANCTIONS = new Set(['IR', 'KP', 'CU', 'SY']);
+const TARGETED_SANCTIONS = new Set(['RU', 'BY', 'MM', 'VE']);
+const CRIMEA_REGION = new Set(['UA']); // Requires sub-region check
+
+type SanctionsResult = {
+  allowed: boolean;
+  tier: 'comprehensive' | 'targeted' | 'region_restricted' | 'clear';
+  reason: string;
+  countryName: string | null;
+};
+
+function checkCountrySanctions(countryCode: string): SanctionsResult {
+  if (!country.isValid(countryCode)) {
+    return {
+      allowed: false,
+      tier: 'comprehensive',
+      reason: 'Invalid country code',
+      countryName: null,
+    };
+  }
+
+  const code = countryCode.toUpperCase();
+  const name = country.toName(code);
+
+  if (COMPREHENSIVE_SANCTIONS.has(code)) {
+    return {
+      allowed: false,
+      tier: 'comprehensive',
+      reason: `${name} is subject to comprehensive OFAC sanctions`,
+      countryName: name,
+    };
+  }
+
+  if (TARGETED_SANCTIONS.has(code)) {
+    return {
+      allowed: true, // May be allowed, but requires enhanced screening
+      tier: 'targeted',
+      reason: `${name} is subject to targeted OFAC sanctions -- enhanced screening required`,
+      countryName: name,
+    };
+  }
+
+  return {
+    allowed: true,
+    tier: 'clear',
+    reason: 'No country-level sanctions apply',
+    countryName: name,
+  };
+}
+
+checkCountrySanctions('IR');
+// { allowed: false, tier: 'comprehensive',
+//   reason: 'Iran is subject to comprehensive OFAC sanctions', countryName: 'Iran' }
+
+checkCountrySanctions('RU');
+// { allowed: true, tier: 'targeted',
+//   reason: 'Russia is subject to targeted OFAC sanctions -- enhanced screening required',
+//   countryName: 'Russia' }
+
+checkCountrySanctions('DE');
+// { allowed: true, tier: 'clear',
+//   reason: 'No country-level sanctions apply', countryName: 'Germany' }
+```
+
+### Combining Country and Membership Checks
+
+For fintech applications, you often need to combine sanctions screening with membership checks to determine which compliance rules apply:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+interface ComplianceProfile {
+  sanctionsTier: 'blocked' | 'restricted' | 'clear';
+  isEU: boolean;
+  isSEPA: boolean;
+  requiresEDD: boolean; // Enhanced Due Diligence
+  paymentRailsAvailable: string[];
+}
+
+function getComplianceProfile(countryCode: string): ComplianceProfile | null {
+  if (!country.isValid(countryCode)) return null;
+
+  const code = countryCode.toUpperCase();
+  const BLOCKED = new Set(['IR', 'KP', 'CU', 'SY']);
+  const RESTRICTED = new Set(['RU', 'BY', 'MM', 'VE']);
+
+  if (BLOCKED.has(code)) {
+    return {
+      sanctionsTier: 'blocked',
+      isEU: false,
+      isSEPA: false,
+      requiresEDD: true,
+      paymentRailsAvailable: [],
+    };
+  }
+
+  const isEUMember = membership.isEU(code);
+  const isSEPAMember = membership.isSEPA(code);
+  const isRestricted = RESTRICTED.has(code);
+
+  const rails: string[] = [];
+  if (isSEPAMember) rails.push('SEPA', 'SEPA_INSTANT');
+  if (!isRestricted) rails.push('SWIFT');
+  if (!isRestricted) rails.push('CRYPTO');
+
+  return {
+    sanctionsTier: isRestricted ? 'restricted' : 'clear',
+    isEU: isEUMember,
+    isSEPA: isSEPAMember,
+    requiresEDD: isRestricted,
+    paymentRailsAvailable: rails,
+  };
+}
+
+getComplianceProfile('FR');
+// { sanctionsTier: 'clear', isEU: true, isSEPA: true,
+//   requiresEDD: false, paymentRailsAvailable: ['SEPA', 'SEPA_INSTANT', 'SWIFT', 'CRYPTO'] }
+
+getComplianceProfile('RU');
+// { sanctionsTier: 'restricted', isEU: false, isSEPA: false,
+//   requiresEDD: true, paymentRailsAvailable: [] }
+
+getComplianceProfile('IR');
+// { sanctionsTier: 'blocked', isEU: false, isSEPA: false,
+//   requiresEDD: true, paymentRailsAvailable: [] }
+```
+
+## Building a Sanctions Screening Function in TypeScript
+
+A production sanctions screening system needs to handle multiple layers: country checks, region checks, and integration points for entity-level SDN screening. Here is a more complete implementation pattern:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+// ---- Configuration (load from your compliance data source) ----
+
+interface SanctionsConfig {
+  comprehensiveSanctions: Set<string>;
+  targetedSanctions: Set<string>;
+  fatfBlacklist: Set<string>;
+  fatfGreylist: Set<string>;
+}
+
+function loadSanctionsConfig(): SanctionsConfig {
+  // In production, load this from a database, API, or compliance feed
+  // Updated regularly by your compliance team
+  return {
+    comprehensiveSanctions: new Set(['IR', 'KP', 'CU', 'SY']),
+    targetedSanctions: new Set(['RU', 'BY', 'MM', 'VE']),
+    fatfBlacklist: new Set(['IR', 'KP', 'MM']),
+    fatfGreylist: new Set([
+      'BF', 'CM', 'CD', 'HT', 'KE', 'ML', 'MZ', 'NG',
+      'PH', 'SN', 'SS', 'TZ', 'VN', 'YE',
+    ]),
+  };
+}
+
+// ---- Screening Logic ----
+
+type RiskLevel = 'blocked' | 'high' | 'elevated' | 'standard';
+
+interface ScreeningResult {
+  countryCode: string;
+  countryName: string | null;
+  riskLevel: RiskLevel;
+  flags: string[];
+  requiresManualReview: boolean;
+  blocked: boolean;
+}
+
+function screenCountry(
+  countryCode: string,
+  config: SanctionsConfig
+): ScreeningResult {
+  const flags: string[] = [];
+
+  if (!country.isValid(countryCode)) {
+    return {
+      countryCode,
+      countryName: null,
+      riskLevel: 'blocked',
+      flags: ['INVALID_COUNTRY_CODE'],
+      requiresManualReview: false,
+      blocked: true,
+    };
+  }
+
+  const code = countryCode.toUpperCase();
+  const name = country.toName(code);
+
+  // Layer 1: Comprehensive sanctions -- block immediately
+  if (config.comprehensiveSanctions.has(code)) {
+    flags.push('OFAC_COMPREHENSIVE');
+    return {
+      countryCode: code,
+      countryName: name,
+      riskLevel: 'blocked',
+      flags,
+      requiresManualReview: false,
+      blocked: true,
+    };
+  }
+
+  // Layer 2: Targeted sanctions -- high risk, may require manual review
+  if (config.targetedSanctions.has(code)) {
+    flags.push('OFAC_TARGETED');
+  }
+
+  // Layer 3: FATF blacklist/greylist
+  if (config.fatfBlacklist.has(code)) {
+    flags.push('FATF_BLACKLIST');
+  } else if (config.fatfGreylist.has(code)) {
+    flags.push('FATF_GREYLIST');
+  }
+
+  // Determine overall risk level
+  let riskLevel: RiskLevel = 'standard';
+  if (flags.includes('OFAC_TARGETED') || flags.includes('FATF_BLACKLIST')) {
+    riskLevel = 'high';
+  } else if (flags.includes('FATF_GREYLIST')) {
+    riskLevel = 'elevated';
+  }
+
+  return {
+    countryCode: code,
+    countryName: name,
+    riskLevel,
+    flags,
+    requiresManualReview: riskLevel === 'high',
+    blocked: false,
+  };
+}
+
+// ---- Usage ----
+
+const config = loadSanctionsConfig();
+
+screenCountry('IR', config);
+// { countryCode: 'IR', countryName: 'Iran', riskLevel: 'blocked',
+//   flags: ['OFAC_COMPREHENSIVE'], requiresManualReview: false, blocked: true }
+
+screenCountry('RU', config);
+// { countryCode: 'RU', countryName: 'Russia', riskLevel: 'high',
+//   flags: ['OFAC_TARGETED'], requiresManualReview: true, blocked: false }
+
+screenCountry('NG', config);
+// { countryCode: 'NG', countryName: 'Nigeria', riskLevel: 'elevated',
+//   flags: ['FATF_GREYLIST'], requiresManualReview: false, blocked: false }
+
+screenCountry('US', config);
+// { countryCode: 'US', countryName: 'United States', riskLevel: 'standard',
+//   flags: [], requiresManualReview: false, blocked: false }
+```
+
+### Integrating with Transaction Processing
+
+Here is how you might integrate the screening function into a transaction flow:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+interface Transaction {
+  id: string;
+  senderCountry: string;
+  recipientCountry: string;
+  amount: number;
+  currency: string;
+}
+
+interface TransactionScreeningResult {
+  transactionId: string;
+  senderScreening: ScreeningResult;
+  recipientScreening: ScreeningResult;
+  overallDecision: 'approve' | 'review' | 'block';
+  reasons: string[];
+}
+
+function screenTransaction(
+  tx: Transaction,
+  config: SanctionsConfig
+): TransactionScreeningResult {
+  const senderResult = screenCountry(tx.senderCountry, config);
+  const recipientResult = screenCountry(tx.recipientCountry, config);
+
+  const reasons: string[] = [];
+  let decision: 'approve' | 'review' | 'block' = 'approve';
+
+  // If either side is blocked, block the transaction
+  if (senderResult.blocked || recipientResult.blocked) {
+    decision = 'block';
+    if (senderResult.blocked) {
+      reasons.push(`Sender country ${senderResult.countryName} is comprehensively sanctioned`);
+    }
+    if (recipientResult.blocked) {
+      reasons.push(`Recipient country ${recipientResult.countryName} is comprehensively sanctioned`);
+    }
+  }
+  // If either side requires manual review, flag for review
+  else if (senderResult.requiresManualReview || recipientResult.requiresManualReview) {
+    decision = 'review';
+    reasons.push(...senderResult.flags.map(f => `Sender: ${f}`));
+    reasons.push(...recipientResult.flags.map(f => `Recipient: ${f}`));
+  }
+
+  return {
+    transactionId: tx.id,
+    senderScreening: senderResult,
+    recipientScreening: recipientResult,
+    overallDecision: decision,
+    reasons,
+  };
+}
+```
+
+> [!NOTE]
+> Country-level screening is only one part of a complete sanctions compliance program. You also need entity-level screening against the SDN list (name matching), IP-based geolocation checks, and ongoing transaction monitoring. Use a dedicated compliance provider for SDN screening -- name matching against 12,000+ entries with fuzzy logic is not something to build from scratch.
+
+## OFAC vs EU vs UN Sanctions: Comparison
+
+Different sanctions regimes have different scopes, enforcement mechanisms, and penalties. If your application serves users globally, you may need to comply with multiple regimes simultaneously.
+
+### Sanctions Regimes Overview
+
+| Aspect | OFAC (United States) | EU Sanctions | UN Sanctions |
+|---|---|---|---|
+| **Administering Body** | U.S. Treasury (OFAC) | EU Council | UN Security Council |
+| **Legal Basis** | IEEPA, Trading with the Enemy Act | EU Common Foreign and Security Policy | UN Charter, Chapter VII |
+| **Scope** | All U.S. persons, U.S. nexus transactions | All EU persons, EU-nexus transactions | All UN member states |
+| **Primary Lists** | SDN List, SSI List, Entity List | EU Consolidated Sanctions List | UN Consolidated List |
+| **Liability Standard** | Strict liability (no intent required) | Varies by member state | Varies by member state |
+| **Max Civil Penalty** | $361,000+ per violation | Varies; up to millions EUR | Implemented by member states |
+| **Comprehensive Programs** | Iran, North Korea, Cuba, Syria, Crimea | Russia, Belarus, Myanmar, Iran, North Korea, Syria | North Korea, Iran (nuclear), others |
+| **Update Frequency** | Multiple times per week (SDN) | As needed, often monthly | As needed by UNSC resolution |
+| **Extraterritorial Reach** | Extensive (any USD transaction) | Growing (EU nexus) | Through member state implementation |
+
+### Key Differences in Sanctioned Countries
+
+Not all sanctions regimes target the same countries or to the same extent:
+
+| Country | OFAC | EU | UN |
+|---|:---:|:---:|:---:|
+| Iran | Comprehensive | Targeted (nuclear, oil) | Targeted (nuclear) |
+| North Korea | Comprehensive | Comprehensive | Comprehensive |
+| Cuba | Comprehensive | No sanctions | No sanctions |
+| Syria | Comprehensive | Comprehensive | No comprehensive |
+| Russia | Targeted (extensive) | Comprehensive (since 2022) | No sanctions |
+| Belarus | Targeted | Comprehensive | No sanctions |
+| Myanmar | Targeted | Targeted | Targeted (arms embargo) |
+| Venezuela | Targeted | Targeted | No sanctions |
+
+Notice the significant differences. Cuba is comprehensively sanctioned by OFAC but not by the EU or UN. Russia faces more extensive EU sanctions than OFAC sanctions in some areas. This means your compliance logic needs to account for which regime(s) apply based on your business structure and transaction flow.
+
+### Implementing Multi-Regime Screening
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+type SanctionsRegime = 'OFAC' | 'EU' | 'UN';
+
+interface RegimeConfig {
+  blocked: Set<string>;
+  restricted: Set<string>;
+}
+
+// Each regime has its own blocked and restricted lists
+const REGIMES: Record<SanctionsRegime, RegimeConfig> = {
+  OFAC: {
+    blocked: new Set(['IR', 'KP', 'CU', 'SY']),
+    restricted: new Set(['RU', 'BY', 'MM', 'VE']),
+  },
+  EU: {
+    blocked: new Set(['KP', 'SY', 'RU', 'BY']),
+    restricted: new Set(['IR', 'MM', 'VE']),
+  },
+  UN: {
+    blocked: new Set(['KP']),
+    restricted: new Set(['IR', 'SO', 'YE', 'SS', 'CF', 'CD', 'ML', 'LY']),
+  },
+};
+
+interface MultiRegimeResult {
+  countryCode: string;
+  countryName: string | null;
+  blockedBy: SanctionsRegime[];
+  restrictedBy: SanctionsRegime[];
+  clearInAll: boolean;
+}
+
+function screenAllRegimes(
+  countryCode: string,
+  applicableRegimes: SanctionsRegime[]
+): MultiRegimeResult {
+  const code = countryCode.toUpperCase();
+  const name = country.isValid(code) ? country.toName(code) : null;
+
+  const blockedBy: SanctionsRegime[] = [];
+  const restrictedBy: SanctionsRegime[] = [];
+
+  for (const regime of applicableRegimes) {
+    const config = REGIMES[regime];
+    if (config.blocked.has(code)) {
+      blockedBy.push(regime);
+    } else if (config.restricted.has(code)) {
+      restrictedBy.push(regime);
+    }
+  }
+
+  return {
+    countryCode: code,
+    countryName: name,
+    blockedBy,
+    restrictedBy,
+    clearInAll: blockedBy.length === 0 && restrictedBy.length === 0,
+  };
+}
+
+// A U.S. company with EU operations must comply with both
+screenAllRegimes('CU', ['OFAC', 'EU']);
+// { countryCode: 'CU', countryName: 'Cuba', blockedBy: ['OFAC'],
+//   restrictedBy: [], clearInAll: false }
+
+screenAllRegimes('RU', ['OFAC', 'EU', 'UN']);
+// { countryCode: 'RU', countryName: 'Russia', blockedBy: ['EU'],
+//   restrictedBy: ['OFAC'], clearInAll: false }
+
+screenAllRegimes('DE', ['OFAC', 'EU', 'UN']);
+// { countryCode: 'DE', countryName: 'Germany', blockedBy: [],
+//   restrictedBy: [], clearInAll: true }
+```
+
+## Common Mistakes Developers Make
+
+### Mistake 1: Hardcoding Sanctions Lists
+
+Sanctions change frequently. Hardcoding country lists directly in your application code means they go stale silently.
+
+```typescript copy
+// WRONG: Hardcoded list that will go stale
+const SANCTIONED = ['IR', 'KP', 'CU', 'SY'];
+
+// CORRECT: Load from a configurable data source
+const sanctionsConfig = await loadSanctionsConfig(); // From database, API, or config service
+```
+
+Use `@koshmoney/countries` for the stable ISO country data layer, and load your sanctions lists from a regularly updated compliance data source.
+
+### Mistake 2: Only Checking Country, Not Entities
+
+Country-level screening catches the obvious cases, but the SDN list includes individuals and entities in non-sanctioned countries. A Russian oligarch living in London is still sanctioned, even though GB is not a sanctioned country.
+
+```typescript copy
+// INCOMPLETE: Country check alone is not sufficient
+function isAllowed(countryCode: string): boolean {
+  return !SANCTIONED_COUNTRIES.has(countryCode);
+}
+
+// BETTER: Country check + entity screening
+async function screenUser(
+  countryCode: string,
+  fullName: string,
+  dateOfBirth: string
+): Promise<{ allowed: boolean; flags: string[] }> {
+  const flags: string[] = [];
+
+  // Layer 1: Country screening
+  const countryResult = screenCountry(countryCode, config);
+  if (countryResult.blocked) {
+    return { allowed: false, flags: ['SANCTIONED_COUNTRY'] };
+  }
+  if (countryResult.riskLevel === 'high') {
+    flags.push('HIGH_RISK_COUNTRY');
+  }
+
+  // Layer 2: Entity screening (use a dedicated SDN screening service)
+  const sdnResult = await sdnScreeningService.check({ fullName, dateOfBirth });
+  if (sdnResult.match) {
+    return { allowed: false, flags: ['SDN_MATCH'] };
+  }
+  if (sdnResult.potentialMatch) {
+    flags.push('SDN_POTENTIAL_MATCH');
+  }
+
+  return { allowed: true, flags };
+}
+```
+
+### Mistake 3: Ignoring Sub-National Sanctions
+
+OFAC sanctions on the Crimea, Donetsk, and Luhansk regions of Ukraine target specific regions, not the entire country. Ukraine (UA) itself is not sanctioned. If your system only checks at the country level, you will either over-block (rejecting all Ukrainian users) or under-block (missing users in sanctioned regions).
+
+```typescript copy
+// WRONG: Blocking all of Ukraine
+const SANCTIONED = new Set(['IR', 'KP', 'CU', 'SY', 'UA']);
+
+// CORRECT: Ukraine is not sanctioned; specific regions are
+// You need additional data (IP geolocation, address) to identify
+// users in Crimea, Donetsk, or Luhansk
+function isRegionalSanction(countryCode: string, region?: string): boolean {
+  if (countryCode === 'UA' && region) {
+    const sanctionedRegions = new Set(['crimea', 'donetsk', 'luhansk']);
+    return sanctionedRegions.has(region.toLowerCase());
+  }
+  return false;
+}
+```
+
+### Mistake 4: No Audit Trail
+
+Compliance regulators expect you to demonstrate that you performed sanctions screening. Every screening decision should be logged with enough detail to reconstruct what happened.
+
+```typescript copy
+interface ComplianceLog {
+  timestamp: Date;
+  action: 'COUNTRY_SCREEN' | 'ENTITY_SCREEN' | 'TRANSACTION_SCREEN';
+  input: Record<string, string>;
+  result: ScreeningResult;
+  sanctionsDataVersion: string; // Track which version of sanctions data was used
+  decision: 'approve' | 'review' | 'block';
+}
+
+function logScreeningDecision(log: ComplianceLog): void {
+  // Persist to your compliance audit table
+  // This is NOT optional -- regulators will ask for it
+  complianceAuditRepository.save(log);
+}
+```
+
+### Mistake 5: Screening Only at Onboarding
+
+Sanctions lists change. A customer who was clear at onboarding may become sanctioned later. Production systems need ongoing rescreening -- typically daily or whenever the SDN list is updated.
+
+### Mistake 6: Not Handling the Crimea/Region Edge Case for Russia
+
+Russia itself is under targeted (not comprehensive) sanctions, but the Crimea, Donetsk, and Luhansk regions have comprehensive restrictions. Your system needs to distinguish between these:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+function assessRussiaUkraineRisk(
+  countryCode: string,
+  address?: { region?: string }
+): 'blocked' | 'restricted' | 'standard' {
+  const code = countryCode.toUpperCase();
+
+  // Ukraine: check for sanctioned regions
+  if (code === 'UA' && address?.region) {
+    const sanctionedRegions = ['crimea', 'donetsk', 'luhansk', 'sevastopol'];
+    if (sanctionedRegions.some(r => address.region!.toLowerCase().includes(r))) {
+      return 'blocked';
+    }
+    return 'standard';
+  }
+
+  // Russia: targeted sanctions (not comprehensive)
+  if (code === 'RU') {
+    return 'restricted';
+  }
+
+  return 'standard';
+}
+```
+
+## Summary
+
+- **OFAC sanctions carry strict liability** -- even unintentional violations are penalized
+- **Comprehensive sanctions** (Iran, North Korea, Cuba, Syria, Crimea regions) block virtually all transactions
+- **Targeted sanctions** (Russia, Belarus, Myanmar, Venezuela) require enhanced screening but do not block all activity
+- **Country-level screening is necessary but not sufficient** -- you also need entity-level SDN screening
+- **Never hardcode sanctions lists** -- load them from a regularly updated compliance data source
+- **Multiple sanctions regimes** (OFAC, EU, UN) target different countries to different extents
+- **Audit everything** -- log every screening decision with timestamps and data versions
+- Use `@koshmoney/countries` for validated ISO country codes and membership checks as the foundation of your compliance data layer
+
+## Related Resources
+
+- [EU Country Codes List](/blog/eu-country-codes-list) -- complete EU, EEA, SEPA, Eurozone reference tables
+- [ISO Country Codes for KYC Compliance](/blog/iso-country-codes-kyc-compliance) -- address validation, sanctions screening patterns, and database schemas
+- [SEPA Countries List](/blog/sepa-countries-list) -- all 36 SEPA members with ISO codes
+- [Membership API Reference](/docs/api/membership) -- `isEU()`, `isEEA()`, `isSEPA()`, `getMemberships()` documentation
+- [OFAC Sanctions Programs](https://ofac.treasury.gov/sanctions-programs-and-information) -- official U.S. Treasury sanctions information
+- [OFAC SDN List](https://ofac.treasury.gov/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists) -- the full Specially Designated Nationals list
+- [FATF High-Risk Jurisdictions](https://www.fatf-gafi.org/en/countries/black-and-grey-lists.html) -- official FATF grey and black lists
+
+## Get Started
+
+Add standardized country data to your sanctions screening workflows:
+
+```bash copy
+npm install @koshmoney/countries
+```
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { membership } from '@koshmoney/countries/membership';
+
+// Validate country codes in your screening pipeline
+country.isValid('IR'); // true
+
+// Combine sanctions checks with membership data
+membership.isEU('RU'); // false
+membership.isSEPA('RU'); // false
+
+// Get all memberships for compliance profiling
+membership.getMemberships('DE');
+// { EU: true, SEPA: true, EEA: true, Eurozone: true, Schengen: true }
+```
+
+Explore the full [API documentation](/docs/api/country) to see all available functions.

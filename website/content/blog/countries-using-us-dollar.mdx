@@ -155,6 +155,39 @@ americasUSD.map((code) => country.toName(code));
 // ['Ecuador', 'El Salvador', 'Puerto Rico', 'United States', ...]
 ```
 
+## Countries with Informal USD Usage
+
+Beyond the 18 countries where USD is the official currency, many more use the US Dollar informally as a de facto currency for daily transactions. These countries have their own official currencies but USD circulates widely due to economic ties, tourism, or currency instability.
+
+| Country | Alpha-2 | Official Currency | USD Status |
+|---------|---------|-------------------|------------|
+| Cambodia | KH | Cambodian Riel (KHR) | Dual economy -- ~80% of transactions in USD |
+| Zimbabwe | ZW | Zimbabwean Dollar (ZWL) | Multicurrency system, USD dominant in practice |
+| Lebanon | LB | Lebanese Pound (LBP) | USD widely used alongside LBP due to currency crisis |
+| Bahamas | BS | Bahamian Dollar (BSD) | BSD pegged 1:1 to USD, both accepted everywhere |
+| Belize | BZ | Belize Dollar (BZD) | BZD pegged 2:1 to USD, USD widely accepted |
+| Panama | PA | Panamanian Balboa (PAB) | PAB pegged 1:1 to USD, USD is de facto currency |
+| Costa Rica | CR | Costa Rican Colon (CRC) | USD accepted in tourist areas and major businesses |
+| Honduras | HN | Honduran Lempira (HNL) | USD accepted in tourist areas, especially Bay Islands |
+| Guatemala | GT | Guatemalan Quetzal (GTQ) | USD accepted in tourist areas, especially Antigua |
+
+Cambodia is the most notable example -- despite having the Riel as its official currency, the vast majority of commerce uses US Dollars. ATMs dispense USD, prices are quoted in dollars, and the Riel is primarily used for small change below one dollar. Zimbabwe has cycled through multiple currency crises and currently operates a multicurrency system where USD is the most trusted and widely used medium of exchange.
+
+Panama is a special case: while the Balboa is the official currency and has its own coins, there are no Balboa banknotes. All paper currency in circulation is USD, making it functionally dollarized even though the ISO 4217 code is PAB.
+
+> [!NOTE]
+> For applications, the key distinction is between **official** and **informal** USD usage. `currency.getCountriesByCurrency('USD')` returns only countries where USD is the ISO 4217 official currency. For countries like Cambodia or Panama, you may want to support USD as an additional display currency even though the API returns KHR or PAB.
+
+## Other Dollar Currencies Worldwide
+
+The word "dollar" appears in more than 20 currency names globally. The Australian Dollar (AUD), Canadian Dollar (CAD), Singapore Dollar (SGD), Hong Kong Dollar (HKD), New Zealand Dollar (NZD), and many others are distinct currencies with their own ISO 4217 codes and exchange rates -- they are not pegged to or interchangeable with the US Dollar.
+
+For a complete list of every dollar-named currency with ISO codes and the countries that use them, see [Dollar Currencies Worldwide](/blog/dollar-currencies-worldwide).
+
+## USD as the World Reserve Currency
+
+The US Dollar is the dominant global reserve currency, accounting for roughly 60% of worldwide foreign exchange reserves and approximately 88% of all foreign exchange transactions. Its central role in international trade is reinforced by the petrodollar system, where oil is priced and traded in USD globally. This reserve status means that even countries with no formal or informal USD adoption hold significant dollar reserves and are affected by US monetary policy.
+
 ## Summary
 
 The US Dollar is the official currency in 18 countries and territories listed in ISO 3166. This includes the United States and its territories, several sovereign nations that adopted USD through dollarization (Ecuador, El Salvador, East Timor), Pacific island nations with Compact of Free Association agreements, and a handful of British and Dutch territories. The `@koshmoney/countries` library provides `currency.getCountriesByCurrency('USD')` to find all of them programmatically.
@@ -167,4 +200,5 @@ The US Dollar is the official currency in 18 countries and territories listed in
 - [Countries Using the Euro](/blog/countries-using-euro) -- All EUR countries
 - [South American Countries List](/blog/south-american-countries-list-codes) -- South American country codes
 - [North American Countries List](/blog/north-american-countries-list-codes) -- North American country codes
+- [Every Dollar Currency in the World](/blog/dollar-currencies-worldwide)
 - [Oceania Countries List](/blog/oceania-countries-list-codes) -- Oceania country codes

@@ -416,6 +416,60 @@ Log every compliance decision that involves country data: what check was perform
 
 Some customers may have documents from former countries (Yugoslavia, Czechoslovakia). Have a process for mapping historical ISO 3166-3 codes to current codes.
 
+## Sanctions Screening with Country Codes
+
+Sanctions screening is one of the most critical compliance checks in financial applications. Governments and international bodies maintain lists of countries, entities, and individuals subject to economic sanctions. The three major sanctions regimes are **OFAC** (US Office of Foreign Assets Control), **EU restrictive measures**, and **UN Security Council sanctions**. Each publishes lists of comprehensively sanctioned countries where most or all financial transactions are prohibited, as well as sectoral sanctions targeting specific industries or activities.
+
+ISO 3166 country codes are the backbone of automated sanctions screening. When a customer registers, submits an address, or initiates a transaction, your system needs to check the involved country codes against sanctions lists. Without standardized codes, matching would be unreliable -- "North Korea", "DPRK", "Democratic People's Republic of Korea", and "Korea (North)" would all need to be handled as variants. With ISO codes, you simply check against `KP`.
+
+Here is an example of building a sanctions check utility using `@koshmoney/countries` for validation alongside your sanctions data:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Sanctions lists should come from an external compliance data provider
+// and be updated regularly. This is a simplified example.
+const OFAC_COMPREHENSIVE = new Set(['CU', 'IR', 'KP', 'SY', 'RU']);
+const EU_SANCTIONED = new Set(['BY', 'IR', 'KP', 'SY', 'RU']);
+const UN_SANCTIONED = new Set(['CF', 'CD', 'IR', 'KP', 'LY', 'ML', 'SO', 'SS', 'YE']);
+
+type SanctionsResult = {
+  blocked: boolean;
+  matches: string[];  // Which lists matched
+  countryName: string | null;
+};
+
+function checkCountrySanctions(countryCode: string): SanctionsResult {
+  // Validate the country code first
+  if (!country.isValid(countryCode)) {
+    return { blocked: true, matches: ['INVALID_CODE'], countryName: null };
+  }
+
+  const code = countryCode.toUpperCase();
+  const matches: string[] = [];
+
+  if (OFAC_COMPREHENSIVE.has(code)) matches.push('OFAC');
+  if (EU_SANCTIONED.has(code)) matches.push('EU');
+  if (UN_SANCTIONED.has(code)) matches.push('UN');
+
+  return {
+    blocked: matches.length > 0,
+    matches,
+    countryName: country.toName(code),
+  };
+}
+
+checkCountrySanctions('KP');
+// { blocked: true, matches: ['OFAC', 'EU', 'UN'], countryName: 'Korea, Democratic People\'s Republic Of' }
+
+checkCountrySanctions('DE');
+// { blocked: false, matches: [], countryName: 'Germany' }
+```
+
+In production, never hardcode sanctions lists as shown above. Sanctions change in response to geopolitical events -- sometimes within hours. Use a dedicated compliance data provider that delivers machine-readable updates, and rebuild your screening sets on each update. The `@koshmoney/countries` library handles the stable ISO data layer (validating codes, resolving names, checking memberships), while the dynamic regulatory data belongs in a separate, frequently updated source.
+
+For a deeper look at OFAC sanctions specifically, including the full list of comprehensively sanctioned countries and implementation patterns for developers, see [OFAC Sanctioned Countries for Developers](/blog/ofac-sanctioned-countries-developers).
+
 ## Further Reading
 
 - [ISO 3166 Country Codes Guide](/blog/iso-3166-country-codes-guide) -- complete reference for the ISO 3166 standard

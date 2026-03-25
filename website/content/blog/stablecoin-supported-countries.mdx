@@ -1,0 +1,468 @@
+---
+description: "Which countries support stablecoins like USDC and USDT in 2026? Complete guide to stablecoin availability by country, platform coverage, regulations, and programmatic country eligibility checks."
+faqs:
+  - q: "How many countries support USDC?"
+    a: "Circle makes USDC available in 180+ countries. However, actual access depends on your platform -- Stripe Stablecoin Accounts support 101 countries, while other on/off-ramp providers vary. Regulatory restrictions apply in sanctioned jurisdictions."
+  - q: "What is the difference between USDC and USDT availability?"
+    a: "USDC (Circle) focuses on regulated markets with MiCA compliance in the EU and strong US presence. USDT (Tether) has wider adoption in Asia and Latin America, particularly in countries with less formal crypto regulation. Both are available in 180+ countries at the protocol level."
+  - q: "Which countries ban stablecoins?"
+    a: "China has a comprehensive ban on crypto transactions including stablecoins. Other countries like Nigeria and Turkey restrict stablecoin usage through banking regulations rather than outright bans. India's status remains ambiguous with heavy taxation but no explicit ban."
+  - q: "Can I use stablecoins for cross-border payments?"
+    a: "Yes. Stablecoins are increasingly used for cross-border remittances and B2B payments, especially on corridors where traditional banking is slow or expensive. Popular routes include US to Latin America, Gulf states to South Asia, and intra-African transfers."
+---
+
+# Stablecoin Supported Countries 2026: Where USDC and USDT Work
+
+Stablecoins like USDC, USDT, and EURC have become core infrastructure for cross-border payments. They settle in seconds, cost a fraction of wire transfers, and work around the clock. But availability is not uniform. Where you can send, receive, and off-ramp stablecoins depends on the platform you use, the regulatory environment in the destination country, and which stablecoin you choose.
+
+This guide maps out stablecoin availability by country in 2026. It covers the major platforms, regulatory stances, restricted jurisdictions, and how to check country eligibility programmatically using `@koshmoney/countries`.
+
+## Why Stablecoin Country Coverage Matters
+
+If you are building a payments product, a remittance service, or a treasury management tool, you need to know where stablecoins actually work -- not just where blockchain transactions are technically possible, but where users can on-ramp, off-ramp, and hold stablecoins through regulated platforms.
+
+A stablecoin transfer to a wallet address in Nigeria is technically possible on any EVM chain. But whether the recipient can convert that USDC to naira through a licensed provider is a different question. Country coverage means end-to-end usability: fiat in, stablecoin transfer, fiat out.
+
+## Major Stablecoin Platforms and Their Coverage
+
+### Circle (USDC)
+
+Circle issues USDC, the second-largest stablecoin by market cap. USDC is available on 19 blockchains including Ethereum, Solana, Polygon, Arbitrum, Base, and Stellar.
+
+- **Country coverage:** 180+ countries
+- **EU compliance:** MiCA-compliant since mid-2024, the first major stablecoin to achieve this
+- **US compliance:** Regulated as a stored-value instrument, backed by US Treasuries and cash
+- **Key exclusion:** Sanctioned jurisdictions (North Korea, Iran, Syria, Cuba, Russia, Crimea/Donetsk/Luhansk regions)
+
+Circle does not directly serve end users for on/off-ramp in most countries. Instead, platforms like Copperx, Coinbase, and others build on top of Circle's infrastructure. The 180+ figure represents where USDC can be held and transferred, not necessarily where fiat conversion is available.
+
+### Stripe Stablecoin Accounts
+
+Stripe launched stablecoin financial accounts that allow businesses to hold, send, and receive USDC and USDB (Bridge-backed stablecoin).
+
+- **Country coverage:** 101 countries
+- **Target:** Businesses and platforms, not individual consumers
+- **Features:** USDC/USDB balances, conversion to fiat, payouts to bank accounts
+- **Notable inclusions:** Most of Latin America, Southeast Asia, Africa, EU, US
+- **Notable exclusions:** China, India, Russia, and sanctioned jurisdictions
+
+Stripe's 101-country list is one of the most practical references for stablecoin availability because it represents real on/off-ramp access, not just blockchain-level support.
+
+### Rain
+
+Rain provides card issuing infrastructure that connects stablecoin balances to Visa card payments.
+
+- **Country coverage:** 150+ countries for card acceptance
+- **Use case:** Spend stablecoin balances anywhere Visa is accepted
+- **Deployment model:** B2B -- fintech platforms integrate Rain to offer cards to their users
+- **Supported stablecoins:** USDC, USDT
+
+Rain's coverage is notable because it bridges the "last mile" problem: even in countries without crypto-to-fiat off-ramp infrastructure, a Visa card funded by stablecoins works at any merchant that accepts Visa.
+
+### Tether (USDT)
+
+Tether issues USDT, the largest stablecoin by market cap and daily trading volume.
+
+- **Country coverage:** 180+ countries (protocol level)
+- **Dominant regions:** Asia (especially China, Vietnam, Turkey), Latin America, Africa
+- **Blockchain support:** Ethereum, Tron (largest USDT volume), Solana, Avalanche, and others
+- **EU status:** Did not receive MiCA authorization -- several EU exchanges delisted USDT in early 2025
+
+USDT has the widest informal adoption globally. In countries like Turkey, Argentina, and Vietnam, USDT is often the default stablecoin for peer-to-peer trading and remittances. However, its regulatory position in Europe has weakened significantly since MiCA enforcement began.
+
+### EURC (Euro Stablecoin)
+
+Circle also issues EURC, a Euro-denominated stablecoin.
+
+- **Country coverage:** Available in the same jurisdictions as USDC
+- **Primary market:** Eurozone and SEPA countries
+- **Use case:** Euro-denominated payments without FX conversion
+- **Compliance:** MiCA-compliant
+
+EURC is relevant for businesses that operate in the Euro area and want to avoid USD/EUR conversion costs. It is still early in adoption compared to USDC and USDT.
+
+## Countries with Stablecoin-Friendly Regulations
+
+The following countries have established regulatory frameworks that explicitly accommodate or encourage stablecoin usage:
+
+| Country | Alpha-2 | Framework | Status | Notes |
+|---------|---------|-----------|--------|-------|
+| United Arab Emirates | AE | VARA (Dubai), FSRA (Abu Dhabi) | Active | Comprehensive crypto licensing since 2023 |
+| Singapore | SG | MAS Payment Services Act | Active | Licensed stablecoin framework since 2023 |
+| Hong Kong | HK | HKMA Stablecoin Ordinance | Active | Licensing regime effective 2025 |
+| EU (27 members) | -- | MiCA | Active | USDC compliant, USDT delisted from some exchanges |
+| United States | US | State-level + SEC/CFTC | Partial | No federal stablecoin law yet; state MTL licensing |
+| United Kingdom | GB | FCA + HMT framework | Active | Stablecoin regulation under Financial Services Act 2023 |
+| Japan | JP | Payment Services Act | Active | Yen-denominated stablecoins regulated since 2023 |
+| Switzerland | CH | FINMA | Active | Crypto-friendly, stablecoins classified as deposits or securities |
+| Brazil | BR | Central Bank framework | Active | Stablecoin regulation included in crypto asset framework 2024 |
+| Bahrain | BH | CBB sandbox + licensing | Active | Early mover in Gulf region |
+
+These countries provide legal certainty for stablecoin issuers and users. A stablecoin-friendly regulatory environment typically means: clear licensing requirements for issuers, consumer protection rules, reserve and audit requirements, and defined tax treatment.
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Countries with established stablecoin regulatory frameworks
+const stablecoinFriendlyCountries = [
+  'AE', 'SG', 'HK', 'US', 'GB', 'JP', 'CH', 'BR', 'BH',
+];
+
+// Add EU members
+const euStablecoinCountries = [
+  'AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES',
+  'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU',
+  'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK',
+];
+
+const allFriendly = [...stablecoinFriendlyCountries, ...euStablecoinCountries];
+
+allFriendly.map((code) => ({
+  code,
+  name: country.toName(code),
+}));
+```
+
+## Countries That Restrict or Ban Stablecoins
+
+Not every country welcomes stablecoins. Restrictions range from full bans to ambiguous regulatory positions that make compliance difficult.
+
+### China (CN)
+
+China banned all cryptocurrency transactions in 2021, including stablecoins. The ban covers trading, mining, and providing crypto-related services. Despite this, USDT remains widely used through peer-to-peer channels and OTC desks. The Tron network, which carries the majority of USDT volume globally, sees significant usage from Chinese traders operating through VPNs and offshore accounts.
+
+### India (IN)
+
+India's position is ambiguous. There is no explicit ban on stablecoins, but the regulatory environment is hostile:
+- 30% tax on crypto gains (introduced 2022)
+- 1% TDS (Tax Deducted at Source) on all crypto transactions
+- RBI has repeatedly expressed opposition to private cryptocurrencies
+- Major exchanges have restricted or exited the Indian market
+
+In practice, stablecoins are legal to hold and trade in India, but the tax burden and regulatory uncertainty make compliant usage difficult.
+
+### Nigeria (NG)
+
+Nigeria lifted its banking ban on crypto in late 2023 after years of restriction, and the SEC has begun licensing exchanges. However, the regulatory environment remains unpredictable. Ironically, Nigeria has some of the highest peer-to-peer stablecoin adoption in Africa, driven by naira devaluation and limited access to US dollars through official channels.
+
+### Turkey (TR)
+
+Turkey banned crypto payments for goods and services in 2021 but did not ban holding or trading. Stablecoins -- particularly USDT -- are widely held as a hedge against Turkish lira inflation. New legislation in 2024 introduced licensing requirements for crypto platforms, moving toward regulation rather than prohibition.
+
+### Other Restricted Jurisdictions
+
+| Country | Alpha-2 | Status | Notes |
+|---------|---------|--------|-------|
+| Russia | RU | Sanctioned | Excluded from most Western stablecoin platforms |
+| Iran | IR | Sanctioned | OFAC restrictions prevent service |
+| North Korea | KP | Sanctioned | Full exclusion |
+| Syria | SY | Sanctioned | OFAC restrictions |
+| Cuba | CU | Sanctioned | OFAC restrictions |
+| Myanmar | MM | Restricted | Military regime, limited access |
+| Bangladesh | BD | Banned | Crypto transactions illegal since 2017 |
+| Algeria | DZ | Banned | Crypto banned since 2018 |
+
+## Checking Country Eligibility Programmatically
+
+When building a stablecoin payment application, you need to check whether a user's country is eligible for your service. The `@koshmoney/countries` library provides the building blocks.
+
+### Basic Country Validation
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// Validate a country code is real before checking eligibility
+function isValidCountry(code: string): boolean {
+  return country.isValid(code);
+}
+
+isValidCountry('US'); // true
+isValidCountry('XX'); // false
+```
+
+### Build a Sanctions Check
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+// OFAC-sanctioned countries where stablecoin services are prohibited
+const SANCTIONED_COUNTRIES = new Set([
+  'CU', // Cuba
+  'IR', // Iran
+  'KP', // North Korea
+  'RU', // Russia
+  'SY', // Syria
+]);
+
+// Countries with additional restrictions
+const RESTRICTED_COUNTRIES = new Set([
+  'BD', // Bangladesh
+  'DZ', // Algeria
+  'MM', // Myanmar
+]);
+
+function getCountryEligibility(alpha2: string): {
+  eligible: boolean;
+  reason?: string;
+  countryName: string | null;
+} {
+  const name = country.toName(alpha2);
+
+  if (!name) {
+    return { eligible: false, reason: 'Invalid country code', countryName: null };
+  }
+
+  if (SANCTIONED_COUNTRIES.has(alpha2.toUpperCase())) {
+    return { eligible: false, reason: 'Sanctioned jurisdiction', countryName: name };
+  }
+
+  if (RESTRICTED_COUNTRIES.has(alpha2.toUpperCase())) {
+    return { eligible: false, reason: 'Restricted jurisdiction', countryName: name };
+  }
+
+  return { eligible: true, countryName: name };
+}
+
+getCountryEligibility('US');
+// { eligible: true, countryName: 'United States' }
+
+getCountryEligibility('IR');
+// { eligible: false, reason: 'Sanctioned jurisdiction', countryName: 'Iran' }
+
+getCountryEligibility('BD');
+// { eligible: false, reason: 'Restricted jurisdiction', countryName: 'Bangladesh' }
+```
+
+### Combine with Currency Data
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { membership } from '@koshmoney/countries/membership';
+
+// Determine which stablecoin to default for a country
+function getDefaultStablecoin(alpha2: string): 'USDC' | 'EURC' | 'USDT' {
+  const currencyCode = currency.getCurrencyCode(alpha2);
+
+  // Euro countries default to EURC
+  if (currencyCode === 'EUR' || membership.isEurozone(alpha2)) {
+    return 'EURC';
+  }
+
+  // USD countries default to USDC
+  if (currencyCode === 'USD') {
+    return 'USDC';
+  }
+
+  // SEPA countries may prefer EURC for Euro transfers
+  if (membership.isSEPA(alpha2)) {
+    return 'EURC';
+  }
+
+  // Default to USDC for all other countries
+  return 'USDC';
+}
+
+getDefaultStablecoin('DE'); // 'EURC' (Eurozone)
+getDefaultStablecoin('US'); // 'USDC' (USD country)
+getDefaultStablecoin('CH'); // 'EURC' (SEPA member)
+getDefaultStablecoin('SG'); // 'USDC' (default)
+getDefaultStablecoin('JP'); // 'USDC' (default)
+```
+
+### Filter Eligible Countries for a Dropdown
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+
+const EXCLUDED = new Set(['CU', 'IR', 'KP', 'RU', 'SY', 'BD', 'DZ', 'MM']);
+
+// Build a country selector for a stablecoin payment form
+const eligibleCountries = country
+  .all()
+  .filter((c) => !EXCLUDED.has(c.alpha2))
+  .map((c) => ({
+    value: c.alpha2,
+    label: c.name,
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+console.log(eligibleCountries.length);
+// ~241 countries (249 total minus excluded)
+```
+
+## USDC vs USDT: Availability Comparison
+
+The two dominant stablecoins differ significantly in where they are practically usable:
+
+| Factor | USDC (Circle) | USDT (Tether) |
+|--------|---------------|---------------|
+| Market cap (2026) | ~$60B | ~$140B |
+| Primary blockchains | Ethereum, Solana, Base, Arbitrum | Tron, Ethereum, Solana |
+| Country reach (protocol) | 180+ | 180+ |
+| EU availability | Full (MiCA-compliant) | Limited (delisted from major EU exchanges) |
+| US availability | Full | Available but less institutional adoption |
+| Asia adoption | Growing | Dominant (especially Tron-based) |
+| Latin America | Strong (Stripe, Circle partnerships) | Strong (P2P, OTC) |
+| Africa | Growing (through platforms) | Strong (P2P) |
+| Regulated exchange support | Coinbase, Kraken, Bitstamp | Binance, OKX, Bybit |
+| Reserve transparency | Monthly attestations by Deloitte | Quarterly attestations |
+| Off-ramp to fiat | Wide (bank integrations) | Variable (depends on region) |
+
+### Regional Breakdown
+
+**Europe:** USDC dominates regulated channels since MiCA enforcement. USDT is still available through non-EU exchanges and DeFi, but compliant European businesses will default to USDC or EURC.
+
+**Asia-Pacific:** USDT is the clear leader, especially on Tron. In markets like Vietnam, the Philippines, and Indonesia, USDT/Tron is the default for peer-to-peer stablecoin transfers. USDC is growing through institutional partnerships but lags in retail adoption.
+
+**Latin America:** Both stablecoins are widely used. USDC has stronger institutional presence through Circle's partnerships with Nubank (Brazil) and Mercado Pago (Argentina). USDT dominates informal P2P markets. Argentina, Brazil, Mexico, and Colombia are the four largest markets.
+
+**Middle East and North Africa:** UAE is the regional hub, with both USDC and USDT widely available through licensed exchanges. USDT dominates in Turkey for lira-hedging. North African countries are largely restricted.
+
+**Sub-Saharan Africa:** Nigeria, Kenya, South Africa, and Ghana lead stablecoin adoption. USDT has broader P2P penetration, but USDC is gaining through platform integrations.
+
+## Cross-Border Payment Corridors
+
+Stablecoins are most impactful on corridors where traditional banking infrastructure is expensive, slow, or inaccessible. These are the top stablecoin remittance and B2B payment routes:
+
+### High-Volume Remittance Corridors
+
+| Corridor | Direction | Primary Stablecoin | Why Stablecoins Win |
+|----------|-----------|-------------------|---------------------|
+| US to Mexico | US -> MX | USDC | Traditional remittance fees 5-8%, stablecoin under 1% |
+| US to Philippines | US -> PH | USDT | Banking hours mismatch, 2-3 day settlement via banks |
+| UAE to India | AE -> IN | USDT | Large migrant worker population, instant settlement |
+| UAE to Pakistan | AE -> PK | USDT | Similar corridor dynamics to India |
+| UK to Nigeria | GB -> NG | USDC/USDT | Naira volatility, limited FX access |
+| US to Colombia | US -> CO | USDC | Growing crypto adoption, regulated exchanges |
+| Saudi Arabia to Bangladesh | SA -> BD | USDT (P2P) | Despite BD restrictions, P2P routes exist |
+| Singapore to Indonesia | SG -> ID | USDT | Regional trade settlement |
+
+### B2B Payment Corridors
+
+| Corridor | Use Case | Primary Stablecoin |
+|----------|----------|-------------------|
+| US to India | Software services, outsourcing | USDC |
+| EU to Southeast Asia | Manufacturing payments | EURC/USDC |
+| China to Africa | Trade finance | USDT |
+| US to Latin America | SaaS, contractor payments | USDC |
+| Gulf States to East Africa | Trade, construction | USDT |
+
+### Checking Corridor Currencies
+
+```typescript copy
+import { currency } from '@koshmoney/countries/currency';
+import { country } from '@koshmoney/countries';
+
+// Map a payment corridor to understand FX implications
+function describeCorridor(fromCode: string, toCode: string) {
+  const fromCurrency = currency.getCurrencyCode(fromCode);
+  const toCurrency = currency.getCurrencyCode(toCode);
+  const fromName = country.toName(fromCode);
+  const toName = country.toName(toCode);
+
+  const sameCurrency = fromCurrency === toCurrency;
+
+  return {
+    from: { country: fromName, currency: fromCurrency },
+    to: { country: toName, currency: toCurrency },
+    requiresFX: !sameCurrency,
+    suggestedStablecoin: fromCurrency === 'EUR' ? 'EURC' : 'USDC',
+  };
+}
+
+describeCorridor('US', 'MX');
+// {
+//   from: { country: 'United States', currency: 'USD' },
+//   to: { country: 'Mexico', currency: 'MXN' },
+//   requiresFX: true,
+//   suggestedStablecoin: 'USDC'
+// }
+
+describeCorridor('DE', 'FR');
+// {
+//   from: { country: 'Germany', currency: 'EUR' },
+//   to: { country: 'France', currency: 'EUR' },
+//   requiresFX: false,
+//   suggestedStablecoin: 'EURC'
+// }
+```
+
+## Building Stablecoin Country Logic in Production
+
+For production applications, you will typically combine country data with your own eligibility rules:
+
+```typescript copy
+import { country } from '@koshmoney/countries';
+import { currency } from '@koshmoney/countries/currency';
+import { membership } from '@koshmoney/countries/membership';
+
+interface StablecoinConfig {
+  supportedStablecoins: ('USDC' | 'USDT' | 'EURC')[];
+  defaultStablecoin: 'USDC' | 'USDT' | 'EURC';
+  offRampAvailable: boolean;
+  regulatoryNotes?: string;
+}
+
+function getStablecoinConfig(alpha2: string): StablecoinConfig | null {
+  if (!country.isValid(alpha2)) return null;
+
+  const code = alpha2.toUpperCase();
+  const currencyCode = currency.getCurrencyCode(code);
+
+  // Sanctioned -- no service
+  const sanctioned = new Set(['CU', 'IR', 'KP', 'RU', 'SY']);
+  if (sanctioned.has(code)) return null;
+
+  // EU/Eurozone: USDC + EURC, no USDT (MiCA)
+  if (membership.isEU(code)) {
+    return {
+      supportedStablecoins: ['USDC', 'EURC'],
+      defaultStablecoin: currencyCode === 'EUR' ? 'EURC' : 'USDC',
+      offRampAvailable: true,
+      regulatoryNotes: 'MiCA-regulated. USDT not available on EU-licensed exchanges.',
+    };
+  }
+
+  // US: USDC primary
+  if (code === 'US') {
+    return {
+      supportedStablecoins: ['USDC', 'USDT'],
+      defaultStablecoin: 'USDC',
+      offRampAvailable: true,
+    };
+  }
+
+  // Default: all three, USDC default
+  return {
+    supportedStablecoins: ['USDC', 'USDT', 'EURC'],
+    defaultStablecoin: 'USDC',
+    offRampAvailable: true,
+  };
+}
+
+getStablecoinConfig('DE');
+// {
+//   supportedStablecoins: ['USDC', 'EURC'],
+//   defaultStablecoin: 'EURC',
+//   offRampAvailable: true,
+//   regulatoryNotes: 'MiCA-regulated. USDT not available on EU-licensed exchanges.'
+// }
+```
+
+## Summary
+
+Stablecoin availability in 2026 is shaped by three factors: protocol-level reach (180+ countries for both USDC and USDT), platform-level access (101 countries for Stripe, 150+ for Rain card issuing), and regulatory stance (ranging from stablecoin-specific licensing in UAE and Singapore to outright bans in China and Bangladesh).
+
+For developers building on stablecoins, the key decisions are: which stablecoin to default per region (USDC for regulated markets, USDT for Asia-Pacific P2P, EURC for the Eurozone), which countries to exclude (sanctioned jurisdictions at minimum), and how to handle the grey areas (India, Nigeria, Turkey) where stablecoins are used widely but regulation is still catching up.
+
+The `@koshmoney/countries` library gives you the country, currency, and membership data to build these eligibility checks programmatically rather than maintaining hardcoded lists.
+
+---
+
+## Related
+
+- [Countries Using the US Dollar](/blog/countries-using-us-dollar) -- All 18 countries where USD is the official currency
+- [Eurozone Countries List](/blog/eurozone-countries-list) -- All 21 Euro-area members
+- [SEPA Countries List](/blog/sepa-countries-list) -- All 36 SEPA member countries
+- [Currency API Reference](/docs/api/currency) -- Full currency module documentation

@@ -53,4 +53,6 @@ export default {
   'phone-country-codes-dial-codes': 'Phone Country Codes: Complete International Dial Code Reference',
   'eu-vs-eurozone-countries': 'EU Countries vs Eurozone Countries: What\'s the Difference?',
   'dollar-currencies-worldwide': 'Every Dollar Currency in the World: USD, AUD, CAD, and 20+ More',
+  'ofac-sanctioned-countries-developers': 'OFAC Sanctioned Countries: A Developer\'s Guide to Sanctions Compliance',
+  'stablecoin-supported-countries': 'Stablecoin Supported Countries 2026: Where USDC and USDT Work',
 }

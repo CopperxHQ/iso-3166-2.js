@@ -38,6 +38,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/docs/examples/nodejs`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     // Tools
     { url: `${BASE_URL}/tools/country-code-converter`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE_URL}/countries`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     // Guides (missing)
     { url: `${BASE_URL}/docs/guides/postal-code-formats`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     // Use Cases
@@ -98,6 +99,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'phone-country-codes-dial-codes',
     'eu-vs-eurozone-countries',
     'dollar-currencies-worldwide',
+    'ofac-sanctioned-countries-developers',
+    'stablecoin-supported-countries',
   ]
 
   const blogPages: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({

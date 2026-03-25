@@ -2,6 +2,78 @@ import type { CountryPageData } from '../../lib/country-data';
 import { CopyButton } from './copy-button';
 import { BreadcrumbSchema } from './breadcrumb-schema';
 
+const COUNTRY_BLOG_MAP: Record<string, { slug: string; title: string }[]> = {
+  DE: [
+    { slug: 'eurozone-countries-list', title: 'Eurozone Countries List 2026' },
+    { slug: 'german-state-codes-list', title: 'German State Codes' },
+    { slug: 'eu-country-codes-list', title: 'EU Country Codes' },
+    { slug: 'sepa-countries-list', title: 'SEPA Countries List' },
+  ],
+  FR: [
+    { slug: 'eurozone-countries-list', title: 'Eurozone Countries List 2026' },
+    { slug: 'french-region-codes-list', title: 'French Region Codes' },
+    { slug: 'eu-country-codes-list', title: 'EU Country Codes' },
+  ],
+  US: [
+    { slug: 'us-state-codes-list', title: 'US State Codes' },
+    { slug: 'countries-using-us-dollar', title: 'Countries Using the US Dollar' },
+    { slug: 'country-code-faq', title: 'Country Code FAQ' },
+  ],
+  GB: [
+    { slug: 'uk-country-codes-subdivisions', title: 'UK Country Codes & Subdivisions' },
+    { slug: 'uk-region-codes-list', title: 'UK Region Codes' },
+    { slug: 'sepa-countries-list', title: 'SEPA Countries List' },
+  ],
+  ES: [
+    { slug: 'spanish-community-codes-list', title: 'Spanish Community Codes' },
+    { slug: 'eurozone-countries-list', title: 'Eurozone Countries List 2026' },
+    { slug: 'eu-country-codes-list', title: 'EU Country Codes' },
+  ],
+  CN: [
+    { slug: 'chinese-province-codes-list', title: 'Chinese Province Codes' },
+    { slug: 'asian-countries-list-codes', title: 'Asian Countries List' },
+    { slug: 'country-code-faq', title: 'Country Code FAQ' },
+  ],
+  PT: [
+    { slug: 'eurozone-countries-list', title: 'Eurozone Countries List 2026' },
+    { slug: 'european-countries-list-codes', title: 'European Countries List' },
+    { slug: 'sepa-countries-list', title: 'SEPA Countries List' },
+  ],
+  IN: [
+    { slug: 'indian-state-codes-list', title: 'Indian State Codes' },
+    { slug: 'asian-countries-list-codes', title: 'Asian Countries List' },
+  ],
+  JP: [
+    { slug: 'japanese-prefecture-codes-list', title: 'Japanese Prefecture Codes' },
+    { slug: 'asian-countries-list-codes', title: 'Asian Countries List' },
+  ],
+  BR: [
+    { slug: 'brazilian-state-codes-list', title: 'Brazilian State Codes' },
+    { slug: 'south-american-countries-list-codes', title: 'South American Countries' },
+  ],
+  IT: [
+    { slug: 'italian-region-codes-list', title: 'Italian Region Codes' },
+    { slug: 'eurozone-countries-list', title: 'Eurozone Countries List 2026' },
+    { slug: 'eu-country-codes-list', title: 'EU Country Codes' },
+  ],
+  AU: [
+    { slug: 'australian-state-codes-list', title: 'Australian State Codes' },
+    { slug: 'oceania-countries-list-codes', title: 'Oceania Countries List' },
+  ],
+  MX: [
+    { slug: 'mexican-state-codes-list', title: 'Mexican State Codes' },
+    { slug: 'north-american-countries-list-codes', title: 'North American Countries' },
+  ],
+  KR: [
+    { slug: 'south-korean-province-codes-list', title: 'South Korean Province Codes' },
+    { slug: 'asian-countries-list-codes', title: 'Asian Countries List' },
+  ],
+  CA: [
+    { slug: 'canadian-province-codes', title: 'Canadian Province Codes' },
+    { slug: 'north-american-countries-list-codes', title: 'North American Countries' },
+  ],
+};
+
 function CodeCard({
   label,
   value,
@@ -163,6 +235,28 @@ function RelatedCountries({ data }: { data: CountryPageData }) {
   );
 }
 
+function RelatedArticles({ data }: { data: CountryPageData }) {
+  const articles = COUNTRY_BLOG_MAP[data.alpha2];
+  if (!articles?.length) return null;
+
+  return (
+    <div className="mt-6">
+      <h2 className="text-xl font-normal text-white">Related Articles</h2>
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {articles.map((a) => (
+          <a
+            key={a.slug}
+            href={`/blog/${a.slug}`}
+            className="rounded-lg border border-slate-800 px-4 py-3 text-sm text-slate-300 transition hover:border-sky-500/30 hover:bg-slate-800/50"
+          >
+            {a.title}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function CountryPageLayout({ data }: { data: CountryPageData }) {
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -223,6 +317,17 @@ export function CountryPageLayout({ data }: { data: CountryPageData }) {
         </p>
       </header>
 
+      {/* About section */}
+      <div className="mt-6">
+        <h2 className="text-xl font-normal text-white">About {data.name}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+          {data.name} ({data.alpha2}) is located in {data.continent}{data.region ? `, ${data.region}` : ''}.
+          {data.currency ? ` The official currency is the ${data.currency.name} (${data.currency.code}).` : ''}
+          {data.subdivisionCount > 0 ? ` It has ${data.subdivisionCount} administrative subdivisions defined in ISO 3166-2.` : ''}
+          {data.memberships.length > 0 ? ` ${data.name} is a member of ${data.memberships.join(', ')}.` : ''}
+        </p>
+      </div>
+
       <div className="grid grid-cols-3 gap-3">
         <CodeCard label="Alpha-2" value={data.alpha2} />
         <CodeCard label="Alpha-3" value={data.alpha3} />
@@ -257,6 +362,7 @@ export function CountryPageLayout({ data }: { data: CountryPageData }) {
       <CodeExample data={data} />
       <SubdivisionPreview data={data} />
       <FAQ data={data} />
+      <RelatedArticles data={data} />
       <RelatedCountries data={data} />
 
       <div className="mt-8 rounded-xl bg-sky-500/10 p-6 ring-1 ring-sky-500/20">
