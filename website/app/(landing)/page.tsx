@@ -23,6 +23,8 @@ import { SiteFooter } from '../_components/site-footer'
 
 /* ─── Data ────────────────────────────────────────────────────────────── */
 
+const LAST_UPDATED = 'March 2026'
+
 const FEATURES = [
   { icon: GlobeIcon, title: '249 Countries', desc: 'Full ISO 3166-1 with alpha-2, alpha-3, and numeric codes.' },
   { icon: MapPin, title: '5,000+ Subdivisions', desc: 'ISO 3166-2 states, provinces, regions, and territories.' },
@@ -40,6 +42,7 @@ const COMPARISON = [
   { feature: 'TypeScript', ours: 'Built-in', a: '@types', b: 'Built-in', c: 'Partial' },
   { feature: 'Tree-Shaking', ours: 'Per-country', a: false, b: false, c: false },
   { feature: 'Zero Deps', ours: 'Core', a: false, b: true, c: true },
+  { feature: 'Last Updated', ours: LAST_UPDATED, a: '2023', b: '2024', c: '2024' },
 ]
 
 const CODE_TABS = [
@@ -175,6 +178,8 @@ export default function HomePage() {
               <span><strong className="text-white">5,000+</strong> Subdivisions</span>
               <span><strong className="text-white">150+</strong> Postal Codes</span>
               <span><strong className="text-white">8KB</strong> Min Bundle</span>
+              <span className="text-slate-600">·</span>
+              <span>Updated <strong className="text-white">{LAST_UPDATED}</strong></span>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="/docs/getting-started" className="inline-flex items-center gap-2 rounded-lg bg-sky-400 px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-sky-300">
