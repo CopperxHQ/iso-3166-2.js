@@ -11,6 +11,7 @@ on:
     paths:
       - 'website/**'
       - 'src/**'
+  workflow_dispatch:
 
 env:
   VERCEL_ORG_ID: team_XfLFiZjBzWGeFIoVP1sV2ZXs
