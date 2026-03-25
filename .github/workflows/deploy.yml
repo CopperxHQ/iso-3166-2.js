@@ -30,7 +30,7 @@ jobs:
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN_PUBLIC_REPO }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-args: ${{ github.event_name == 'push' && '--prod' || '' }}
+          vercel-args: ${{ github.event_name != 'pull_request' && '--prod' || '' }}
           vercel-org-id: ${{ env.VERCEL_ORG_ID }}
           vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
           working-directory: website
