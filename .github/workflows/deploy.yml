@@ -26,13 +26,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Copy library source into website for Vercel
         run: cp -r src website/_pkg
-      - uses: rkalkani/vercel-action@v25
+      - uses: CopperxHQ/vercel-action@v25.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN_PUBLIC_REPO }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-args: ${{ github.event_name != 'pull_request' && '--prod' || '' }}
           vercel-org-id: ${{ env.VERCEL_ORG_ID }}
           vercel-project-id: ${{ env.VERCEL_PROJECT_ID }}
+          vercel-version: 48
           working-directory: website
           scope: copperx-hq
           github-comment: false
