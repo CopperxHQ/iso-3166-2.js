@@ -6,6 +6,10 @@ on:
     paths:
       - 'package.json'
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   publish-beta:
     runs-on: ubuntu-latest
